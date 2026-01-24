@@ -24,6 +24,7 @@ class SuperadminMenuSeeder extends Seeder
 
         // Create menu
         $this->dashboardMenu();
+        $this->ppobMenu();
         $this->managementMenu();
     }
 
@@ -36,6 +37,51 @@ class SuperadminMenuSeeder extends Seeder
             'icon' => 'LayoutGrid',
             'order' => 1,
             'active_pattern' => '/cms/dashboard',
+            'status' => 1,
+        ]);
+    }
+
+    public function ppobMenu()
+    {
+        $ppob = Menu::create([
+            'role_id' => $this->role->id,
+            'name' => 'PPOB',
+            'url' => '#',
+            'icon' => 'Box',
+            'order' => 10,
+            'active_pattern' => '/cms/ppob',
+            'status' => 1,
+        ]);
+        $ppob->subMenu()->create([
+            'role_id' => $this->role->id,
+            'name' => 'Categories',
+            'url' => '/cms/ppob/categories',
+            'order' => 1,
+            'active_pattern' => '/cms/ppob/categories',
+            'status' => 1,
+        ]);
+        $ppob->subMenu()->create([
+            'role_id' => $this->role->id,
+            'name' => 'Brands',
+            'url' => '/cms/ppob/brands',
+            'order' => 2,
+            'active_pattern' => '/cms/ppob/brands',
+            'status' => 1,
+        ]);
+        $ppob->subMenu()->create([
+            'role_id' => $this->role->id,
+            'name' => 'Products',
+            'url' => '/cms/ppob/products',
+            'order' => 3,
+            'active_pattern' => '/cms/ppob/products',
+            'status' => 1,
+        ]);
+        $ppob->subMenu()->create([
+            'role_id' => $this->role->id,
+            'name' => 'Migrate Products',
+            'url' => '/cms/ppob/products/import-digiflazz',
+            'order' => 4,
+            'active_pattern' => '/cms/ppob/products/import-digiflazz',
             'status' => 1,
         ]);
     }

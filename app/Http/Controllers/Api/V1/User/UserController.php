@@ -104,7 +104,6 @@ class UserController extends Controller
         return $this->responseWithSuccess($action->handle($user));
     }
 
-
     /**
      * Update the password of the specified resource in storage.
      */

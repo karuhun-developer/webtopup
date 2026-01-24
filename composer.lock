@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "03e578b28cdd47c843fa5a59475c4fd4",
+    "content-hash": "cf70b02363c8df8496e9d125fb88570f",
     "packages": [
         {
             "name": "aaronfrancis/fast-paginate",
@@ -7369,6 +7369,125 @@
                 "source": "https://github.com/tijsverkoyen/CssToInlineStyles/tree/v2.4.0"
             },
             "time": "2025-12-02T11:56:42+00:00"
+        },
+        {
+            "name": "triyatna/digiflazz-laravel-4buyer",
+            "version": "1.0.0",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/triyatna/digiflazz-laravel-4buyer.git",
+                "reference": "9dfa95f7f445ab559d33cc21b98a11d80922fd61"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/triyatna/digiflazz-laravel-4buyer/zipball/9dfa95f7f445ab559d33cc21b98a11d80922fd61",
+                "reference": "9dfa95f7f445ab559d33cc21b98a11d80922fd61",
+                "shasum": ""
+            },
+            "require": {
+                "illuminate/contracts": "^11.0 || ^12.0",
+                "illuminate/http": "^11.0 || ^12.0",
+                "illuminate/support": "^11.0 || ^12.0",
+                "php": "^8.2"
+            },
+            "type": "library",
+            "extra": {
+                "laravel": {
+                    "aliases": {
+                        "Digiflazz": "Triyatna\\Digiflazz\\Digiflazz"
+                    },
+                    "providers": [
+                        "Triyatna\\Digiflazz\\DigiflazzServiceProvider"
+                    ]
+                }
+            },
+            "autoload": {
+                "psr-4": {
+                    "Triyatna\\Digiflazz\\": "src/"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "Tri Yatna",
+                    "email": "triyatna.dev@gmail.com"
+                }
+            ],
+            "description": "Unofficial laravel package for integrating Digiflazz API (Buyer)",
+            "homepage": "https://github.com/triyatna/digiflazz-laravel-4buyer",
+            "keywords": [
+                "Topup",
+                "api",
+                "digiflazz",
+                "digiflazz api",
+                "digiflazz api buyer",
+                "digiflazz buyer",
+                "digiflazz laravel",
+                "digiflazz laravel buyer",
+                "laravel",
+                "payment",
+                "php",
+                "service"
+            ],
+            "support": {
+                "issues": "https://github.com/triyatna/digiflazz-laravel-4buyer/issues",
+                "source": "https://github.com/triyatna/digiflazz-laravel-4buyer/tree/1.0.0"
+            },
+            "time": "2025-06-24T01:00:35+00:00"
+        },
+        {
+            "name": "triyatna/php-valid-game",
+            "version": "1.0.1",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/triyatna/php-valid-game.git",
+                "reference": "359bc2618ceb8cac5d6cfeeb2116c290bb7bb31f"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/triyatna/php-valid-game/zipball/359bc2618ceb8cac5d6cfeeb2116c290bb7bb31f",
+                "reference": "359bc2618ceb8cac5d6cfeeb2116c290bb7bb31f",
+                "shasum": ""
+            },
+            "require": {
+                "guzzlehttp/guzzle": "^7.8",
+                "php": "^8.2",
+                "psr/log": "^3.0"
+            },
+            "require-dev": {
+                "friendsofphp/php-cs-fixer": "^3.64",
+                "phpstan/phpstan": "^1.11",
+                "phpunit/phpunit": "^11.0"
+            },
+            "type": "library",
+            "extra": {
+                "laravel": {
+                    "aliases": {
+                        "ValidGame": "Triyatna\\PhpValidGame\\Laravel\\Facades\\ValidGame"
+                    },
+                    "providers": [
+                        "Triyatna\\PhpValidGame\\Laravel\\ValidGameServiceProvider"
+                    ]
+                }
+            },
+            "autoload": {
+                "psr-4": {
+                    "Triyatna\\PhpValidGame\\": "src/"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "description": "Validate user id from games with php (scraper php)",
+            "support": {
+                "issues": "https://github.com/triyatna/php-valid-game/issues",
+                "source": "https://github.com/triyatna/php-valid-game/tree/1.0.1"
+            },
+            "time": "2025-09-15T18:49:16+00:00"
         },
         {
             "name": "vlucas/phpdotenv",
