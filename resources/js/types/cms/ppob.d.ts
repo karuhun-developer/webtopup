@@ -50,3 +50,31 @@ export interface PPOBDepositDataItem {
     created_at: string;
     updated_at: string;
 }
+
+export interface DigiflazzProductDataItem {
+    product_name: string;
+    category: string;
+    brand: string;
+    type: string;
+    seller_name: string;
+    price: number;
+    buyer_sku_code: string;
+    buyer_product_status: boolean;
+    seller_product_status: boolean;
+    unlimited_stock: boolean;
+    stock: number;
+    multi: boolean;
+    start_cut_off: string;
+    end_cut_off: string;
+    desc: string;
+}
+
+export interface DigiflazzBrandGroup {
+    name: string;
+    products: DigiflazzProductDataItem[];
+}
+
+export interface DigiflazzCategoryGroup {
+    name: string;
+    brands: DigiflazzBrandGroup[];
+}

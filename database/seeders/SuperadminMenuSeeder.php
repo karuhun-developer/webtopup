@@ -79,9 +79,9 @@ class SuperadminMenuSeeder extends Seeder
         $ppob->subMenu()->create([
             'role_id' => $this->role->id,
             'name' => 'Migrate Products',
-            'url' => '/cms/ppob/products/import-digiflazz',
+            'url' => '/cms/ppob/import-digiflazz',
             'order' => 4,
-            'active_pattern' => '/cms/ppob/products/import-digiflazz',
+            'active_pattern' => '/cms/ppob/import-digiflazz',
             'status' => 1,
         ]);
     }
