@@ -11,8 +11,24 @@ interface Product {
     rating: number;
 }
 
+interface Category {
+    id: number;
+    name: string;
+    icon: string;
+    count: number;
+}
+
+interface Brand {
+    id: number;
+    name: string;
+    logo: string;
+    category: string;
+}
+
 interface Props {
     products?: Product[];
+    categories?: Category[];
+    brands?: Brand[];
 }
 
 const props = withDefaults(defineProps<Props>(), {
@@ -90,6 +106,23 @@ const props = withDefaults(defineProps<Props>(), {
             rating: 5,
         },
     ],
+    categories: () => [
+        { id: 1, name: 'Games', icon: '🎮', count: 150 },
+        { id: 2, name: 'Pulsa', icon: '📱', count: 12 },
+        { id: 3, name: 'Data', icon: '📶', count: 24 },
+        { id: 4, name: 'E-Wallet', icon: '💳', count: 8 },
+        { id: 5, name: 'Voucher', icon: '🎫', count: 45 },
+    ],
+    brands: () => [
+        { id: 1, name: 'Mobile Legends', logo: 'https://placehold.co/100x100/7C3AED/FFFFFF?text=ML', category: 'Games' },
+        { id: 2, name: 'PUBG Mobile', logo: 'https://placehold.co/100x100/F59E0B/FFFFFF?text=PUBG', category: 'Games' },
+        { id: 3, name: 'Free Fire', logo: 'https://placehold.co/100x100/DC2626/FFFFFF?text=FF', category: 'Games' },
+        { id: 4, name: 'Genshin Impact', logo: 'https://placehold.co/100x100/8B5CF6/FFFFFF?text=GI', category: 'Games' },
+        { id: 5, name: 'Telkomsel', logo: 'https://placehold.co/100x100/DC2626/FFFFFF?text=TSEL', category: 'Pulsa' },
+        { id: 6, name: 'XL Axiata', logo: 'https://placehold.co/100x100/3B82F6/FFFFFF?text=XL', category: 'Pulsa' },
+        { id: 7, name: 'Indosat', logo: 'https://placehold.co/100x100/F59E0B/FFFFFF?text=ISAT', category: 'Pulsa' },
+        { id: 8, name: 'Tri', logo: 'https://placehold.co/100x100/EC4899/FFFFFF?text=TRI', category: 'Pulsa' },
+    ],
 });
 </script>
 
@@ -104,6 +137,45 @@ const props = withDefaults(defineProps<Props>(), {
         <main class="mx-auto max-w-7xl px-4 py-8">
             <!-- Hero Banner -->
             <HeroBanner class="mb-8" />
+
+            <!-- Categories Section -->
+            <section class="mb-8">
+                <div class="mb-4">
+                    <h2 class="text-xl font-bold text-foreground">Kategori</h2>
+                </div>
+                <div class="flex gap-3 overflow-x-auto pb-2">
+                    <button
+                        v-for="category in categories"
+                        :key="category.id"
+                        class="flex min-w-[140px] flex-col items-center gap-2 rounded-lg border border-border/50 bg-card p-4 transition-all hover:scale-105 hover:border-primary/50 hover:shadow-md"
+                    >
+                        <span class="text-3xl">{{ category.icon }}</span>
+                        <span class="text-sm font-semibold text-foreground">{{ category.name }}</span>
+                        <span class="text-xs text-muted-foreground">{{ category.count }} produk</span>
+                    </button>
+                </div>
+            </section>
+
+            <!-- Brands Section -->
+            <section class="mb-8">
+                <div class="mb-4">
+                    <h2 class="text-xl font-bold text-foreground">Brand Populer</h2>
+                </div>
+                <div class="flex gap-3 overflow-x-auto pb-2">
+                    <button
+                        v-for="brand in brands"
+                        :key="brand.id"
+                        class="flex min-w-[100px] flex-col items-center gap-2 rounded-lg border border-border/50 bg-card p-3 transition-all hover:scale-105 hover:border-primary/50 hover:shadow-md"
+                    >
+                        <img
+                            :src="brand.logo"
+                            :alt="brand.name"
+                            class="h-12 w-12 rounded-md object-cover"
+                        />
+                        <span class="text-center text-xs font-medium text-foreground">{{ brand.name }}</span>
+                    </button>
+                </div>
+            </section>
 
             <!-- Products Section -->
             <section>
