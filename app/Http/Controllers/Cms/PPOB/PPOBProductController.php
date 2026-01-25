@@ -2,32 +2,24 @@
 
 namespace App\Http\Controllers\Cms\PPOB;
 
-use App\Actions\Cms\PPOB\PPOBBrand\DeletePPOBBrandAction;
-use App\Actions\Cms\PPOB\PPOBBrand\StorePPOBBrandAction;
-use App\Actions\Cms\PPOB\PPOBBrand\UpdatePPOBBrandAction;
+use App\Actions\Cms\PPOB\PPOBProduct\DeletePPOBProductAction;
+use App\Actions\Cms\PPOB\PPOBProduct\StorePPOBProductAction;
+use App\Actions\Cms\PPOB\PPOBProduct\UpdatePPOBProductAction;
 use App\Http\Controllers\Controller;
-use App\Http\Requests\Cms\PPOB\PPOBBrand\StorePPOBBrandRequest;
-use App\Http\Requests\Cms\PPOB\PPOBBrand\UpdatePPOBBrandRequest;
+use App\Http\Requests\Cms\PPOB\PPOBProduct\StorePPOBProductRequest;
+use App\Http\Requests\Cms\PPOB\PPOBProduct\UpdatePPOBProductRequest;
 use App\Models\PPOB\PPOBBrand;
 use App\Models\PPOB\PPOBCategory;
+use App\Models\PPOB\PPOBProduct;
 use App\Traits\WithGetFilterData;
-use App\Traits\WithReturnResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Gate;
 
-class PPOBBrandController extends Controller
+class PPOBProductController extends Controller
 {
-    use WithGetFilterData, WithReturnResponse;
+    use WithGetFilterData;
 
-    protected string $resource = PPOBBrand::class;
-
-    /**
-     * Display all json the resource.
-     */
-    public function jsonAll(Request $request)
-    {
-        return $this->responseWithSuccess(PPOBBrand::where('status', true)->where('p_p_o_b_category_id', $request->category_id)->get());
-    }
+    protected string $resource = PPOBProduct::class;
 
     /**
      * Display a listing of the resource.
@@ -43,12 +35,19 @@ class PPOBBrandController extends Controller
         $search = $request?->search ?? '';
 
         $model = $this->getDataWithFilter(
-            model: PPOBBrand::with('media', 'category')->when($request->has('filter_category_id'), function ($query) use ($request) {
-                $query->where('p_p_o_b_category_id', $request->filter_category_id);
+            model: PPOBProduct::with('media', 'brand.category')->when($request->has('filter_category_id'), function ($query) use ($request) {
+                $query->whereHas('brand', function ($q) use ($request) {
+                    $q->where('p_p_o_b_category_id', $request->filter_category_id);
+                });
+            })->when($request->has('filter_brand_id'), function ($query) use ($request) {
+                $query->where('p_p_o_b_brand_id', $request->filter_brand_id);
             }),
             searchBy: [
                 'name',
+                'sku',
                 'description',
+                'buy_price',
+                'sell_price',
             ],
             order: $order,
             orderBy: $orderBy,
@@ -64,8 +63,11 @@ class PPOBBrandController extends Controller
             return $item;
         });
 
-        return inertia('cms/ppob/ppob-brand/Index', [
+        return inertia('cms/ppob/ppob-product/Index', [
             'categories' => PPOBCategory::where('status', true)->get(),
+            'brands' => PPOBBrand::where('status', true)->where('p_p_o_b_category_id', $request->filter_category_id)->get(),
+            'filter_category_id' => (int) $request->filter_category_id ?? null,
+            'filter_brand_id' => (int) $request->filter_brand_id ?? null,
             'data' => $model,
             'order' => $order,
             'orderBy' => $orderBy,
@@ -83,7 +85,7 @@ class PPOBBrandController extends Controller
     {
         Gate::authorize('create'.$this->resource);
 
-        return inertia('cms/ppob/ppob-brand/Create', [
+        return inertia('cms/ppob/ppob-product/Create', [
             'categories' => PPOBCategory::where('status', true)->get(),
         ]);
     }
@@ -91,7 +93,7 @@ class PPOBBrandController extends Controller
     /**
      * Store a newly created resource in storage.
      */
-    public function store(StorePPOBBrandRequest $request, StorePPOBBrandAction $action)
+    public function store(StorePPOBProductRequest $request, StorePPOBProductAction $action)
     {
         Gate::authorize('create'.$this->resource);
 
@@ -103,7 +105,7 @@ class PPOBBrandController extends Controller
     /**
      * Display the specified resource.
      */
-    public function show(PPOBBrand $brand)
+    public function show(PPOBProduct $product)
     {
         //
     }
@@ -111,26 +113,26 @@ class PPOBBrandController extends Controller
     /**
      * Show the form for editing the specified resource.
      */
-    public function edit(PPOBBrand $brand)
+    public function edit(PPOBProduct $product)
     {
         Gate::authorize('update'.$this->resource);
 
-        $brand->image = $brand->getFirstMediaUrl('image');
+        $product->image = $product->getFirstMediaUrl('image');
 
-        return inertia('cms/ppob/ppob-brand/Edit', [
+        return inertia('cms/ppob/ppob-product/Edit', [
             'categories' => PPOBCategory::where('status', true)->get(),
-            'brand' => $brand,
+            'product' => $product->load('brand'),
         ]);
     }
 
     /**
      * Update the specified resource in storage.
      */
-    public function update(UpdatePPOBBrandRequest $request, PPOBBrand $brand, UpdatePPOBBrandAction $action)
+    public function update(UpdatePPOBProductRequest $request, PPOBProduct $product, UpdatePPOBProductAction $action)
     {
         Gate::authorize('update'.$this->resource);
 
-        $action->handle($brand, $request->validated());
+        $action->handle($product, $request->validated());
 
         return back();
     }
@@ -138,11 +140,11 @@ class PPOBBrandController extends Controller
     /**
      * Remove the specified resource from storage.
      */
-    public function destroy(PPOBBrand $brand, DeletePPOBBrandAction $action)
+    public function destroy(PPOBProduct $product, DeletePPOBProductAction $action)
     {
         Gate::authorize('delete'.$this->resource);
 
-        $action->handle($brand);
+        $action->handle($product);
 
         return back();
     }

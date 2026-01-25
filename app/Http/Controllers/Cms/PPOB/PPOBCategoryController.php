@@ -100,6 +100,8 @@ class PPOBCategoryController extends Controller
     {
         Gate::authorize('update'.$this->resource);
 
+        $category->image = $category->getFirstMediaUrl('image');
+
         return inertia('cms/ppob/ppob-category/Edit', [
             'category' => $category,
         ]);
