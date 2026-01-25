@@ -16,7 +16,7 @@ class UpdatePPOBProductRequest extends FormRequest
         return [
             'p_p_o_b_brand_id' => 'required|exists:p_p_o_b_brands,id',
             'name' => 'required|string|max:255',
-            'sku' => 'nullable|string|max:100|unique:p_p_o_b_products,sku,' . $this->product->id,
+            'sku' => 'nullable|string|max:100|unique:p_p_o_b_products,sku,'.$this->product->id,
             'description' => 'nullable|string|max:1000',
             'buy_price' => 'required|numeric|min:0',
             'sell_price' => 'required|numeric|min:0',

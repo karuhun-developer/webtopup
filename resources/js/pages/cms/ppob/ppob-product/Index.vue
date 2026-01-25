@@ -3,7 +3,6 @@ import {
     create,
     destroy,
     edit,
-    index,
 } from '@/actions/App/Http/Controllers/Cms/PPOB/PPOBProductController';
 import Heading from '@/components/Heading.vue';
 import ResourceTable from '@/components/ResourceTable.vue';
@@ -16,6 +15,7 @@ import {
     SelectTrigger,
     SelectValue,
 } from '@/components/ui/select';
+import { useFilter } from '@/composables/useFilter';
 import { usePermission } from '@/composables/usePermission';
 import { useSwal } from '@/composables/useSwal';
 import AppLayout from '@/layouts/AppLayout.vue';
@@ -87,34 +87,38 @@ const breadcrumbItems: BreadcrumbItem[] = [
 const filter_category_id = ref<number | null>(props.filter_category_id || null);
 const filter_brand_id = ref<number | null>(props.filter_brand_id || null);
 
+const { updateParams } = useFilter();
+
 watch(filter_category_id, (newValue) => {
-    const currentParams = new URLSearchParams(window.location.search);
-    const query: Record<string, any> = {};
-    currentParams.forEach((value, key) => {
-        query[key] = value;
-    });
-    if (newValue) {
-        query.filter_category_id = newValue;
+    const params: Record<string, any> = {};
+
+    if (newValue !== null) {
+        params.filter_category_id = newValue;
+    } else {
+        params.filter_category_id = null;
     }
-    router.get(index().url, query, {
-        preserveState: true,
-        replace: true,
-    });
+
+    params.filter_brand_id = null; // Reset brand filter when category changes
+
+    // Reset to page 1 when filter changes
+    params.page = 1;
+
+    updateParams(params);
 });
 
 watch(filter_brand_id, (newValue) => {
-    const currentParams = new URLSearchParams(window.location.search);
-    const query: Record<string, any> = {};
-    currentParams.forEach((value, key) => {
-        query[key] = value;
-    });
-    if (newValue) {
-        query.filter_brand_id = newValue;
+    const params: Record<string, any> = {};
+
+    if (newValue !== null) {
+        params.filter_brand_id = newValue;
+    } else {
+        params.filter_brand_id = null;
     }
-    router.get(index().url, query, {
-        preserveState: true,
-        replace: true,
-    });
+
+    // Reset to page 1 when filter changes
+    params.page = 1;
+
+    updateParams(params);
 });
 </script>
 

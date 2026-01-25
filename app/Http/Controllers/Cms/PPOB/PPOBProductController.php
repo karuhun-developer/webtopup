@@ -35,11 +35,11 @@ class PPOBProductController extends Controller
         $search = $request?->search ?? '';
 
         $model = $this->getDataWithFilter(
-            model: PPOBProduct::with('media', 'brand.category')->when($request->has('filter_category_id'), function ($query) use ($request) {
+            model: PPOBProduct::with('media', 'brand.category')->when($request->filter_category_id, function ($query) use ($request) {
                 $query->whereHas('brand', function ($q) use ($request) {
                     $q->where('p_p_o_b_category_id', $request->filter_category_id);
                 });
-            })->when($request->has('filter_brand_id'), function ($query) use ($request) {
+            })->when($request->filter_brand_id, function ($query) use ($request) {
                 $query->where('p_p_o_b_brand_id', $request->filter_brand_id);
             }),
             searchBy: [
