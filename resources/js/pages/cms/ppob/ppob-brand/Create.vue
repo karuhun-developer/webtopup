@@ -34,11 +34,9 @@ const description = ref<string>('');
 <template>
     <Modal v-slot="{ close }">
         <div class="p-6">
-            <h2 class="text-lg font-medium text-gray-900 dark:text-gray-100">
-                Create PPOB Brand
-            </h2>
+            <h2 class="text-lg font-medium">Create PPOB Brand</h2>
 
-            <p class="mt-1 text-sm text-gray-600 dark:text-gray-400">
+            <p class="mt-1 text-sm text-muted-foreground">
                 Create a new PPOB brand by filling out the form below.
             </p>
 

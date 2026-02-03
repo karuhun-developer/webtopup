@@ -25,7 +25,7 @@ class HomeController extends Controller
             'products' => inertia()->scroll(fn () => PPOBBrand::query()
                 ->with('category', 'media')
                 ->when($category, fn ($query) => $query->where('p_p_o_b_category_id', $category->id))
-                ->paginate(12)
+                ->simplePaginate(12)
                 ->through(function ($brand) {
                     $brand->image = $brand->getFirstMediaUrl('image');
                     $brand->makeHidden('media');

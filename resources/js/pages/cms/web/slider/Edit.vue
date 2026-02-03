@@ -1,12 +1,11 @@
 <script setup lang="ts">
-import { update } from '@/actions/App/Http/Controllers/Cms/PPOB/PPOBCategoryController';
+import { update } from '@/actions/App/Http/Controllers/Cms/Web/SliderController';
 import ImageUploadPreview from '@/components/ImageUploadPreview.vue';
 import InputDescription from '@/components/InputDescription.vue';
 import InputError from '@/components/InputError.vue';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import QuilTextEditor from '@/components/ui/quil-editor/QuilTextEditor.vue';
 import {
     Select,
     SelectContent,
@@ -15,39 +14,35 @@ import {
     SelectValue,
 } from '@/components/ui/select';
 import { useSwal } from '@/composables/useSwal';
-import { PPOBCategoryDataItem } from '@/types/cms/ppob';
+import { SliderDataItem } from '@/types/cms/web';
 import { Form } from '@inertiajs/vue3';
 import { Modal } from '@inertiaui/modal-vue';
 import { Save } from 'lucide-vue-next';
-import { ref } from 'vue';
 
 const props = defineProps<{
-    category: PPOBCategoryDataItem;
+    slider: SliderDataItem;
 }>();
 
 const { toast } = useSwal();
-
-// Description state
-const description = ref<string>(props.category.description || '');
 </script>
 
 <template>
     <Modal v-slot="{ close }">
         <div class="p-6">
-            <h2 class="text-lg font-medium">Edit PPOB Category</h2>
+            <h2 class="text-lg font-medium">Edit Slider</h2>
 
             <p class="mt-1 text-sm text-muted-foreground">
-                Edit the PPOB Category details by modifying the form below.
+                Edit the Slider details by modifying the form below.
             </p>
 
             <Form
-                v-bind="update.form({ category: category.slug })"
+                v-bind="update.form({ slider: slider.id })"
                 class="mt-6 space-y-6"
                 @success="
                     () => {
                         toast.fire({
                             icon: 'success',
-                            title: 'PPOB Category updated successfully.',
+                            title: 'Slider updated successfully.',
                         });
                         close();
                     }
@@ -55,70 +50,81 @@ const description = ref<string>(props.category.description || '');
                 v-slot="{ errors, processing }"
             >
                 <div class="grid gap-2">
-                    <Label for="name">Name</Label>
+                    <Label for="title">Title</Label>
                     <InputDescription>
-                        The name of the PPOB category.
+                        The title of the Slider.
                     </InputDescription>
                     <Input
-                        id="name"
-                        name="name"
+                        id="title"
+                        name="title"
                         type="text"
                         class="mt-1 block w-full"
                         required
                         autofocus
-                        :default-value="category.name"
+                        :default-value="slider.title"
                     />
-                    <InputError :message="errors.name" />
+                    <InputError :message="errors.title" />
                 </div>
 
                 <div class="grid gap-2">
-                    <Label for="description">Description</Label>
+                    <Label for="order">Order</Label>
                     <InputDescription>
-                        A brief description of the PPOB category.
+                        The order of the Slider.
                     </InputDescription>
                     <Input
-                        id="description"
-                        name="description"
-                        type="hidden"
-                        :value="description"
+                        id="order"
+                        name="order"
+                        type="number"
+                        class="mt-1 block w-full"
+                        required
+                        autofocus
+                        :default-value="slider.order"
                     />
-                    <QuilTextEditor
-                        :content="description"
-                        @update:content="
-                            (value) => {
-                                description = value;
-                            }
-                        "
+                    <InputError :message="errors.order" />
+                </div>
+
+                <div class="grid gap-2">
+                    <Label for="link">Link</Label>
+                    <InputDescription>
+                        The link of the Slider.
+                    </InputDescription>
+                    <Input
+                        id="link"
+                        name="link"
+                        type="text"
+                        class="mt-1 block w-full"
+                        autofocus
+                        :default-value="slider.link"
                     />
-                    <InputError :message="errors.description" />
+                    <InputError :message="errors.link" />
                 </div>
 
                 <div class="grid gap-2">
                     <Label for="logo">Image</Label>
                     <InputDescription>
-                        Upload the PPOB category image (Max 5MB).
+                        Upload the Slider image (Max 5MB).
                     </InputDescription>
                     <ImageUploadPreview
                         input-id="image"
                         input-name="image"
                         label=""
-                        description="Upload your PPOB category image here."
+                        description="Upload your Slider image here."
                         accept="image/*"
                         :max-size="5"
                         preview-height="200px"
                         :errors="errors.image"
-                        :initial-preview="category.image"
+                        :initial-preview="slider.image"
                     />
                 </div>
 
                 <div class="grid gap-2">
                     <Label for="status">Status</Label>
                     <InputDescription>
-                        Select the status of the category.
+                        Select the status of the slider.
                     </InputDescription>
                     <Select
                         name="status"
-                        :default-value="String(category.status)"
+                        :default-value="String(slider.status)"
                     >
                         <SelectTrigger id="status" class="mt-1 w-full">
                             <SelectValue placeholder="Select a status" />

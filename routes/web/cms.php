@@ -12,6 +12,9 @@ Route::group([
         return inertia('Dashboard');
     })->name('dashboard');
 
+    // Web Routes
+    require 'cms/web.php';
+
     // PPOB Routes
     require 'cms/ppob.php';
 

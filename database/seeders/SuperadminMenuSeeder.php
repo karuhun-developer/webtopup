@@ -25,6 +25,7 @@ class SuperadminMenuSeeder extends Seeder
         // Create menu
         $this->dashboardMenu();
         $this->ppobMenu();
+        $this->webMenu();
         $this->managementMenu();
     }
 
@@ -82,6 +83,35 @@ class SuperadminMenuSeeder extends Seeder
             'url' => '/cms/ppob/import-digiflazz',
             'order' => 4,
             'active_pattern' => '/cms/ppob/import-digiflazz',
+            'status' => 1,
+        ]);
+    }
+
+    public function webMenu()
+    {
+        $web = Menu::create([
+            'role_id' => $this->role->id,
+            'name' => 'Web',
+            'url' => '#',
+            'icon' => 'Globe',
+            'order' => 20,
+            'active_pattern' => '/cms/web',
+            'status' => 1,
+        ]);
+        $web->subMenu()->create([
+            'role_id' => $this->role->id,
+            'name' => 'Sliders',
+            'url' => '/cms/web/sliders',
+            'order' => 1,
+            'active_pattern' => '/cms/web/sliders',
+            'status' => 1,
+        ]);
+        $web->subMenu()->create([
+            'role_id' => $this->role->id,
+            'name' => 'FAQs',
+            'url' => '/cms/web/faqs',
+            'order' => 2,
+            'active_pattern' => '/cms/web/faqs',
             'status' => 1,
         ]);
     }

@@ -143,9 +143,7 @@ const handlePermissionChange = (
                                 v-for="(perms, model) in permissions"
                                 :key="model"
                             >
-                                <h3
-                                    class="mb-4 font-semibold text-gray-900 dark:text-gray-100"
-                                >
+                                <h3 class="mb-4 font-semibold">
                                     Resource: {{ model }}
                                 </h3>
                                 <div

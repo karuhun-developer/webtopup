@@ -29,11 +29,9 @@ const { toast } = useSwal();
 <template>
     <Modal v-slot="{ close }">
         <div class="p-6">
-            <h2 class="text-lg font-medium text-gray-900 dark:text-gray-100">
-                Edit {{ user.name }}
-            </h2>
+            <h2 class="text-lg font-medium">Edit {{ user.name }}</h2>
 
-            <p class="mt-1 text-sm text-gray-600 dark:text-gray-400">
+            <p class="mt-1 text-sm text-muted-foreground">
                 Edit the user details.
             </p>
 
