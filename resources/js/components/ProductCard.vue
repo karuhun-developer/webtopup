@@ -1,20 +1,13 @@
 <script setup lang="ts">
 import { show } from '@/actions/App/Http/Controllers/Main/ProductController';
+import { PPOBBrandDataItem } from '@/types/cms/ppob';
 import { Link } from '@inertiajs/vue3';
+import { ShoppingBag } from 'lucide-vue-next';
 import InputDescription from './InputDescription.vue';
 
-interface Props {
-    image: string;
-    title: string;
-    description?: string;
-    rating?: number;
-    buttonText?: string;
-}
-
-const props = withDefaults(defineProps<Props>(), {
-    rating: 5,
-    buttonText: 'Detail',
-});
+const props = defineProps<{
+    product: PPOBBrandDataItem;
+}>();
 </script>
 
 <template>
@@ -24,17 +17,25 @@ const props = withDefaults(defineProps<Props>(), {
         <Link
             :href="
                 show({
-                    product: title,
+                    product: product.slug,
                 }).url
             "
         >
             <!-- Product Image -->
             <div class="relative aspect-[3/4] overflow-hidden bg-muted">
                 <img
-                    :src="image"
-                    :alt="title"
+                    v-if="product.image"
+                    :src="product.image"
+                    :alt="product.name"
                     class="h-full w-full object-cover"
                 />
+                <div
+                    v-else
+                    class="flex h-full w-full items-center justify-center text-muted-foreground"
+                >
+                    <ShoppingBag class="h-15 w-15 opacity-20" />
+                </div>
+
                 <!-- Overlay on hover -->
                 <div
                     class="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent opacity-0 transition-opacity duration-300 group-hover:opacity-100"
@@ -43,18 +44,18 @@ const props = withDefaults(defineProps<Props>(), {
 
             <!-- Product Info -->
             <div class="p-4">
-                <!-- Title -->
+                <!-- Name -->
                 <h3
                     class="mb-2 line-clamp-2 text-sm font-semibold text-foreground"
                 >
-                    {{ title }}
+                    {{ product.name }}
                 </h3>
 
                 <!-- Star Rating -->
                 <div class="mb-3 flex items-center gap-1">
                     <div v-for="i in 5" :key="i" class="text-yellow-400">
                         <svg
-                            v-if="i <= rating"
+                            v-if="i <= 5"
                             class="h-3 w-3 fill-current"
                             viewBox="0 0 20 20"
                         >
@@ -74,7 +75,7 @@ const props = withDefaults(defineProps<Props>(), {
                     </div>
                 </div>
                 <InputDescription>
-                    {{ description }}
+                    <span v-html="product.description" />
                 </InputDescription>
             </div>
         </Link>

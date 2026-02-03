@@ -3,64 +3,42 @@
 namespace App\Http\Controllers\Main;
 
 use App\Http\Controllers\Controller;
-use Inertia\Inertia;
+use App\Models\PPOB\PPOBBrand;
+use App\Models\PPOB\PPOBCategory;
+use Illuminate\Http\Request;
 use Inertia\Response;
 
 class HomeController extends Controller
 {
-    public function index(): Response
+    /**
+     * Display the main home page.
+     */
+    public function index(Request $request)
     {
-        return Inertia::render('main/Home', [
-            'products' => [
-                [
-                    'id' => 1,
-                    'title' => 'AOV',
-                    'image' => 'https://placehold.co/300x400/4F46E5/FFFFFF?text=AOV',
-                    'rating' => 5,
-                ],
-                [
-                    'id' => 2,
-                    'title' => 'DOTA 2',
-                    'image' => 'https://placehold.co/300x400/DC2626/FFFFFF?text=DOTA+2',
-                    'rating' => 5,
-                ],
-                [
-                    'id' => 3,
-                    'title' => 'Honor of Kings',
-                    'image' => 'https://placehold.co/300x400/F59E0B/FFFFFF?text=Honor+of+Kings',
-                    'rating' => 5,
-                ],
-                [
-                    'id' => 4,
-                    'title' => 'Mobile Legends',
-                    'image' => 'https://placehold.co/300x400/7C3AED/FFFFFF?text=Mobile+Legends',
-                    'rating' => 5,
-                ],
-                [
-                    'id' => 5,
-                    'title' => 'Unite',
-                    'image' => 'https://placehold.co/300x400/10B981/FFFFFF?text=Unite',
-                    'rating' => 5,
-                ],
-                [
-                    'id' => 6,
-                    'title' => 'Heroes of the Storm',
-                    'image' => 'https://placehold.co/300x400/3B82F6/FFFFFF?text=Heroes+of+the+Storm',
-                    'rating' => 5,
-                ],
-                [
-                    'id' => 7,
-                    'title' => 'Vainglory',
-                    'image' => 'https://placehold.co/300x400/EC4899/FFFFFF?text=Vainglory',
-                    'rating' => 5,
-                ],
-                [
-                    'id' => 8,
-                    'title' => 'Arena of Valor',
-                    'image' => 'https://placehold.co/300x400/8B5CF6/FFFFFF?text=Arena+of+Valor',
-                    'rating' => 5,
-                ],
-            ],
+        // Filter category
+        $category = null;
+        if ($request->has('category')) {
+            $category = PPOBCategory::where('slug', $request->query('category'))->first();
+        }
+
+        return inertia('main/Home', [
+            'products' => inertia()->scroll(fn () => PPOBBrand::query()
+                ->with('category', 'media')
+                ->when($category, fn ($query) => $query->where('p_p_o_b_category_id', $category->id))
+                ->paginate(12)
+                ->through(function ($brand) {
+                    $brand->image = $brand->getFirstMediaUrl('image');
+                    $brand->makeHidden('media');
+                    return $brand;
+                })),
+            'categories' => PPOBCategory::query()
+                ->withCount('brands', 'media')
+                ->get()
+                ->map(function ($category) {
+                    $category->image = $category->getFirstMediaUrl('image');
+                    $category->makeHidden('media');
+                    return $category;
+                }),
         ]);
     }
 }

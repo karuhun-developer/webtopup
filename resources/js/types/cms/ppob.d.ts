@@ -7,6 +7,7 @@ export interface PPOBCategoryDataItem {
     status: boolean;
     created_at: string;
     updated_at: string;
+    brands_count?: number;
 }
 
 export interface PPOBBrandDataItem {
