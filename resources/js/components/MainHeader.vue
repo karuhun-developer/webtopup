@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { Input } from '@/components/ui/input';
 import { Link, router, usePage } from '@inertiajs/vue3';
+import { ArrowLeft, LogIn, Menu, UserPlus, X } from 'lucide-vue-next';
 import { ref } from 'vue';
 
 interface Props {
@@ -86,37 +87,8 @@ const closeMobileMenu = () => {
                     class="flex items-center justify-center rounded-md p-2 text-foreground hover:bg-muted md:hidden"
                     @click="toggleMobileMenu"
                 >
-                    <svg
-                        v-if="!mobileMenuOpen"
-                        xmlns="http://www.w3.org/2000/svg"
-                        width="24"
-                        height="24"
-                        viewBox="0 0 24 24"
-                        fill="none"
-                        stroke="currentColor"
-                        stroke-width="2"
-                        stroke-linecap="round"
-                        stroke-linejoin="round"
-                    >
-                        <line x1="4" x2="20" y1="12" y2="12" />
-                        <line x1="4" x2="20" y1="6" y2="6" />
-                        <line x1="4" x2="20" y1="18" y2="18" />
-                    </svg>
-                    <svg
-                        v-else
-                        xmlns="http://www.w3.org/2000/svg"
-                        width="24"
-                        height="24"
-                        viewBox="0 0 24 24"
-                        fill="none"
-                        stroke="currentColor"
-                        stroke-width="2"
-                        stroke-linecap="round"
-                        stroke-linejoin="round"
-                    >
-                        <path d="M18 6 6 18" />
-                        <path d="m6 6 12 12" />
-                    </svg>
+                    <Menu v-if="!mobileMenuOpen" class="h-6 w-6" />
+                    <X v-else class="h-6 w-6" />
                 </button>
 
                 <!-- Back Button -->
@@ -125,20 +97,7 @@ const closeMobileMenu = () => {
                     class="flex items-center gap-2 text-sm font-medium text-foreground hover:text-primary"
                     @click="goBack"
                 >
-                    <svg
-                        xmlns="http://www.w3.org/2000/svg"
-                        width="16"
-                        height="16"
-                        viewBox="0 0 24 24"
-                        fill="none"
-                        stroke="currentColor"
-                        stroke-width="2"
-                        stroke-linecap="round"
-                        stroke-linejoin="round"
-                    >
-                        <path d="m12 19-7-7 7-7" />
-                        <path d="M19 12H5" />
-                    </svg>
+                    <ArrowLeft class="h-4 w-4" />
                     <span class="hidden md:inline">Kembali</span>
                 </button>
 
@@ -147,53 +106,24 @@ const closeMobileMenu = () => {
                     v-if="showAuthButtons && !page.props.auth.user"
                     class="flex items-center gap-2"
                 >
-                    <button
-                        class="flex items-center gap-2 rounded-md bg-primary px-4 py-2 text-sm font-medium text-white transition-colors hover:bg-primary/90"
-                    >
-                        <!-- LogIn Icon -->
-                        <svg
-                            xmlns="http://www.w3.org/2000/svg"
-                            width="16"
-                            height="16"
-                            viewBox="0 0 24 24"
-                            fill="none"
-                            stroke="currentColor"
-                            stroke-width="2"
-                            stroke-linecap="round"
-                            stroke-linejoin="round"
+                    <Link href="/login">
+                        <button
+                            class="flex items-center gap-2 rounded-md bg-primary px-4 py-2 text-sm font-medium text-white transition-colors hover:bg-primary/90"
                         >
-                            <path
-                                d="M15 3h4a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2h-4"
-                            />
-                            <polyline points="10 17 15 12 10 7" />
-                            <line x1="15" x2="3" y1="12" y2="12" />
-                        </svg>
-                        <span>LOG IN</span>
-                    </button>
-                    <button
-                        class="hidden items-center gap-2 rounded-md bg-gray-800 px-4 py-2 text-sm font-medium text-white transition-colors hover:bg-gray-700 md:flex"
-                    >
-                        <!-- UserPlus Icon -->
-                        <svg
-                            xmlns="http://www.w3.org/2000/svg"
-                            width="16"
-                            height="16"
-                            viewBox="0 0 24 24"
-                            fill="none"
-                            stroke="currentColor"
-                            stroke-width="2"
-                            stroke-linecap="round"
-                            stroke-linejoin="round"
+                            <!-- LogIn Icon -->
+                            <LogIn class="h-4 w-4" />
+                            <span>LOG IN</span>
+                        </button>
+                    </Link>
+                    <Link href="/register">
+                        <button
+                            class="hidden items-center gap-2 rounded-md bg-gray-800 px-4 py-2 text-sm font-medium text-white transition-colors hover:bg-gray-700 md:flex"
                         >
-                            <path
-                                d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"
-                            />
-                            <circle cx="9" cy="7" r="4" />
-                            <line x1="19" x2="19" y1="8" y2="14" />
-                            <line x1="22" x2="16" y1="11" y2="11" />
-                        </svg>
-                        <span>SIGN UP</span>
-                    </button>
+                            <!-- UserPlus Icon -->
+                            <UserPlus class="h-4 w-4" />
+                            <span>SIGN UP</span>
+                        </button>
+                    </Link>
                 </div>
             </div>
         </div>

@@ -6,7 +6,7 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Spinner } from '@/components/ui/spinner';
 import AuthBase from '@/layouts/AuthLayout.vue';
-import { login } from '@/routes';
+import { home, login } from '@/routes';
 import { store } from '@/routes/register';
 import { Form, Head } from '@inertiajs/vue3';
 </script>
@@ -102,6 +102,11 @@ import { Form, Head } from '@inertiajs/vue3';
                     :tabindex="6"
                     >Log in</TextLink
                 >
+            </div>
+
+            <div class="text-center text-sm text-muted-foreground">
+                Go to
+                <TextLink :href="home()" :tabindex="5">homepage</TextLink>
             </div>
         </Form>
     </AuthBase>

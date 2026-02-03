@@ -7,7 +7,7 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Spinner } from '@/components/ui/spinner';
 import AuthBase from '@/layouts/AuthLayout.vue';
-import { register } from '@/routes';
+import { home, register } from '@/routes';
 import { store } from '@/routes/login';
 import { request } from '@/routes/password';
 import { Form, Head } from '@inertiajs/vue3';
@@ -104,6 +104,10 @@ defineProps<{
             >
                 Don't have an account?
                 <TextLink :href="register()" :tabindex="5">Sign up</TextLink>
+            </div>
+            <div class="text-center text-sm text-muted-foreground">
+                Go to
+                <TextLink :href="home()" :tabindex="5">homepage</TextLink>
             </div>
         </Form>
     </AuthBase>

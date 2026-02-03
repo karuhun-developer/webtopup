@@ -93,7 +93,14 @@ const handlePaginate = (value: number) => {
 // Helper for pagination links
 const onPageClick = (url: string | null) => {
     if (url) {
-        router.get(url, {}, { preserveState: true, preserveScroll: true });
+        const urlObj = new URL(url, window.location.origin);
+        const newParams = Object.fromEntries(urlObj.searchParams.entries());
+
+        if (!newParams.page) {
+            newParams.page = '1';
+        }
+
+        updateParams(newParams);
     }
 };
 </script>
