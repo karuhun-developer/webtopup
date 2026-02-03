@@ -5,11 +5,13 @@ import MainHeader from '@/components/MainHeader.vue';
 import ProductCard from '@/components/ProductCard.vue';
 import { PaginationItem } from '@/types';
 import { PPOBBrandDataItem, PPOBCategoryDataItem } from '@/types/cms/ppob';
+import { SliderDataItem } from '@/types/cms/web';
 import { Head, InfiniteScroll, Link } from '@inertiajs/vue3';
 
 defineProps<{
-    products?: PaginationItem<PPOBBrandDataItem>;
-    categories?: PPOBCategoryDataItem[];
+    sliders: SliderDataItem[];
+    products: PaginationItem<PPOBBrandDataItem>;
+    categories: PPOBCategoryDataItem[];
 }>();
 </script>
 
@@ -23,7 +25,12 @@ defineProps<{
         <!-- Main Content -->
         <main class="mx-auto max-w-7xl px-4 py-8">
             <!-- Hero Banner -->
-            <HeroBanner class="mb-8" />
+            <HeroBanner
+                class="mb-8"
+                :slides="sliders"
+                :autoplay="true"
+                :interval="50000"
+            />
 
             <!-- Categories Section -->
             <section class="mb-8">

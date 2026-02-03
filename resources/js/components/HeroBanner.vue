@@ -1,40 +1,14 @@
 <script setup lang="ts">
-import { ref, onMounted, onUnmounted } from 'vue';
-
-interface Slide {
-    id: number;
-    image: string;
-    title: string;
-    description?: string;
-}
+import { SliderDataItem } from '@/types/cms/web';
+import { onMounted, onUnmounted, ref } from 'vue';
 
 interface Props {
-    slides?: Slide[];
+    slides: SliderDataItem[];
     autoplay?: boolean;
     interval?: number;
 }
 
-const props = withDefaults(defineProps<Props>(), {
-    slides: () => [
-        {
-            id: 1,
-            image: 'https://placehold.co/1200x400/4F46E5/FFFFFF?text=Roblox+Cashback',
-            title: 'Roblox Cashback',
-        },
-        {
-            id: 2,
-            image: 'https://placehold.co/1200x400/7C3AED/FFFFFF?text=Mobile+Legends+Event',
-            title: 'Mobile Legends Event',
-        },
-        {
-            id: 3,
-            image: 'https://placehold.co/1200x400/EC4899/FFFFFF?text=Free+Fire+Promo',
-            title: 'Free Fire Promo',
-        },
-    ],
-    autoplay: true,
-    interval: 5000,
-});
+const props = defineProps<Props>();
 
 const currentSlide = ref(0);
 let autoplayTimer: ReturnType<typeof setInterval> | null = null;
@@ -45,7 +19,9 @@ const nextSlide = () => {
 
 const prevSlide = () => {
     currentSlide.value =
-        currentSlide.value === 0 ? props.slides.length - 1 : currentSlide.value - 1;
+        currentSlide.value === 0
+            ? props.slides.length - 1
+            : currentSlide.value - 1;
 };
 
 const goToSlide = (index: number) => {
@@ -99,7 +75,7 @@ onUnmounted(() => {
         <!-- Navigation Arrows -->
         <button
             v-if="slides.length > 1"
-            class="absolute left-4 top-1/2 -translate-y-1/2 rounded-full bg-white/80 p-2 shadow-md transition-all hover:bg-white"
+            class="absolute top-1/2 left-4 -translate-y-1/2 rounded-full bg-white/80 p-2 shadow-md transition-all hover:bg-white"
             @click="prevSlide"
         >
             <svg
@@ -119,7 +95,7 @@ onUnmounted(() => {
 
         <button
             v-if="slides.length > 1"
-            class="absolute right-4 top-1/2 -translate-y-1/2 rounded-full bg-white/80 p-2 shadow-md transition-all hover:bg-white"
+            class="absolute top-1/2 right-4 -translate-y-1/2 rounded-full bg-white/80 p-2 shadow-md transition-all hover:bg-white"
             @click="nextSlide"
         >
             <svg

@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Main;
 use App\Http\Controllers\Controller;
 use App\Models\PPOB\PPOBBrand;
 use App\Models\PPOB\PPOBCategory;
+use App\Models\Web\Slider;
 use Illuminate\Http\Request;
 use Inertia\Response;
 
@@ -22,6 +23,16 @@ class HomeController extends Controller
         }
 
         return inertia('main/Home', [
+            'sliders' => Slider::query()
+                ->with('media')
+                ->where('status', true)
+                ->orderBy('order')
+                ->get()
+                ->map(function ($slider) {
+                    $slider->image = $slider->getFirstMediaUrl('image');
+                    $slider->makeHidden('media');
+                    return $slider;
+                }),
             'products' => inertia()->scroll(fn () => PPOBBrand::query()
                 ->with('category', 'media')
                 ->when($category, fn ($query) => $query->where('p_p_o_b_category_id', $category->id))
