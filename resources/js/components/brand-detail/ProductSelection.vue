@@ -26,7 +26,7 @@ const emit = defineEmits<{
 
         <div
             v-if="products && products.length > 0"
-            class="grid grid-cols-2 gap-3 sm:grid-cols-3"
+            class="grid grid-cols-3 gap-3 sm:grid-cols-4"
         >
             <button
                 v-for="product in products"
