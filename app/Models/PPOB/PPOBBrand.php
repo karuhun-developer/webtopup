@@ -17,7 +17,14 @@ class PPOBBrand extends Model implements HasMedia
         'name',
         'slug',
         'description',
+        'featured',
+        'order',
+        'settings',
         'status',
+    ];
+
+    protected $casts = [
+        'settings' => 'array',
     ];
 
     public function getRouteKeyName()

@@ -18,7 +18,7 @@ import { useSwal } from '@/composables/useSwal';
 import { PPOBCategoryDataItem } from '@/types/cms/ppob';
 import { Form } from '@inertiajs/vue3';
 import { Modal } from '@inertiaui/modal-vue';
-import { Save } from 'lucide-vue-next';
+import { Plus, Save, Trash2 } from 'lucide-vue-next';
 import { ref } from 'vue';
 
 defineProps<{
@@ -29,6 +29,23 @@ const { toast } = useSwal();
 
 // Description state
 const description = ref<string>('');
+
+// Settings type state
+const settingsType = ref<string>('id');
+// Server list state
+const serverList = ref<string[]>([]);
+
+// Add server function
+const addServer = async () => {
+    const result = prompt('Enter server name:');
+
+    serverList.value.push(result ? result : 'New Server');
+};
+
+// Delete server function
+const deleteServer = (index: number) => {
+    serverList.value.splice(index, 1);
+};
 </script>
 
 <template>
@@ -131,6 +148,189 @@ const description = ref<string>('');
                         preview-height="200px"
                         :errors="errors.image"
                     />
+                </div>
+
+                <div class="grid gap-2">
+                    <Label for="featured">Featured</Label>
+                    <InputDescription>
+                        Is this brand featured?
+                    </InputDescription>
+                    <Select name="featured" default-value="0">
+                        <SelectTrigger id="featured" class="mt-1 w-full">
+                            <SelectValue
+                                placeholder="Is this brand featured?"
+                            />
+                        </SelectTrigger>
+                        <SelectContent>
+                            <SelectItem value="1">Yes</SelectItem>
+                            <SelectItem value="0">No</SelectItem>
+                        </SelectContent>
+                    </Select>
+                    <InputError :message="errors.featured" />
+                </div>
+
+                <div class="grid gap-2">
+                    <Label for="order">Order</Label>
+                    <InputDescription>
+                        The order of the brand in listings.
+                    </InputDescription>
+                    <Input
+                        id="order"
+                        name="order"
+                        type="number"
+                        class="mt-1 block w-full"
+                        required
+                        autofocus
+                    />
+                    <InputError :message="errors.order" />
+                </div>
+
+                <div class="grid gap-2">
+                    <Label for="settings.type">Checkout Type</Label>
+                    <InputDescription>
+                        Select the type of PPOB brand.
+                    </InputDescription>
+                    <Select
+                        name="settings[type]"
+                        v-model="settingsType"
+                        :default-value="settingsType"
+                    >
+                        <SelectTrigger id="settings.type" class="mt-1 w-full">
+                            <SelectValue placeholder="Select a type" />
+                        </SelectTrigger>
+                        <SelectContent>
+                            <SelectItem value="id">ID</SelectItem>
+                            <SelectItem value="id+server">ID+Server</SelectItem>
+                        </SelectContent>
+                    </Select>
+                    <InputError :message="errors['settings.type']" />
+                </div>
+
+                <div class="grid gap-2">
+                    <Label for="settings.label_id">Label ID</Label>
+                    <InputDescription>
+                        The label ID associated with this PPOB brand.
+                    </InputDescription>
+                    <Input
+                        id="settings.label_id"
+                        name="settings[label_id]"
+                        type="text"
+                        class="mt-1 block w-full"
+                        required
+                        autofocus
+                        default-value="ID"
+                    />
+                    <InputError :message="errors['settings.label_id']" />
+                </div>
+
+                <div class="grid gap-2" v-if="settingsType === 'id+server'">
+                    <Label for="settings.label_server">Label Server</Label>
+                    <InputDescription>
+                        The label server associated with this PPOB brand.
+                    </InputDescription>
+                    <Input
+                        id="settings.label_server"
+                        name="settings[label_server]"
+                        type="text"
+                        class="mt-1 block w-full"
+                        required
+                        autofocus
+                        default-value="Server"
+                    />
+                    <InputError :message="errors['settings.label_server']" />
+                </div>
+
+                <div class="grid gap-2" v-if="settingsType === 'id+server'">
+                    <Label for="settings.server_list">Server List</Label>
+                    <InputDescription>
+                        Manage the list of servers for this PPOB brand.
+                    </InputDescription>
+
+                    <!-- Hidden input to submit server list -->
+                    <Input
+                        v-for="(server, index) in serverList"
+                        :key="index"
+                        name="settings[servers][]"
+                        type="hidden"
+                        :default-value="server"
+                    />
+
+                    <!-- Add Server Button -->
+                    <div class="mb-2 flex justify-end">
+                        <Button
+                            type="button"
+                            variant="outline"
+                            size="sm"
+                            @click="addServer"
+                        >
+                            <Plus class="mr-2 h-4 w-4" />
+                            Add Server
+                        </Button>
+                    </div>
+
+                    <!-- Server List Table -->
+                    <div class="rounded-md border">
+                        <table class="w-full">
+                            <thead>
+                                <tr class="border-b bg-muted/50">
+                                    <th
+                                        class="px-4 py-3 text-left text-sm font-medium"
+                                    >
+                                        No
+                                    </th>
+                                    <th
+                                        class="px-4 py-3 text-left text-sm font-medium"
+                                    >
+                                        Server Name
+                                    </th>
+                                    <th
+                                        class="px-4 py-3 text-right text-sm font-medium"
+                                    >
+                                        Action
+                                    </th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr
+                                    v-if="serverList.length === 0"
+                                    class="border-b"
+                                >
+                                    <td
+                                        colspan="3"
+                                        class="px-4 py-8 text-center text-sm text-muted-foreground"
+                                    >
+                                        No servers added yet. Click "Add Server"
+                                        to add one.
+                                    </td>
+                                </tr>
+                                <tr
+                                    v-for="(server, index) in serverList"
+                                    :key="index"
+                                    class="border-b transition-colors hover:bg-muted/50"
+                                >
+                                    <td class="px-4 py-3 text-sm">
+                                        {{ index + 1 }}
+                                    </td>
+                                    <td class="px-4 py-3 text-sm">
+                                        {{ server }}
+                                    </td>
+                                    <td class="px-4 py-3 text-right">
+                                        <Button
+                                            type="button"
+                                            variant="ghost"
+                                            size="sm"
+                                            @click="deleteServer(index)"
+                                        >
+                                            <Trash2
+                                                class="h-4 w-4 text-destructive"
+                                            />
+                                        </Button>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                    <InputError :message="errors['settings.server_list']" />
                 </div>
 
                 <div class="grid gap-2">

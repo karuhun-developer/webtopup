@@ -16,6 +16,9 @@ export interface PPOBBrandDataItem {
     name: string;
     slug: string;
     description?: string;
+    featured: boolean;
+    order: number;
+    settings: any;
     image?: string;
     status: boolean;
     created_at: string;

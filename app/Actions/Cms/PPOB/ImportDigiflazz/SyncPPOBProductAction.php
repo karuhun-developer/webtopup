@@ -35,10 +35,16 @@ class SyncPPOBProductAction
                 ],
                 [
                     'description' => 'Imported from Digiflazz',
+                    'featured' => false,
+                    'order' => PPOBBrand::max('order') + 1,
+                    'settings' => [
+                        'type' => 'id',
+                        'label_id' => 'uid',
+                    ],
                     'status' => true,
                 ],
             );
-            $product = PPOBProduct::updateOrCreate(
+            PPOBProduct::updateOrCreate(
                 [
                     'p_p_o_b_brand_id' => $brand->id,
                     'sku' => $productData['buyer_sku_code'],
