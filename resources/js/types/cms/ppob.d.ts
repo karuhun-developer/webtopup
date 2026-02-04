@@ -18,7 +18,12 @@ export interface PPOBBrandDataItem {
     description?: string;
     featured: boolean;
     order: number;
-    settings: any;
+    settings?: {
+        type?: 'id' | 'id+server';
+        label_id?: string;
+        label_server?: string;
+        servers?: string[];
+    };
     image?: string;
     banner?: string;
     default_product_image?: string;
@@ -26,6 +31,7 @@ export interface PPOBBrandDataItem {
     created_at: string;
     updated_at: string;
     category?: PPOBCategoryDataItem;
+    products?: PPOBProductDataItem[];
 }
 
 export interface PPOBProductDataItem {

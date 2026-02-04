@@ -1,8 +1,9 @@
 <script setup lang="ts">
 import { index } from '@/actions/App/Http/Controllers/Main/HomeController';
+import BrandCard from '@/components/BrandCard.vue';
 import HeroBanner from '@/components/HeroBanner.vue';
+import MainFooter from '@/components/MainFooter.vue';
 import MainHeader from '@/components/MainHeader.vue';
-import ProductCard from '@/components/ProductCard.vue';
 import { PaginationItem } from '@/types';
 import { PPOBBrandDataItem, PPOBCategoryDataItem } from '@/types/cms/ppob';
 import { SliderDataItem } from '@/types/cms/web';
@@ -10,8 +11,8 @@ import { Head, InfiniteScroll, Link } from '@inertiajs/vue3';
 
 defineProps<{
     sliders: SliderDataItem[];
-    products: PaginationItem<PPOBBrandDataItem>;
-    featured_products: PPOBBrandDataItem[];
+    brands: PaginationItem<PPOBBrandDataItem>;
+    featured_brands: PPOBBrandDataItem[];
     categories: PPOBCategoryDataItem[];
 }>();
 </script>
@@ -65,23 +66,25 @@ defineProps<{
                 </div>
             </section>
 
-            <!-- Featured Products Section -->
-            <section class="mb-8" v-if="featured_products.length > 0">
+            <!-- Featured Brands Section -->
+            <section class="mb-8" v-if="featured_brands.length > 0">
                 <div class="mb-4">
                     <h2 class="text-xl font-bold text-foreground">
                         Produk Unggulan
                     </h2>
                 </div>
-                <div class="grid grid-cols-2 gap-4 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6">
-                    <ProductCard
-                        v-for="product in featured_products"
-                        :key="product.id"
-                        :product="product"
+                <div
+                    class="grid grid-cols-2 gap-4 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6"
+                >
+                    <BrandCard
+                        v-for="brand in featured_brands"
+                        :key="brand.id"
+                        :brand="brand"
                     />
                 </div>
             </section>
 
-            <!-- Products Section -->
+            <!-- Brands Section -->
             <section>
                 <div class="mb-6">
                     <h2 class="text-xl font-bold text-foreground">
@@ -89,18 +92,21 @@ defineProps<{
                     </h2>
                 </div>
 
-                <InfiniteScroll data="products">
+                <InfiniteScroll data="brands">
                     <div
                         class="grid grid-cols-2 gap-4 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6"
                     >
-                        <ProductCard
-                            v-for="product in products?.data"
-                            :key="product.id"
-                            :product="product"
+                        <BrandCard
+                            v-for="brand in brands?.data"
+                            :key="brand.id"
+                            :brand="brand"
                         />
                     </div>
                 </InfiniteScroll>
             </section>
         </main>
+
+        <!-- Footer -->
+        <MainFooter />
     </div>
 </template>

@@ -1,12 +1,12 @@
 <script setup lang="ts">
-import { show } from '@/actions/App/Http/Controllers/Main/ProductController';
+import { show } from '@/actions/App/Http/Controllers/Main/BrandController';
 import { PPOBBrandDataItem } from '@/types/cms/ppob';
 import { Link } from '@inertiajs/vue3';
 import { ShoppingBag } from 'lucide-vue-next';
 import InputDescription from './InputDescription.vue';
 
 const props = defineProps<{
-    product: PPOBBrandDataItem;
+    brand: PPOBBrandDataItem;
 }>();
 </script>
 
@@ -17,16 +17,16 @@ const props = defineProps<{
         <Link
             :href="
                 show({
-                    product: product.slug,
+                    brand: brand.slug,
                 }).url
             "
         >
-            <!-- Product Image -->
+            <!-- Brand Image -->
             <div class="relative aspect-[3/4] overflow-hidden bg-muted">
                 <img
-                    v-if="product.image"
-                    :src="product.image"
-                    :alt="product.name"
+                    v-if="brand.image"
+                    :src="brand.image"
+                    :alt="brand.name"
                     class="h-full w-full object-cover"
                 />
                 <div
@@ -42,16 +42,16 @@ const props = defineProps<{
                 ></div>
             </div>
 
-            <!-- Product Info -->
+            <!-- Brand Info -->
             <div class="p-4">
                 <!-- Name -->
                 <h3
                     class="mb-2 line-clamp-2 text-sm font-semibold text-foreground"
                 >
-                    {{ product.name }}
+                    {{ brand.name }}
                 </h3>
                 <InputDescription>
-                    <span v-html="product.description" />
+                    <span v-html="brand.description" />
                 </InputDescription>
             </div>
         </Link>
