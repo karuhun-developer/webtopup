@@ -36,6 +36,7 @@ class HomeController extends Controller
             'brands' => inertia()->scroll(fn () => PPOBBrand::query()
                 ->with('category', 'media')
                 ->when($category, fn ($query) => $query->where('p_p_o_b_category_id', $category->id))
+                ->where('status', true)
                 ->orderBy('order')
                 ->simplePaginate(12)
                 ->through(function ($brand) {
@@ -47,6 +48,7 @@ class HomeController extends Controller
             'featured_brands' => PPOBBrand::query()
                 ->with('category', 'media')
                 ->where('featured', true)
+                ->where('status', true)
                 ->orderBy('order')
                 ->limit(6)
                 ->get()
@@ -58,6 +60,7 @@ class HomeController extends Controller
                 }),
             'categories' => PPOBCategory::query()
                 ->withCount('brands', 'media')
+                ->where('status', true)
                 ->get()
                 ->map(function ($category) {
                     $category->image = $category->getFirstMediaUrl('image');

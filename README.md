@@ -4,7 +4,8 @@
 - [x] Role-Based Access Control
 - [x] Slider Management
 - [x] FAQ Management
-- [ ] Checkout Flow
+- [x] Checkout Flow
+- [ ] Payment Flow
 - [ ] Transaction History
 - [ ] Transaction Status Tracking
 - [ ] User Profile Management
