@@ -71,45 +71,47 @@ const deleteServer = (index: number) => {
                 "
                 v-slot="{ errors, processing }"
             >
-                <div class="grid gap-2">
-                    <Label for="p_p_o_b_category_id">Category</Label>
-                    <InputDescription>
-                        Select the category for this PPOB brand.
-                    </InputDescription>
-                    <Select name="p_p_o_b_category_id">
-                        <SelectTrigger
-                            id="p_p_o_b_category_id"
-                            class="mt-1 w-full"
-                        >
-                            <SelectValue placeholder="Select a category" />
-                        </SelectTrigger>
-                        <SelectContent>
-                            <SelectItem
-                                v-for="category in categories"
-                                :key="category.id"
-                                :value="String(category.id)"
+                <div class="grid grid-cols-1 gap-2 md:grid-cols-2 md:gap-6">
+                    <div class="grid gap-2">
+                        <Label for="p_p_o_b_category_id">Category</Label>
+                        <InputDescription>
+                            Select the category for this PPOB brand.
+                        </InputDescription>
+                        <Select name="p_p_o_b_category_id">
+                            <SelectTrigger
+                                id="p_p_o_b_category_id"
+                                class="mt-1 w-full"
                             >
-                                {{ category.name }}
-                            </SelectItem>
-                        </SelectContent>
-                    </Select>
-                    <InputError :message="errors.p_p_o_b_category_id" />
-                </div>
+                                <SelectValue placeholder="Select a category" />
+                            </SelectTrigger>
+                            <SelectContent>
+                                <SelectItem
+                                    v-for="category in categories"
+                                    :key="category.id"
+                                    :value="String(category.id)"
+                                >
+                                    {{ category.name }}
+                                </SelectItem>
+                            </SelectContent>
+                        </Select>
+                        <InputError :message="errors.p_p_o_b_category_id" />
+                    </div>
 
-                <div class="grid gap-2">
-                    <Label for="name">Name</Label>
-                    <InputDescription>
-                        The name of the PPOB brand.
-                    </InputDescription>
-                    <Input
-                        id="name"
-                        name="name"
-                        type="text"
-                        class="mt-1 block w-full"
-                        required
-                        autofocus
-                    />
-                    <InputError :message="errors.name" />
+                    <div class="grid gap-2">
+                        <Label for="name">Name</Label>
+                        <InputDescription>
+                            The name of the PPOB brand.
+                        </InputDescription>
+                        <Input
+                            id="name"
+                            name="name"
+                            type="text"
+                            class="mt-1 block w-full"
+                            required
+                            autofocus
+                        />
+                        <InputError :message="errors.name" />
+                    </div>
                 </div>
 
                 <div class="grid gap-2">
@@ -151,38 +153,77 @@ const deleteServer = (index: number) => {
                 </div>
 
                 <div class="grid gap-2">
-                    <Label for="featured">Featured</Label>
+                    <Label for="banner">Banner</Label>
                     <InputDescription>
-                        Is this brand featured?
+                        Upload the PPOB brand banner (Max 5MB).
                     </InputDescription>
-                    <Select name="featured" default-value="0">
-                        <SelectTrigger id="featured" class="mt-1 w-full">
-                            <SelectValue
-                                placeholder="Is this brand featured?"
-                            />
-                        </SelectTrigger>
-                        <SelectContent>
-                            <SelectItem value="1">Yes</SelectItem>
-                            <SelectItem value="0">No</SelectItem>
-                        </SelectContent>
-                    </Select>
-                    <InputError :message="errors.featured" />
+                    <ImageUploadPreview
+                        input-id="banner"
+                        input-name="banner"
+                        label=""
+                        description="Upload your PPOB brand banner here."
+                        accept="image/*"
+                        :max-size="5"
+                        preview-height="200px"
+                        :errors="errors.banner"
+                    />
                 </div>
 
                 <div class="grid gap-2">
-                    <Label for="order">Order</Label>
+                    <Label for="default_product_image"
+                        >Default Product Image</Label
+                    >
                     <InputDescription>
-                        The order of the brand in listings.
+                        Upload the default product image for this PPOB brand
+                        (Max 2MB).
                     </InputDescription>
-                    <Input
-                        id="order"
-                        name="order"
-                        type="number"
-                        class="mt-1 block w-full"
-                        required
-                        autofocus
+                    <ImageUploadPreview
+                        input-id="default_product_image"
+                        input-name="default_product_image"
+                        label=""
+                        description="Upload your default product image here."
+                        accept="image/*"
+                        :max-size="2"
+                        preview-height="200px"
+                        :errors="errors.default_product_image"
                     />
-                    <InputError :message="errors.order" />
+                </div>
+
+                <div class="grid grid-cols-1 gap-2 md:grid-cols-2 md:gap-6">
+                    <div class="grid gap-2">
+                        <Label for="featured">Featured</Label>
+                        <InputDescription>
+                            Is this brand featured?
+                        </InputDescription>
+                        <Select name="featured" default-value="0">
+                            <SelectTrigger id="featured" class="mt-1 w-full">
+                                <SelectValue
+                                    placeholder="Is this brand featured?"
+                                />
+                            </SelectTrigger>
+                            <SelectContent>
+                                <SelectItem value="1">Yes</SelectItem>
+                                <SelectItem value="0">No</SelectItem>
+                            </SelectContent>
+                        </Select>
+                        <InputError :message="errors.featured" />
+                    </div>
+
+                    <div class="grid gap-2">
+                        <Label for="order">Order</Label>
+                        <InputDescription>
+                            The order of the brand in listings.
+                        </InputDescription>
+                        <Input
+                            id="order"
+                            name="order"
+                            type="number"
+                            class="mt-1 block w-full"
+                            required
+                            autofocus
+                        />
+                        <InputError :message="errors.order" />
+                    </div>
                 </div>
 
                 <div class="grid gap-2">

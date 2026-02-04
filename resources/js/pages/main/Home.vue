@@ -11,6 +11,7 @@ import { Head, InfiniteScroll, Link } from '@inertiajs/vue3';
 defineProps<{
     sliders: SliderDataItem[];
     products: PaginationItem<PPOBBrandDataItem>;
+    featured_products: PPOBBrandDataItem[];
     categories: PPOBCategoryDataItem[];
 }>();
 </script>
@@ -61,6 +62,22 @@ defineProps<{
                             </span>
                         </button>
                     </Link>
+                </div>
+            </section>
+
+            <!-- Featured Products Section -->
+            <section class="mb-8" v-if="featured_products.length > 0">
+                <div class="mb-4">
+                    <h2 class="text-xl font-bold text-foreground">
+                        Produk Unggulan
+                    </h2>
+                </div>
+                <div class="grid grid-cols-2 gap-4 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6">
+                    <ProductCard
+                        v-for="product in featured_products"
+                        :key="product.id"
+                        :product="product"
+                    />
                 </div>
             </section>
 

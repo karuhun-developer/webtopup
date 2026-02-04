@@ -20,6 +20,8 @@ export interface PPOBBrandDataItem {
     order: number;
     settings: any;
     image?: string;
+    banner?: string;
+    default_product_image?: string;
     status: boolean;
     created_at: string;
     updated_at: string;

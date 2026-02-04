@@ -23,6 +23,22 @@ class UpdatePPOBBrandAction
             );
         }
 
+        if ($data['banner'] ?? null instanceof UploadedFile) {
+            $this->saveMedia(
+                model: $brand,
+                file: $data['banner'],
+                collection: 'banner',
+            );
+        }
+
+        if ($data['default_product_image'] ?? null instanceof UploadedFile) {
+            $this->saveMedia(
+                model: $brand,
+                file: $data['default_product_image'],
+                collection: 'default_product_image',
+            );
+        }
+
         return $brand->update($data);
     }
 }

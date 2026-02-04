@@ -36,8 +36,8 @@ class PPOBBrandController extends Controller
     {
         Gate::authorize('view'.$this->resource);
 
-        $order = $request?->order ?? 'desc';
-        $orderBy = $request?->orderBy ?? 'created_at';
+        $order = $request?->order ?? 'asc';
+        $orderBy = $request?->orderBy ?? 'order';
         $paginate = $request?->paginate ?? 10;
         $searchBySpecific = $request?->searchBySpecific ?? '';
         $search = $request?->search ?? '';
@@ -49,6 +49,7 @@ class PPOBBrandController extends Controller
             searchBy: [
                 'name',
                 'description',
+                'order',
             ],
             order: $order,
             orderBy: $orderBy,
@@ -116,6 +117,8 @@ class PPOBBrandController extends Controller
         Gate::authorize('update'.$this->resource);
 
         $brand->image = $brand->getFirstMediaUrl('image');
+        $brand->banner = $brand->getFirstMediaUrl('banner');
+        $brand->default_product_image = $brand->getFirstMediaUrl('default_product_image');
 
         return inertia('cms/ppob/ppob-brand/Edit', [
             'categories' => PPOBCategory::where('status', true)->get(),

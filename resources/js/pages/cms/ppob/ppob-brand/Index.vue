@@ -49,6 +49,8 @@ const columns = [
     { label: 'Name', key: 'name', sortable: true },
     { label: 'Description', key: 'description', sortable: true },
     { label: 'Image', key: 'image', sortable: false },
+    { label: 'Order', key: 'order', sortable: true },
+    { label: 'Featured', key: 'featured', sortable: true },
     { label: 'Status', key: 'status', sortable: true },
     { label: 'Created At', key: 'created_at', sortable: true },
     {
@@ -95,6 +97,7 @@ watch(filter_category_id, (newValue) => {
                 <div class="flex items-center gap-2">
                     <ModalLink
                         :href="create().url"
+                        max-width="5xl"
                         slideover
                         v-if="hasPermission('create' + resource)"
                     >
@@ -172,6 +175,17 @@ watch(filter_category_id, (newValue) => {
                         {{ row.status ? 'Active' : 'Inactive' }}
                     </span>
                 </template>
+                <template #featured="{ row }">
+                    <span
+                        :class="{
+                            'rounded-full px-2 py-1 text-xs font-semibold': true,
+                            'bg-green-100 text-green-800': row.featured,
+                            'bg-red-100 text-red-800': !row.featured,
+                        }"
+                    >
+                        {{ row.featured ? 'Yes' : 'No' }}
+                    </span>
+                </template>
                 <template #created_at="{ row }">
                     {{ dayjs(row.created_at).format('DD MMMM YYYY H:m:s') }}
                 </template>
@@ -179,6 +193,7 @@ watch(filter_category_id, (newValue) => {
                     <div class="flex items-center justify-center gap-2">
                         <ModalLink
                             :href="edit({ brand: row.slug }).url"
+                            max-width="5xl"
                             slideover
                             v-if="hasPermission('update' + resource)"
                         >

@@ -24,7 +24,9 @@ class StorePPOBBrandRequest extends FormRequest
             'settings.label_id' => 'required_with:settings|string|max:255',
             'settings.label_server' => 'required_if:settings.type,id+server|string|max:255',
             'settings.servers' => 'nullable|array',
-            'image' => 'nullable|image|max:2048', // max 2MB
+            'image' => 'nullable|image|max:5120', // max 5MB
+            'banner' => 'nullable|image|max:5120', // max 5MB
+            'default_product_image' => 'nullable|image|max:2048', // max 2MB
             'status' => 'required|boolean',
         ];
     }
