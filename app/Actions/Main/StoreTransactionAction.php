@@ -31,7 +31,7 @@ class StoreTransactionAction
 
         $data['reference'] = $reference['code'];
         $data['ref_number'] = $reference['number'];
-        $data['amount'] = (int) $product->price;
+        $data['amount'] = (int) $product->sell_price;
 
         // Get fee if payment type is automatic
         if ($data['payment_type'] === 'automatic') {

@@ -1,97 +1,50 @@
 <script setup lang="ts">
+import { check } from '@/actions/App/Http/Controllers/Main/TransactionController';
+import MainFooter from '@/components/MainFooter.vue';
 import MainHeader from '@/components/MainHeader.vue';
-import { Badge } from '@/components/ui/badge';
+import StatusBadge from '@/components/transaction/StatusBadge.vue';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
-import { Head } from '@inertiajs/vue3';
-import { ref } from 'vue';
+import { useSwal } from '@/composables/useSwal';
+import { formatCurrency } from '@/lib/utils';
+import { OrderDataItem } from '@/types/cms/main';
+import { Head, useForm } from '@inertiajs/vue3';
 
-interface Transaction {
-    id: string;
-    product: string;
-    date: string;
-    amount: string;
-    status: 'success' | 'pending' | 'failed';
-}
+defineProps<{
+    latestOrder: OrderDataItem[];
+}>();
 
-const invoiceId = ref('');
-const searchResult = ref<Transaction | null>(null);
+const form = useForm({
+    reference: '',
+});
 
-const recentTransactions: Transaction[] = [
-    {
-        id: 'INV-001',
-        product: 'Mobile Legends - 100 Diamonds',
-        date: '2024-01-25 10:30',
-        amount: 'Rp 25.000',
-        status: 'success',
-    },
-    {
-        id: 'INV-002',
-        product: 'Free Fire - 50 Diamonds',
-        date: '2024-01-24 15:20',
-        amount: 'Rp 12.000',
-        status: 'success',
-    },
-    {
-        id: 'INV-003',
-        product: 'PUBG Mobile - UC 60',
-        date: '2024-01-23 09:15',
-        amount: 'Rp 15.000',
-        status: 'pending',
-    },
-];
+const { toast } = useSwal();
 
 const handleSearch = () => {
-    if (!invoiceId.value) {
-        alert('Please enter invoice ID');
+    if (!form.reference) {
         return;
     }
-    // Mock search result
-    searchResult.value = {
-        id: invoiceId.value,
-        product: 'Mobile Legends - 100 Diamonds',
-        date: '2024-01-25 10:30',
-        amount: 'Rp 25.000',
-        status: 'success',
-    };
-};
 
-const getStatusColor = (status: string) => {
-    switch (status) {
-        case 'success':
-            return 'bg-emerald-500';
-        case 'pending':
-            return 'bg-yellow-500';
-        case 'failed':
-            return 'bg-red-500';
-        default:
-            return 'bg-gray-500';
-    }
-};
-
-const getStatusText = (status: string) => {
-    switch (status) {
-        case 'success':
-            return 'Success';
-        case 'pending':
-            return 'Pending';
-        case 'failed':
-            return 'Failed';
-        default:
-            return 'Unknown';
-    }
+    form.get(check().url, {
+        onError: (errors) => {
+            toast.fire({
+                icon: 'error',
+                title: 'Transaksi tidak ditemukan. Silakan periksa kembali nomor Invoice kamu.',
+            });
+        },
+    });
 };
 </script>
 
 <template>
-    <Head title="Check Transaction - GameStore" />
+    <Head title="Cek Transaksi" />
 
-    <div class="min-h-screen bg-background">
+    <div class="flex min-h-screen flex-col bg-background">
         <!-- Header -->
         <MainHeader />
 
         <!-- Main Content -->
-        <main class="mx-auto max-w-2xl px-4 py-16">
+        <main class="mx-auto w-full max-w-4xl px-4 py-16">
             <div class="text-center">
                 <h1 class="mb-2 text-3xl font-bold text-foreground">
                     Cek Invoice Kamu dengan Mudah dan Cepat
@@ -111,8 +64,8 @@ const getStatusText = (status: string) => {
                     </h2>
                     <div class="flex gap-2">
                         <Input
-                            v-model="invoiceId"
-                            placeholder="Masukkan Invoice / Order ID Kamu Disini (Contoh: OURAXXXXXXXXX)"
+                            v-model="form.reference"
+                            placeholder="Masukkan Invoice / Order ID Kamu Disini (Contoh: TRX-00002)"
                             class="flex-1"
                             @keyup.enter="handleSearch"
                         />
@@ -125,77 +78,13 @@ const getStatusText = (status: string) => {
                     </div>
                 </div>
 
-                <!-- Search Result -->
-                <div
-                    v-if="searchResult"
-                    class="rounded-lg border border-border/50 bg-card p-6 text-left shadow-sm"
-                >
-                    <div class="mb-4 flex items-center justify-between">
-                        <h3 class="text-lg font-bold text-foreground">
-                            Detail Transaksi
-                        </h3>
-                        <Badge :class="getStatusColor(searchResult.status)">
-                            {{ getStatusText(searchResult.status) }}
-                        </Badge>
-                    </div>
-
-                    <div class="space-y-3 text-sm">
-                        <div
-                            class="flex justify-between border-b border-border/30 pb-2"
-                        >
-                            <span class="text-muted-foreground">Tanggal</span>
-                            <span class="font-medium text-foreground">{{
-                                searchResult.date
-                            }}</span>
-                        </div>
-                        <div
-                            class="flex justify-between border-b border-border/30 pb-2"
-                        >
-                            <span class="text-muted-foreground"
-                                >Nomor Invoice</span
-                            >
-                            <span class="font-medium text-foreground">{{
-                                searchResult.id
-                            }}</span>
-                        </div>
-                        <div
-                            class="flex justify-between border-b border-border/30 pb-2"
-                        >
-                            <span class="text-muted-foreground"
-                                >No. Identifikasi</span
-                            >
-                            <span class="font-medium text-foreground"
-                                >••••••••123</span
-                            >
-                        </div>
-                        <div
-                            class="flex justify-between border-b border-border/30 pb-2"
-                        >
-                            <span class="text-muted-foreground">Item</span>
-                            <span class="font-medium text-foreground">{{
-                                searchResult.product
-                            }}</span>
-                        </div>
-                        <div class="flex justify-between pt-2">
-                            <span
-                                class="text-base font-semibold text-foreground"
-                                >Harga</span
-                            >
-                            <span class="text-base font-bold text-primary">{{
-                                searchResult.amount
-                            }}</span>
-                        </div>
-                    </div>
-                </div>
-
                 <!-- Recent Transactions -->
-                <div v-if="!searchResult" class="mt-12">
+                <div class="mt-12">
                     <h2 class="mb-4 text-xl font-bold text-foreground">
                         Transaksi Real-Time
                     </h2>
                     <p class="mb-4 text-sm text-muted-foreground">
-                        Berikut list Real-Time untuk pelanggan terbaru
-                        GameStore.
+                        Berikut list Real-Time untuk pelanggan terbaru.
                     </p>
 
                     <div
@@ -233,30 +122,35 @@ const getStatusText = (status: string) => {
                             </thead>
                             <tbody class="divide-y divide-border/30">
                                 <tr
-                                    v-for="i in 5"
-                                    :key="i"
+                                    v-for="order in latestOrder"
+                                    :key="order.id"
                                     class="hover:bg-muted/50"
                                 >
                                     <td class="px-4 py-3 text-muted-foreground">
-                                        29-01-2026 20:05:16
+                                        {{
+                                            new Date(
+                                                order.created_at,
+                                            ).toLocaleString('id-ID')
+                                        }}
                                     </td>
                                     <td
-                                        class="px-4 py-3 font-medium text-foreground"
+                                        class="px-4 py-3 font-mono font-medium text-foreground"
                                     >
-                                        OURA••••••••••••
+                                        {{ order.reference }}
                                     </td>
                                     <td class="px-4 py-3 text-muted-foreground">
-                                        ••••••••123
+                                        {{ order.submited.account_id }}
                                     </td>
                                     <td
                                         class="px-4 py-3 font-medium text-foreground"
                                     >
-                                        IDR 3 juta
+                                        {{ formatCurrency(order.total_amount) }}
                                     </td>
                                     <td class="px-4 py-3">
-                                        <Badge class="bg-emerald-500"
-                                            >Pending</Badge
-                                        >
+                                        <StatusBadge
+                                            :status="order.payment_status"
+                                            type="payment"
+                                        />
                                     </td>
                                 </tr>
                             </tbody>
@@ -265,5 +159,8 @@ const getStatusText = (status: string) => {
                 </div>
             </div>
         </main>
+
+        <!-- Footer -->
+        <MainFooter />
     </div>
 </template>

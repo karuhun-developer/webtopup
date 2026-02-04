@@ -30,6 +30,11 @@ class Order extends Model
         'topup_status' => \App\Enums\DigiflazzStatusEnum::class,
     ];
 
+    public function getRouteKeyName()
+    {
+        return 'reference';
+    }
+
     public function user()
     {
         return $this->belongsTo(\App\Models\User::class);
