@@ -6,7 +6,6 @@ use App\Models\Web\Faq;
 
 class StoreFaqAction
 {
-
     /**
      * Handle the action.
      */

@@ -4,7 +4,6 @@ namespace App\Http\Controllers\Main;
 
 use App\Http\Controllers\Controller;
 use App\Models\PPOB\PPOBBrand;
-use Inertia\Inertia;
 use Inertia\Response;
 
 class BrandController extends Controller

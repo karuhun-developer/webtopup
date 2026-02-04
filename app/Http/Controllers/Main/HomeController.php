@@ -7,7 +7,6 @@ use App\Models\PPOB\PPOBBrand;
 use App\Models\PPOB\PPOBCategory;
 use App\Models\Web\Slider;
 use Illuminate\Http\Request;
-use Inertia\Response;
 
 class HomeController extends Controller
 {
@@ -31,6 +30,7 @@ class HomeController extends Controller
                 ->map(function ($slider) {
                     $slider->image = $slider->getFirstMediaUrl('image');
                     $slider->makeHidden('media');
+
                     return $slider;
                 }),
             'brands' => inertia()->scroll(fn () => PPOBBrand::query()
@@ -41,6 +41,7 @@ class HomeController extends Controller
                 ->through(function ($brand) {
                     $brand->image = $brand->getFirstMediaUrl('image');
                     $brand->makeHidden('media');
+
                     return $brand;
                 })),
             'featured_brands' => PPOBBrand::query()
@@ -52,6 +53,7 @@ class HomeController extends Controller
                 ->map(function ($brand) {
                     $brand->image = $brand->getFirstMediaUrl('image');
                     $brand->makeHidden('media');
+
                     return $brand;
                 }),
             'categories' => PPOBCategory::query()
@@ -60,6 +62,7 @@ class HomeController extends Controller
                 ->map(function ($category) {
                     $category->image = $category->getFirstMediaUrl('image');
                     $category->makeHidden('media');
+
                     return $category;
                 }),
         ]);
