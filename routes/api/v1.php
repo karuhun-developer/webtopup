@@ -10,12 +10,6 @@ Route::group(['prefix' => 'v1', 'as' => 'api.v1.'], function () {
         ]);
     })->name('welcome');
 
-    // Authentication Routes
-    require 'v1/auth.php';
-
-    // Role Routes
-    require 'v1/role.php';
-
-    // User Routes
-    require 'v1/user.php';
+    // Callback Routes
+    require 'v1/callback.php';
 });

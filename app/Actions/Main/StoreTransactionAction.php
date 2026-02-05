@@ -6,6 +6,7 @@ use App\Models\Order\Order;
 use App\Models\Payment\Payment;
 use App\Models\PPOB\PPOBProduct;
 use App\Services\MidtransService;
+use App\Services\VodaService;
 use App\Traits\WithGenerateReference;
 
 class StoreTransactionAction
@@ -14,6 +15,7 @@ class StoreTransactionAction
 
     public function __construct(
         public readonly MidtransService $midtransService,
+        public readonly VodaService $vodaService,
     ) {}
 
     /**
@@ -87,6 +89,25 @@ class StoreTransactionAction
             $payment->account_code = $midtrans['code'] ?? null;
             $payment->save();
         }
+
+        // Send notification to user
+        $message = getSetting('template_checkout');
+        $message = str_replace('{app_name}', config('app.name'), $message);
+        $message = str_replace('{product}', $product->name, $message);
+        $message = str_replace('{price}', numberToCurrency($product->sell_price), $message);
+        $message = str_replace('{quantity}', '1', $message);
+        $message = str_replace('{total}', numberToCurrency($order->total_amount), $message);
+        $message = str_replace('{link}', route('transaction.show', [
+            'order' => $order,
+        ]), $message);
+        $message = str_replace('{cs_link}', getSetting('cs'), $message);
+
+        // Send message via Voda
+        $this->vodaService->sendMessage(
+            phone: $order->phone,
+            message: $message,
+            linkPreview: true,
+        );
 
         return $order;
     }
