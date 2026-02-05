@@ -107,6 +107,21 @@ const { toast } = useSwal();
                         </div>
                     </div>
 
+                    <div class="grid gap-2">
+                        <Label for="phone">Phone number</Label>
+                        <Input
+                            id="phone"
+                            type="number"
+                            class="mt-1 block w-full"
+                            name="phone"
+                            :default-value="user.phone"
+                            required
+                            autocomplete="phone"
+                            placeholder="Phone number"
+                        />
+                        <InputError class="mt-2" :message="errors.phone" />
+                    </div>
+
                     <div class="flex items-center gap-4">
                         <Button
                             :disabled="processing"

@@ -8,6 +8,7 @@ use Illuminate\Contracts\Auth\MustVerifyEmail;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Cache;
 use Inertia\Response;
 
 class ProfileController extends Controller
@@ -35,6 +36,8 @@ class ProfileController extends Controller
         }
 
         $request->user()->save();
+
+        Cache::forget('auth:user:'.$request->user()->id);
 
         return to_route('profile.edit');
     }

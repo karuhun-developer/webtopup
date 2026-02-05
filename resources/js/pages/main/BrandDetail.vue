@@ -10,12 +10,14 @@ import MainFooter from '@/components/MainFooter.vue';
 import MainHeader from '@/components/MainHeader.vue';
 import { useSwal } from '@/composables/useSwal';
 import { PPOBBrandDataItem, PPOBProductDataItem } from '@/types/cms/ppob';
-import { Head, useForm } from '@inertiajs/vue3';
+import { Head, useForm, usePage } from '@inertiajs/vue3';
 import { computed } from 'vue';
 
 const props = defineProps<{
     brand: PPOBBrandDataItem;
 }>();
+const page = usePage();
+const user = page?.props?.auth?.user;
 
 // Form data using Inertia's useForm
 const form = useForm({
@@ -23,9 +25,9 @@ const form = useForm({
     account_id: '36688862',
     server_id: '2052',
     product_id: null as number | null,
-    email: '',
-    name: '',
-    phone: '',
+    email: user?.email || '',
+    name: user?.name || '',
+    phone: user?.phone || '',
     payment_type: 'automatic' as 'manual' | 'automatic',
     payment_method: null as string | null,
 });

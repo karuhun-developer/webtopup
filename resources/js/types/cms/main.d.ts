@@ -1,7 +1,8 @@
 import { PPOBBrandDataItem } from '@/types/cms/ppob';
 import { UserDataItem } from './management';
 import { PPOBProductDataItem } from './ppob.d';
-interface PaymentDataItem {
+
+export interface PaymentDataItem {
     driver: string;
     payable_type: string;
     payable_id: number;
@@ -18,7 +19,7 @@ interface PaymentDataItem {
     updated_at: string;
 }
 
-interface OrderDataItem {
+export interface OrderDataItem {
     id: number;
     user_id: number;
     p_p_o_b_brand_id: number;

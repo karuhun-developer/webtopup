@@ -9,7 +9,9 @@ Route::post('/checkout', [App\Http\Controllers\Main\TransactionController::class
 Route::get('/transaction/{order}', [App\Http\Controllers\Main\TransactionController::class, 'show'])->name('transaction.show');
 Route::get('/transaction', [App\Http\Controllers\Main\TransactionController::class, 'check'])->name('transaction.check');
 
-Route::get('/profile', [App\Http\Controllers\Main\ProfileController::class, 'index'])->name('profile');
+Route::get('/profile', [App\Http\Controllers\Main\ProfileController::class, 'index'])->name('main.profile.index')->middleware('auth');
+Route::patch('/profile', [App\Http\Controllers\Main\ProfileController::class, 'update'])->name('main.profile.update')->middleware('auth');
+Route::patch('/password', [App\Http\Controllers\Main\PasswordController::class, 'update'])->name('main.password.update')->middleware('auth');
 
 // After login
 Route::get('/after-login', function () {

@@ -55,6 +55,20 @@ import { Form, Head } from '@inertiajs/vue3';
                 </div>
 
                 <div class="grid gap-2">
+                    <Label for="phone">Phone Number</Label>
+                    <Input
+                        id="phone"
+                        type="number"
+                        required
+                        :tabindex="2"
+                        autocomplete="phone"
+                        name="phone"
+                        placeholder="08123456789"
+                    />
+                    <InputError :message="errors.phone" />
+                </div>
+
+                <div class="grid gap-2">
                     <Label for="password">Password</Label>
                     <Input
                         id="password"
