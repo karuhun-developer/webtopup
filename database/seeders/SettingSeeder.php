@@ -31,9 +31,7 @@ class SettingSeeder extends Seeder
 Silakan lakukan pembayaran sesuai dengan metode yang Anda pilih di link berikut:
 {link}
 
-Jika Anda memiliki pertanyaan, jangan ragu untuk menghubungi kami di {cs_link}
-
-🤝Terima kasih atas kepercayaan Anda kepada TopupWok! 🙏',
+Jika Anda memiliki pertanyaan, jangan ragu untuk menghubungi kami di {cs_link} Kami siap membantu Anda!',
                     'template_payment_confirmation' => '📢 Konfirmasi Pembayaran Diterima!
 Halo *{customer_name}*, kami telah menerima konfirmasi pembayaran Anda untuk pesanan *{order_id}*. Terima kasih atas pembelian Anda di {app_name}!
 Detail pesanan anda bisa dilihat di link berikut:
