@@ -65,7 +65,7 @@ const handleSearch = () => {
                     <div class="flex gap-2">
                         <Input
                             v-model="form.reference"
-                            placeholder="Masukkan Invoice / Order ID Kamu Disini (Contoh: TRX-00002)"
+                            placeholder="Masukkan Invoice / Order ID Kamu Disini (Contoh: TRX-20250907-00002)"
                             class="flex-1"
                             @keyup.enter="handleSearch"
                         />

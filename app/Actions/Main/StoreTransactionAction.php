@@ -23,7 +23,7 @@ class StoreTransactionAction
     {
         $reference = $this->generateReference(
             model: new Order,
-            prefix: 'TRX-',
+            prefix: 'TRX-' . now()->format('Ymd') . '-',
         );
 
         // Get price from product
