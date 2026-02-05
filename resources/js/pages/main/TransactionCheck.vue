@@ -6,9 +6,9 @@ import StatusBadge from '@/components/transaction/StatusBadge.vue';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { useSwal } from '@/composables/useSwal';
-import { formatCurrency } from '@/lib/utils';
 import { OrderDataItem } from '@/types/cms/main';
 import { Head, useForm } from '@inertiajs/vue3';
+import dayjs from 'dayjs';
 
 defineProps<{
     latestOrder: OrderDataItem[];
@@ -128,9 +128,9 @@ const handleSearch = () => {
                                 >
                                     <td class="px-4 py-3 text-muted-foreground">
                                         {{
-                                            new Date(
-                                                order.created_at,
-                                            ).toLocaleString('id-ID')
+                                            dayjs(order.created_at)
+                                                .locale('id')
+                                                .format('DD MMM YYYY, HH:mm')
                                         }}
                                     </td>
                                     <td
@@ -144,7 +144,7 @@ const handleSearch = () => {
                                     <td
                                         class="px-4 py-3 font-medium text-foreground"
                                     >
-                                        {{ formatCurrency(order.total_amount) }}
+                                        {{ order.total_amount }}
                                     </td>
                                     <td class="px-4 py-3">
                                         <StatusBadge

@@ -44,6 +44,7 @@ class TransactionController extends Controller
                     }
 
                     $order->reference = preg_replace('/.(?=.{4})/', '*', $order->reference);
+                    $order->total_amount = preg_replace('/.(?=.{3})/', '*', $order->total_amount);
 
                     return $this->maskData($order);
                 }),

@@ -68,7 +68,7 @@ const closeMobileMenu = () => {
                         Beranda
                     </Link>
                     <Link
-                        href="/transaction-check"
+                        href="/transaction"
                         class="text-sm font-medium text-foreground hover:text-primary"
                     >
                         Cek Transaksi

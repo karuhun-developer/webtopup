@@ -7,6 +7,9 @@ Route::group([
     'as' => 'cms.',
     'middleware' => ['auth', 'verified'],
 ], function () {
+    // Auto redirect to dashboard
+    Route::get('/', fn () => to_route('cms.dashboard'))->name('home');
+
     // Dashboard Route
     Route::get('/dashboard', function () {
         return inertia('Dashboard');
