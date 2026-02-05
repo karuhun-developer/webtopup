@@ -22,7 +22,7 @@ class StoreTransactionRequest extends FormRequest
             'product_id' => 'required|exists:p_p_o_b_products,id',
             'email' => 'nullable|email|max:255',
             'name' => 'required|string|max:255',
-            'phone' => 'required|number|min:10|max:15',
+            'phone' => 'required|numeric',
             'payment_type' => 'required|in:automatic,manual',
             'payment_method' => 'required|in:qris,bca,bni,bri,mandiri,permata',
         ];
