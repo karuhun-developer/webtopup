@@ -6,6 +6,7 @@ use App\Actions\Api\V1\Callback\HandleMidtransCallbackAction;
 use App\Http\Controllers\Controller;
 use App\Traits\WithReturnResponse;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Log;
 
 class MidtransController extends Controller
 {
@@ -16,6 +17,9 @@ class MidtransController extends Controller
         try {
             $action->handle($request->all());
         } catch (\Exception $e) {
+            Log::error('Midtrans Callback Error', [
+                'error' => $e->getMessage(),
+            ]);
             return $this->responseWithError($e->getMessage(), 400);
         }
 

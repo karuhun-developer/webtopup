@@ -8,6 +8,7 @@ use App\Models\Payment\Payment;
 use App\Services\MidtransService;
 use App\Services\VodaService;
 use Illuminate\Support\Facades\Log;
+use Triyatna\Digiflazz\Digiflazz;
 
 class HandleMidtransCallbackAction
 {
@@ -120,6 +121,17 @@ class HandleMidtransCallbackAction
     protected function sendOrderNotification(Order $order, bool $isSuccess)
     {
         if ($isSuccess) {
+            // Proccess Digiflazz Transaction
+            $accountId = $order->submited['account_id'] ?? '';
+            $serverId = $order->submited['server_id'] ?? '';
+            $customer = $accountId . $serverId;
+
+            Digiflazz::createPrepaidTransaction(
+                productCode: $order->product->sku,
+                customerNo: $customer,
+                refId: $order->reference,
+            );
+
             // Send notification to user
             $message = getSetting('template_payment_confirmation');
             $message = str_replace('{customer_name}', $order->name, $message);

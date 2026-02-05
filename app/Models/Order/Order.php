@@ -22,6 +22,7 @@ class Order extends Model
         'total_amount',
         'payment_status',
         'topup_status',
+        'sn',
     ];
 
     protected $casts = [
