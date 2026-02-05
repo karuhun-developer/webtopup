@@ -41,7 +41,7 @@ const handleSearch = () => {
 
     <div class="flex min-h-screen flex-col bg-background">
         <!-- Header -->
-        <MainHeader />
+        <MainHeader :show-search="true" />
 
         <!-- Main Content -->
         <main class="mx-auto w-full max-w-4xl px-4 py-16">

@@ -1,21 +1,22 @@
 <script setup lang="ts">
 import { Input } from '@/components/ui/input';
+import { useSwal } from '@/composables/useSwal';
 import { Link, router, usePage } from '@inertiajs/vue3';
 import { ArrowLeft, LogIn, Menu, UserPlus, X } from 'lucide-vue-next';
 import { ref } from 'vue';
+import Button from './ui/button/Button.vue';
 
 interface Props {
     showSearch?: boolean;
-    showAuthButtons?: boolean;
     showBackButton?: boolean;
 }
 
 const page = usePage();
 const mobileMenuOpen = ref(false);
+const { confirm } = useSwal();
 
 withDefaults(defineProps<Props>(), {
     showSearch: false,
-    showAuthButtons: false,
     showBackButton: false,
 });
 
@@ -29,6 +30,20 @@ const toggleMobileMenu = () => {
 
 const closeMobileMenu = () => {
     mobileMenuOpen.value = false;
+};
+
+const logout = () => {
+    confirm({
+        title: 'Apakah Anda yakin ingin keluar?',
+        icon: 'warning',
+        showCancelButton: true,
+        confirmButtonText: 'Ya, keluar',
+        cancelButtonText: 'Batal',
+    }).then((result) => {
+        if (result.isConfirmed) {
+            router.post('/logout');
+        }
+    });
 };
 </script>
 
@@ -59,6 +74,9 @@ const closeMobileMenu = () => {
                     />
                 </div>
 
+                <!-- Spacer when search is hidden -->
+                <div v-else class="flex-1"></div>
+
                 <!-- Desktop Navigation -->
                 <nav class="hidden items-center gap-6 md:flex">
                     <Link
@@ -81,49 +99,58 @@ const closeMobileMenu = () => {
                     </Link>
                 </nav>
 
-                <!-- Mobile Menu Button -->
-                <button
-                    v-if="!showBackButton"
-                    class="flex items-center justify-center rounded-md p-2 text-foreground hover:bg-muted md:hidden"
-                    @click="toggleMobileMenu"
-                >
-                    <Menu v-if="!mobileMenuOpen" class="h-6 w-6" />
-                    <X v-else class="h-6 w-6" />
-                </button>
+                <!-- Right side container for mobile -->
+                <div class="flex items-center gap-2">
+                    <!-- Mobile Menu Button -->
+                    <button
+                        v-if="!showBackButton"
+                        class="flex items-center justify-center rounded-md p-2 text-foreground hover:bg-muted md:hidden"
+                        @click="toggleMobileMenu"
+                    >
+                        <Menu v-if="!mobileMenuOpen" class="h-6 w-6" />
+                        <X v-else class="h-6 w-6" />
+                    </button>
 
-                <!-- Back Button -->
-                <button
-                    v-if="showBackButton"
-                    class="flex items-center gap-2 text-sm font-medium text-foreground hover:text-primary"
-                    @click="goBack"
-                >
-                    <ArrowLeft class="h-4 w-4" />
-                    <span class="hidden md:inline">Kembali</span>
-                </button>
+                    <!-- Back Button -->
+                    <button
+                        v-if="showBackButton"
+                        class="flex items-center gap-2 text-sm font-medium text-foreground hover:text-primary"
+                        @click="goBack"
+                    >
+                        <ArrowLeft class="h-4 w-4" />
+                        <span class="hidden md:inline">Kembali</span>
+                    </button>
 
-                <!-- Auth Buttons -->
-                <div
-                    v-if="showAuthButtons && !page.props.auth.user"
-                    class="flex items-center gap-2"
-                >
-                    <Link href="/login">
-                        <button
-                            class="flex items-center gap-2 rounded-md bg-primary px-4 py-2 text-sm font-medium text-white transition-colors hover:bg-primary/90"
-                        >
-                            <!-- LogIn Icon -->
-                            <LogIn class="h-4 w-4" />
-                            <span>LOG IN</span>
-                        </button>
-                    </Link>
-                    <Link href="/register">
-                        <button
-                            class="hidden items-center gap-2 rounded-md bg-gray-800 px-4 py-2 text-sm font-medium text-white transition-colors hover:bg-gray-700 md:flex"
-                        >
-                            <!-- UserPlus Icon -->
-                            <UserPlus class="h-4 w-4" />
-                            <span>SIGN UP</span>
-                        </button>
-                    </Link>
+                    <!-- Auth Buttons -->
+                    <div
+                        v-if="!page.props.auth.user"
+                        class="hidden items-center gap-2 md:flex"
+                    >
+                        <Link href="/login">
+                            <Button variant="outline">
+                                <!-- LogIn Icon -->
+                                <LogIn class="h-4 w-4" />
+                                <span>LOG IN</span>
+                            </Button>
+                        </Link>
+                        <Link href="/register">
+                            <Button variant="outline">
+                                <!-- UserPlus Icon -->
+                                <UserPlus class="h-4 w-4" />
+                                <span>SIGN UP</span>
+                            </Button>
+                        </Link>
+                    </div>
+                    <Button
+                        v-else
+                        variant="outline"
+                        class="hidden md:flex"
+                        @click="logout"
+                    >
+                        <!-- LogOut Icon -->
+                        <LogIn class="h-4 w-4 rotate-180" />
+                        <span>LOG OUT</span>
+                    </Button>
                 </div>
             </div>
         </div>
@@ -142,7 +169,7 @@ const closeMobileMenu = () => {
                     Beranda
                 </Link>
                 <Link
-                    href="/transaction-check"
+                    href="/transaction"
                     class="block rounded-md px-3 py-2 text-base font-medium text-foreground hover:bg-muted hover:text-primary"
                     @click="closeMobileMenu"
                 >
@@ -155,6 +182,31 @@ const closeMobileMenu = () => {
                 >
                     Profile
                 </Link>
+
+                <!-- Mobile Auth Links -->
+                <template v-if="!page.props.auth.user">
+                    <Link
+                        href="/login"
+                        class="block rounded-md px-3 py-2 text-base font-medium text-foreground hover:bg-muted hover:text-primary"
+                        @click="closeMobileMenu"
+                    >
+                        Log In
+                    </Link>
+                    <Link
+                        href="/register"
+                        class="block rounded-md px-3 py-2 text-base font-medium text-foreground hover:bg-muted hover:text-primary"
+                        @click="closeMobileMenu"
+                    >
+                        Sign Up
+                    </Link>
+                </template>
+                <button
+                    v-else
+                    class="block w-full rounded-md px-3 py-2 text-left text-base font-medium text-foreground hover:bg-muted hover:text-primary"
+                    @click="logout"
+                >
+                    Log Out
+                </button>
             </nav>
         </div>
     </header>

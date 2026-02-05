@@ -22,7 +22,7 @@ defineProps<{
 
     <div class="min-h-screen bg-background">
         <!-- Header -->
-        <MainHeader :show-search="true" :show-auth-buttons="true" />
+        <MainHeader :show-search="true" />
 
         <!-- Main Content -->
         <main class="mx-auto max-w-7xl px-4 py-8">

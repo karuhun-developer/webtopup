@@ -89,7 +89,7 @@ const getStatusColor = (status: string) => {
 
     <div class="min-h-screen bg-background">
         <!-- Header -->
-        <MainHeader />
+        <MainHeader :show-search="true" />
 
         <!-- Main Content -->
         <main class="mx-auto max-w-5xl px-4 py-8">
