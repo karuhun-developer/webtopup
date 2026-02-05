@@ -6,13 +6,14 @@ use App\Enums\PaymentStatusEnum;
 use App\Models\Order\Order;
 use App\Models\Payment\Payment;
 use App\Services\MidtransService;
+use App\Services\VodaService;
 use Illuminate\Support\Facades\Log;
-use Illuminate\Support\Facades\Notification;
 
 class HandleMidtransCallbackAction
 {
     public function __construct(
         public readonly MidtransService $midtransService,
+        public readonly VodaService $vodaService,
     ) {}
 
     public function handle(array $payload)
@@ -118,7 +119,40 @@ class HandleMidtransCallbackAction
 
     protected function sendOrderNotification(Order $order, bool $isSuccess)
     {
-        if ($order->user) {
+        if ($isSuccess) {
+            // Send notification to user
+            $message = getSetting('template_payment_confirmation');
+            $message = str_replace('{customer_name}', $order->name, $message);
+            $message = str_replace('{order_id}', $order->reference, $message);
+            $message = str_replace('{app_name}', config('app.name'), $message);
+            $message = str_replace('{link}', route('transaction.show', [
+                'order' => $order,
+            ]), $message);
+            $message = str_replace('{cs_link}', getSetting('cs'), $message);
+
+            // Send message via Voda
+            $this->vodaService->sendMessage(
+                phone: $order->phone,
+                message: $message,
+                linkPreview: true,
+            );
+        } else {
+            // Send notification to user
+            $message = getSetting('template_payment_rejected');
+            $message = str_replace('{customer_name}', $order->name, $message);
+            $message = str_replace('{order_id}', $order->reference, $message);
+            $message = str_replace('{app_name}', config('app.name'), $message);
+            $message = str_replace('{link}', route('transaction.show', [
+                'order' => $order,
+            ]), $message);
+            $message = str_replace('{cs_link}', getSetting('cs'), $message);
+
+            // Send message via Voda
+            $this->vodaService->sendMessage(
+                phone: $order->phone,
+                message: $message,
+                linkPreview: true,
+            );
         }
     }
 }

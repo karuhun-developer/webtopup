@@ -3,20 +3,14 @@ import { Button } from '@/components/ui/button';
 import { Label } from '@/components/ui/label';
 import { useSwal } from '@/composables/useSwal';
 import { formatCurrency } from '@/lib/utils';
+import { PaymentDataItem } from '@/types/cms/main';
 import { useForm } from '@inertiajs/vue3';
-import { Copy, Upload } from 'lucide-vue-next';
+import dayjs from 'dayjs';
+import { Clock, Copy, Upload } from 'lucide-vue-next';
 import { ref } from 'vue';
 
-interface Payment {
-    driver: string;
-    payment_type: string;
-    channel: string;
-    account_number: string;
-    expired_at: string;
-}
-
 const props = defineProps<{
-    payment: Payment;
+    payment: PaymentDataItem;
     orderReference: string;
     totalAmount: number;
 }>();
@@ -68,7 +62,10 @@ const uploadProof = () => {
 
         <!-- Midtrans Bank Transfer -->
         <div
-            v-if="payment.driver === 'midtrans' && payment.payment_type === 'bank_transfer'"
+            v-if="
+                payment.driver === 'midtrans' &&
+                payment.payment_type === 'bank_transfer'
+            "
             class="space-y-4"
         >
             <div class="rounded-lg bg-muted/50 p-4">
@@ -101,17 +98,38 @@ const uploadProof = () => {
                 </p>
             </div>
 
-            <div class="text-xs text-muted-foreground">
-                <p class="mb-1">⏰ Bayar sebelum:</p>
-                <p class="font-medium">
-                    {{ new Date(payment.expired_at).toLocaleString('id-ID') }}
-                </p>
+            <div
+                class="flex items-center gap-4 rounded-xl border border-yellow-500/50 bg-yellow-500/10 p-5 text-yellow-600 shadow-[0_0_15px_rgba(234,179,8,0.1)]"
+                v-if="payment?.paid_at === null"
+            >
+                <div
+                    class="flex h-12 w-12 animate-pulse items-center justify-center rounded-full bg-yellow-500/20"
+                >
+                    <Clock class="h-6 w-6 text-yellow-600" />
+                </div>
+
+                <div>
+                    <p
+                        class="text-xs font-bold tracking-wider uppercase opacity-80"
+                    >
+                        Batas Waktu Pembayaran
+                    </p>
+                    <p class="text-xl font-black tabular-nums">
+                        {{
+                            dayjs(payment.expired_at)
+                                .locale('id')
+                                .format('DD MMM YYYY, HH:mm')
+                        }}
+                    </p>
+                </div>
             </div>
         </div>
 
         <!-- Midtrans QRIS -->
         <div
-            v-else-if="payment.driver === 'midtrans' && payment.payment_type === 'qris'"
+            v-else-if="
+                payment.driver === 'midtrans' && payment.payment_type === 'qris'
+            "
             class="space-y-4"
         >
             <div class="flex justify-center">
@@ -129,16 +147,35 @@ const uploadProof = () => {
                 </p>
             </div>
 
-            <div class="text-xs text-muted-foreground">
-                <p class="mb-1">⏰ Bayar sebelum:</p>
-                <p class="font-medium">
-                    {{ new Date(payment.expired_at).toLocaleString('id-ID') }}
-                </p>
+            <div
+                class="flex items-center gap-4 rounded-xl border border-yellow-500/50 bg-yellow-500/10 p-5 text-yellow-600 shadow-[0_0_15px_rgba(234,179,8,0.1)]"
+                v-if="payment?.paid_at === null"
+            >
+                <div
+                    class="flex h-12 w-12 animate-pulse items-center justify-center rounded-full bg-yellow-500/20"
+                >
+                    <Clock class="h-6 w-6 text-yellow-600" />
+                </div>
+
+                <div>
+                    <p
+                        class="text-xs font-bold tracking-wider uppercase opacity-80"
+                    >
+                        Batas Waktu Pembayaran
+                    </p>
+                    <p class="text-xl font-black tabular-nums">
+                        {{
+                            dayjs(payment.expired_at)
+                                .locale('id')
+                                .format('DD MMM YYYY, HH:mm')
+                        }}
+                    </p>
+                </div>
             </div>
 
             <div class="rounded-lg bg-blue-500/10 p-3 text-xs text-blue-600">
                 <p class="font-medium">Cara Bayar:</p>
-                <ol class="ml-4 mt-2 list-decimal space-y-1">
+                <ol class="mt-2 ml-4 list-decimal space-y-1">
                     <li>Buka aplikasi e-wallet atau mobile banking</li>
                     <li>Pilih menu Scan QR</li>
                     <li>Scan QR Code di atas</li>
@@ -210,12 +247,13 @@ const uploadProof = () => {
                         @click="fileInput?.click()"
                     >
                         <Upload class="mr-2 h-4 w-4" />
-                        {{ uploadForm.proof ? uploadForm.proof.name : 'Pilih File' }}
+                        {{
+                            uploadForm.proof
+                                ? uploadForm.proof.name
+                                : 'Pilih File'
+                        }}
                     </Button>
-                    <Button
-                        :disabled="!uploadForm.proof"
-                        @click="uploadProof"
-                    >
+                    <Button :disabled="!uploadForm.proof" @click="uploadProof">
                         Upload
                     </Button>
                 </div>
@@ -224,7 +262,9 @@ const uploadProof = () => {
                 </p>
             </div>
 
-            <div class="rounded-lg bg-yellow-500/10 p-3 text-xs text-yellow-600">
+            <div
+                class="rounded-lg bg-yellow-500/10 p-3 text-xs text-yellow-600"
+            >
                 <p class="font-medium">⚠️ Penting:</p>
                 <p class="mt-1">
                     Setelah transfer, upload bukti transfer untuk mempercepat

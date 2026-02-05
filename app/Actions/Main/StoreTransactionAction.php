@@ -25,7 +25,7 @@ class StoreTransactionAction
     {
         $reference = $this->generateReference(
             model: new Order,
-            prefix: 'TRX-' . now()->format('Ymd') . '-',
+            prefix: 'TRX-'.now()->format('Ymd').'-',
         );
 
         // Get price from product
@@ -93,9 +93,8 @@ class StoreTransactionAction
         // Send notification to user
         $message = getSetting('template_checkout');
         $message = str_replace('{app_name}', config('app.name'), $message);
+        $message = str_replace('{order_id}', $order->reference, $message);
         $message = str_replace('{product}', $product->name, $message);
-        $message = str_replace('{price}', numberToCurrency($product->sell_price), $message);
-        $message = str_replace('{quantity}', '1', $message);
         $message = str_replace('{total}', numberToCurrency($order->total_amount), $message);
         $message = str_replace('{link}', route('transaction.show', [
             'order' => $order,

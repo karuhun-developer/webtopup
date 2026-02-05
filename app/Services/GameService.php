@@ -28,7 +28,6 @@ class GameService
     public readonly ValidGameClient $gameClient;
 
     /**
-     *
      * ## Azurlane server
      * avrora
      * lexington
@@ -38,7 +37,8 @@ class GameService
      * littleenterprise
      *
      **/
-    public function __construct() {
+    public function __construct()
+    {
         $this->gameClient = new ValidGameClient(
             proxy: config('game.proxy'),
         );
@@ -46,7 +46,7 @@ class GameService
 
     public function isIdValid(
         string $game,
-        ?string $server = null,
+        ?string $server,
         string $uid,
     ) {
         try {
@@ -65,7 +65,9 @@ class GameService
             });
 
             // Raise exception if status is false
-            if (!$cachedData['status']) throw new \Exception('Invalid game ID');
+            if (! $cachedData['status']) {
+                throw new \Exception('Invalid game ID');
+            }
 
             return $cachedData;
         } catch (\Exception $e) {

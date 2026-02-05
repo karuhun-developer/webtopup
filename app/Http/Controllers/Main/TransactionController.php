@@ -18,7 +18,9 @@ class TransactionController extends Controller
             $order = Order::where('reference', $request->input('reference'))->first();
 
             // Check if order exists
-            if (!$order) return back()->withErrors(['reference' => 'Order not found with the provided reference.'])->withInput();
+            if (! $order) {
+                return back()->withErrors(['reference' => 'Order not found with the provided reference.'])->withInput();
+            }
 
             return to_route('transaction.show', [
                 'order' => $order,
