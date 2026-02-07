@@ -87,13 +87,13 @@ const page = usePage();
                             class="flex items-center gap-2 text-muted-foreground"
                         >
                             <Mail class="h-4 w-4" />
-                            <span>support@gamestore.com</span>
+                            <span>{{ page.props.setting.email }}</span>
                         </li>
                         <li
                             class="flex items-center gap-2 text-muted-foreground"
                         >
                             <Phone class="h-4 w-4" />
-                            <span>+62 812-3456-7890</span>
+                            <span>{{ page.props.setting.phone }}</span>
                         </li>
                     </ul>
                 </div>
