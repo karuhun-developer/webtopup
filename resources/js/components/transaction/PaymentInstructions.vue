@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import { update } from '@/actions/App/Http/Controllers/Main/TransactionController';
 import { Button } from '@/components/ui/button';
 import { Label } from '@/components/ui/label';
 import { useSwal } from '@/composables/useSwal';
@@ -19,7 +20,7 @@ const { toast } = useSwal();
 const fileInput = ref<HTMLInputElement | null>(null);
 
 const uploadForm = useForm({
-    proof: null as File | null,
+    image: null as File | null,
 });
 
 const copyToClipboard = (text: string) => {
@@ -33,12 +34,12 @@ const copyToClipboard = (text: string) => {
 const handleFileChange = (event: Event) => {
     const target = event.target as HTMLInputElement;
     if (target.files && target.files[0]) {
-        uploadForm.proof = target.files[0];
+        uploadForm.image = target.files[0];
     }
 };
 
 const uploadProof = () => {
-    if (!uploadForm.proof) {
+    if (!uploadForm.image) {
         toast.fire({
             icon: 'error',
             title: 'Pilih file terlebih dahulu',
@@ -46,11 +47,27 @@ const uploadProof = () => {
         return;
     }
 
-    // TODO: Implement upload endpoint
-    toast.fire({
-        icon: 'info',
-        title: 'Upload functionality coming soon',
-    });
+    uploadForm.submit(
+        update({
+            reference: props.orderReference,
+        }),
+        {
+            method: 'put',
+            preserveScroll: true,
+            onSuccess: () => {
+                toast.fire({
+                    icon: 'success',
+                    title: 'Bukti transfer berhasil diupload!',
+                });
+            },
+            onError: () => {
+                toast.fire({
+                    icon: 'error',
+                    title: 'Gagal mengupload bukti transfer',
+                });
+            },
+        },
+    );
 };
 </script>
 
@@ -217,7 +234,7 @@ const uploadProof = () => {
                     <div>
                         <p class="text-xs text-muted-foreground">Atas Nama:</p>
                         <p class="font-medium text-foreground">
-                            PT GameStore Indonesia
+                            {{ payment.account_code }}
                         </p>
                     </div>
                 </div>
@@ -248,18 +265,29 @@ const uploadProof = () => {
                     >
                         <Upload class="mr-2 h-4 w-4" />
                         {{
-                            uploadForm.proof
-                                ? uploadForm.proof.name
+                            uploadForm.image
+                                ? uploadForm.image.name
                                 : 'Pilih File'
                         }}
                     </Button>
-                    <Button :disabled="!uploadForm.proof" @click="uploadProof">
+                    <Button :disabled="!uploadForm.image" @click="uploadProof">
                         Upload
                     </Button>
                 </div>
                 <p class="text-xs text-muted-foreground">
                     Format: JPG, PNG. Max 2MB
                 </p>
+            </div>
+
+            <div v-if="payment.image" class="space-y-1">
+                <p class="text-sm text-muted-foreground">
+                    Bukti transfer yang sudah diupload:
+                </p>
+                <img
+                    :src="payment.image"
+                    alt="Bukti Transfer"
+                    class="h-48 w-full rounded-lg border border-border object-cover"
+                />
             </div>
 
             <div

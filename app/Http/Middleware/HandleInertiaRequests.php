@@ -46,7 +46,7 @@ class HandleInertiaRequests extends Middleware
 
         return [
             ...parent::share($request),
-            'name' => config('app.name'),
+            'name' => getSetting('title'),
             'quote' => ['message' => trim($message), 'author' => trim($author)],
             'auth' => [
                 'user' => $user ? Cache::flexible('auth:user:'.$user->id, [300, 600], function () use ($user) {
@@ -63,6 +63,7 @@ class HandleInertiaRequests extends Middleware
                     return Menu::with('subMenu')->where('role_id', $role->id)->orderBy('order', 'asc')->get();
                 }) : [],
             ],
+            'setting' => getSetting(),
             'sidebarOpen' => ! $request->hasCookie('sidebar_state') || $request->cookie('sidebar_state') === 'true',
         ];
     }

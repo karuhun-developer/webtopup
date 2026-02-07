@@ -1,6 +1,7 @@
 <script setup lang="ts">
-import { Link } from '@inertiajs/vue3';
+import { Link, usePage } from '@inertiajs/vue3';
 import { Facebook, Instagram, Mail, Phone, Twitter } from 'lucide-vue-next';
+const page = usePage();
 </script>
 
 <template>
@@ -10,11 +11,10 @@ import { Facebook, Instagram, Mail, Phone, Twitter } from 'lucide-vue-next';
                 <!-- Company Info -->
                 <div class="md:col-span-2">
                     <h3 class="mb-4 text-lg font-bold text-foreground">
-                        GameStore
+                        {{ page.props.name }}
                     </h3>
                     <p class="mb-4 text-sm text-muted-foreground">
-                        Platform top up game terpercaya dengan harga terjangkau
-                        dan proses cepat. Layanan 24/7 untuk kepuasan pelanggan.
+                        {{ page.props.setting.footer_description }}
                     </p>
                     <div class="flex gap-4">
                         <a
@@ -83,11 +83,15 @@ import { Facebook, Instagram, Mail, Phone, Twitter } from 'lucide-vue-next';
                 <div>
                     <h4 class="mb-4 font-semibold text-foreground">Kontak</h4>
                     <ul class="space-y-3 text-sm">
-                        <li class="flex items-center gap-2 text-muted-foreground">
+                        <li
+                            class="flex items-center gap-2 text-muted-foreground"
+                        >
                             <Mail class="h-4 w-4" />
                             <span>support@gamestore.com</span>
                         </li>
-                        <li class="flex items-center gap-2 text-muted-foreground">
+                        <li
+                            class="flex items-center gap-2 text-muted-foreground"
+                        >
                             <Phone class="h-4 w-4" />
                             <span>+62 812-3456-7890</span>
                         </li>

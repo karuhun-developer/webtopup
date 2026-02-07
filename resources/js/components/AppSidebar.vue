@@ -11,7 +11,7 @@ import {
     SidebarMenuButton,
     SidebarMenuItem,
 } from '@/components/ui/sidebar';
-import { dashboard } from '@/routes/cms';
+import { dashboard, logs } from '@/routes/cms';
 import { type NavItem } from '@/types';
 import { Link, usePage } from '@inertiajs/vue3';
 import AppLogo from './AppLogo.vue';
@@ -25,14 +25,14 @@ const mainNavItems: NavItem[] = page.props.auth.menus;
 
 const footerNavItems: NavItem[] = [
     {
-        name: 'Github Repo',
-        url: 'https://github.com/laravel/vue-starter-kit',
-        icon: 'Folder',
+        name: 'Log',
+        url: logs().url,
+        icon: 'FileText',
     },
     {
-        name: 'Documentation',
-        url: 'https://laravel.com/docs/starter-kits#vue',
-        icon: 'BookOpen',
+        name: 'Support',
+        url: 'https://karuhundeveloper.com',
+        icon: 'Globe',
     },
 ];
 </script>

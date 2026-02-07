@@ -15,6 +15,7 @@ export interface PaymentDataItem {
     expired_at: string;
     paid_at: string;
     amount: number;
+    image?: string;
     created_at: string;
     updated_at: string;
 }

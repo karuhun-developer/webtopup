@@ -44,6 +44,9 @@ class StoreTransactionAction
 
             $data['fee'] = (int) round($fee);
             $data['total_amount'] = $data['amount'] + $data['fee'];
+        } else {
+            $data['fee'] = 0;
+            $data['total_amount'] = $data['amount'];
         }
 
         $order = Order::create($data);
@@ -88,6 +91,12 @@ class StoreTransactionAction
             $payment->transaction_id = $midtrans['transaction_id'];
             $payment->account_number = $midtrans['account'];
             $payment->account_code = $midtrans['code'] ?? null;
+            $payment->save();
+        } else {
+            // For manual payment, we can set the account number to the payment method for easier reconciliation
+            $payment->channel = getSetting('manual_transfer_bank');
+            $payment->account_number = getSetting('manual_transfer_account_number');
+            $payment->account_code = getSetting('manual_transfer_account_name');
             $payment->save();
         }
 

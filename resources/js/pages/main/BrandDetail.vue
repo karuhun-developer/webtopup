@@ -18,6 +18,7 @@ const props = defineProps<{
 }>();
 const page = usePage();
 const user = page?.props?.auth?.user;
+const setting = page?.props?.setting;
 
 // Form data using Inertia's useForm
 const form = useForm({
@@ -46,29 +47,13 @@ const selectedProductData = computed(() => {
 });
 
 // Manual payment - Bank accounts
-const manualBanks = [
-    {
-        id: 'bca',
-        name: 'BCA',
-        account_number: '1234567890',
-        account_name: 'PT GameStore Indonesia',
-        img: '/images/BCA.svg',
-    },
-    {
-        id: 'mandiri',
-        name: 'Mandiri',
-        account_number: '0987654321',
-        account_name: 'PT GameStore Indonesia',
-        img: '/images/MANDIRI.svg',
-    },
-    {
-        id: 'bni',
-        name: 'BNI',
-        account_number: '5555666677',
-        account_name: 'PT GameStore Indonesia',
-        img: '/images/BNI.svg',
-    },
-];
+const manualBank = {
+    id: setting?.manual_transfer_bank,
+    name: setting?.manual_transfer_bank,
+    account_number: setting?.manual_transfer_account_number,
+    account_name: setting?.manual_transfer_account_name,
+    img: setting?.manual_transfer_bank_logo,
+};
 
 // Automatic payment methods
 const paymentMethods = [
@@ -251,7 +236,7 @@ const handleCheckout = () => {
                         <PaymentMethodSelection
                             v-model:payment-type="form.payment_type"
                             v-model:selected-payment="form.payment_method"
-                            :manual-banks="manualBanks"
+                            :manual-bank="manualBank"
                             :payment-methods="paymentMethods"
                         />
                     </div>
@@ -266,7 +251,7 @@ const handleCheckout = () => {
                             :selected-payment="form.payment_method"
                             :payment-type="form.payment_type"
                             :total-amount="totalAmount"
-                            :manual-banks="manualBanks"
+                            :manual-bank="manualBank"
                             :payment-methods="paymentMethods"
                             @checkout="handleCheckout"
                         />

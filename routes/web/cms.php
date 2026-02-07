@@ -21,6 +21,12 @@ Route::group([
     // PPOB Routes
     require 'cms/ppob.php';
 
+    // Order Routes
+    require 'cms/order.php';
+
+    // Setting Routes
+    require 'cms/setting.php';
+
     // Management Routes
     require 'cms/management.php';
 

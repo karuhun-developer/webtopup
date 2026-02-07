@@ -2,11 +2,11 @@
 import { formatCurrency } from '@/lib/utils';
 
 interface ManualBank {
-    id: string;
-    name: string;
-    account_number: string;
-    account_name: string;
-    img: string;
+    id?: string;
+    name?: string;
+    account_number?: string;
+    account_name?: string;
+    img?: string;
 }
 
 interface PaymentMethod {
@@ -20,7 +20,7 @@ interface PaymentMethod {
 defineProps<{
     paymentType: 'manual' | 'automatic';
     selectedPayment: string | null;
-    manualBanks: ManualBank[];
+    manualBank: ManualBank;
     paymentMethods: PaymentMethod[];
 }>();
 
@@ -76,27 +76,27 @@ const handlePaymentTypeChange = (type: 'manual' | 'automatic') => {
         <!-- Manual Payment - Bank Accounts -->
         <div v-if="paymentType === 'manual'" class="space-y-2">
             <button
-                v-for="bank in manualBanks"
-                :key="bank.id"
+                :key="manualBank.id"
                 class="flex w-full items-center gap-4 rounded-lg border-2 p-4 transition-all"
                 :class="
-                    selectedPayment === bank.id
+                    selectedPayment === manualBank.id
                         ? 'border-primary bg-primary/5'
                         : 'border-border/50 hover:border-primary/50'
                 "
-                @click="emit('update:selectedPayment', bank.id)"
+                @click="emit('update:selectedPayment', manualBank.id as any)"
             >
                 <img
-                    :src="bank.img"
-                    :alt="bank.name"
+                    :src="manualBank.img"
+                    :alt="manualBank.name"
                     class="h-8 w-12 object-contain"
                 />
                 <div class="flex-1 text-left">
                     <div class="font-medium text-foreground">
-                        {{ bank.name }}
+                        {{ manualBank.name }}
                     </div>
                     <div class="text-xs text-muted-foreground">
-                        {{ bank.account_number }} - {{ bank.account_name }}
+                        {{ manualBank.account_number }} -
+                        {{ manualBank.account_name }}
                     </div>
                 </div>
                 <span class="text-sm font-medium text-emerald-500">

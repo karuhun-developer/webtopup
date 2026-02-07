@@ -1,17 +1,17 @@
 import '../css/app.css';
 
-import { createInertiaApp } from '@inertiajs/vue3';
+import { createInertiaApp, usePage } from '@inertiajs/vue3';
 import { putConfig, renderApp } from '@inertiaui/modal-vue';
-import { resolvePageComponent } from 'laravel-vite-plugin/inertia-helpers';
 import { VueQueryPlugin } from '@tanstack/vue-query';
+import { resolvePageComponent } from 'laravel-vite-plugin/inertia-helpers';
 import type { DefineComponent } from 'vue';
 import { createApp } from 'vue';
 import { initializeTheme } from './composables/useAppearance';
 
-const appName = import.meta.env.VITE_APP_NAME || 'Laravel';
+const app = usePage();
 
 createInertiaApp({
-    title: (title) => (title ? `${title} - ${appName}` : appName),
+    title: (title) => (title ? `${title} - ${app.props.name}` : app.props.name),
     resolve: (name) =>
         resolvePageComponent(
             `./pages/${name}.vue`,

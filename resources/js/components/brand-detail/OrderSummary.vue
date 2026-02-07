@@ -7,11 +7,11 @@ import ContactCS from './ContactCS.vue';
 import ReviewRating from './ReviewRating.vue';
 
 interface ManualBank {
-    id: string;
-    name: string;
-    account_number: string;
-    account_name: string;
-    img: string;
+    id?: string;
+    name?: string;
+    account_number?: string;
+    account_name?: string;
+    img?: string;
 }
 
 interface PaymentMethod {
@@ -28,7 +28,7 @@ const props = defineProps<{
     selectedPayment: string | null;
     paymentType: 'manual' | 'automatic';
     totalAmount: number;
-    manualBanks: ManualBank[];
+    manualBank: ManualBank;
     paymentMethods: PaymentMethod[];
 }>();
 
@@ -40,8 +40,7 @@ const getPaymentName = () => {
     if (!props.selectedPayment) return null;
 
     if (props.paymentType === 'manual') {
-        return props.manualBanks.find((p) => p.id === props.selectedPayment)
-            ?.name;
+        return props.manualBank.name;
     } else {
         return props.paymentMethods.find((p) => p.id === props.selectedPayment)
             ?.name;

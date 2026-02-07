@@ -3,14 +3,19 @@
 namespace App\Http\Controllers\Main;
 
 use App\Actions\Main\StoreTransactionAction;
+use App\Actions\Main\UpdateTransactionAction;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Main\StoreTransactionRequest;
+use App\Http\Requests\Main\UpdateTransactionRequest;
 use App\Models\Order\Order;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 
 class TransactionController extends Controller
 {
+    /**
+     * Display a listing of the resource.
+     */
     public function check(Request $request)
     {
         // Search by reference if provided - redirect to show
@@ -53,9 +58,12 @@ class TransactionController extends Controller
         ]);
     }
 
+    /**
+     * Display the specified transaction.
+     */
     public function show(Order $order)
     {
-        $order->load('payment', 'product.media', 'brand.media');
+        $order->load('payment.media', 'product.media', 'brand.media');
 
         // Map product image
         if ($order->product) {
@@ -69,6 +77,12 @@ class TransactionController extends Controller
             $order->brand->makeHidden('media');
         }
 
+        // Payment proof image for manual payment
+        if ($order->payment->driver === 'manual') {
+            $order->payment->image = $order->payment?->getFirstMediaUrl('image');
+            $order->payment->makeHidden('media');
+        }
+
         $order = $this->maskData($order);
 
         return inertia('main/TransactionShow', [
@@ -76,6 +90,9 @@ class TransactionController extends Controller
         ]);
     }
 
+    /**
+     * Store a newly created transaction in storage.
+     */
     public function store(StoreTransactionRequest $request, StoreTransactionAction $action)
     {
         try {
@@ -104,6 +121,19 @@ class TransactionController extends Controller
         }
     }
 
+    /**
+     * Update payment proof for manual payment
+     */
+    public function update(UpdateTransactionRequest $request, Order $order, UpdateTransactionAction $action)
+    {
+        $action->handle($order, $request->validated());
+
+        return back();
+    }
+
+    /**
+     * Remove the specified resource from storage.
+     */
     private function maskData(Order $order)
     {
         // Mask sensitive data

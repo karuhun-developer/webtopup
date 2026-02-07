@@ -1,4 +1,5 @@
 import { InertiaLinkProps } from '@inertiajs/vue3';
+import { SettingValue } from './cms/setting';
 
 interface PaginationItem<T> {
     data: T[];
@@ -46,6 +47,7 @@ export type AppPageProps<
     name: string;
     quote: { message: string; author: string };
     auth: Auth;
+    setting: SettingValue;
     sidebarOpen: boolean;
 };
 

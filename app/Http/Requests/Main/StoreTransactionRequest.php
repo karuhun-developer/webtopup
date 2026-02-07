@@ -24,11 +24,11 @@ class StoreTransactionRequest extends FormRequest
             'name' => 'required|string|max:255',
             'phone' => 'required|numeric',
             'payment_type' => 'required|in:automatic,manual',
-            'payment_method' => 'required|in:qris,bca,bni,bri,mandiri,permata',
+            'payment_method' => 'required|string|max:255', // in:qris,bca,bni,bri,mandiri,permata
         ];
     }
 
-    /**
+    /**payment_method
      * Handle a passed validation attempt.
      */
     protected function passedValidation(): void

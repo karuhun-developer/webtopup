@@ -18,7 +18,7 @@ class SettingSeeder extends Seeder
                     'title' => 'TopupWok',
                     'email' => 'support@topupwok.id',
                     'phone' => '+62 812-3456-7890',
-                    'faq' => '<p>GGWP</p>',
+                    'privacy_policy' => '<p>GGWP</p>',
                     'terms' => '<p>GGWP</p>',
                     'footer_description' => 'Platform top up game terpercaya dengan harga terjangkau dan proses cepat. Layanan 24/7 untuk kepuasan pelanggan.',
                     'cs' => 'https://wa.me/6281234567890',
@@ -57,6 +57,10 @@ Detail pesanan anda bisa dilihat di link berikut:
 {link}
 
 Silakan coba melakukan pembelian kembali. Jika Anda memerlukan bantuan, jangan ragu untuk menghubungi kami di {cs_link}.',
+                    'manual_transfer_bank' => 'Bank BCA',
+                    'manual_transfer_bank_logo' => '/public/images/MANDIRI.svg',
+                    'manual_transfer_account_name' => 'PT TopupWok Indonesia',
+                    'manual_transfer_account_number' => '1234567890',
                 ],
             ]);
         }

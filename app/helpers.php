@@ -13,12 +13,19 @@ function currencyToNumber($value)
     return (int) str_replace('.', '', $value);
 }
 
-function getSetting(string $key)
+function getSetting(?string $key = null)
 {
-    return Cache::flexible('global:settings', [
+    $setting = Cache::flexible('global:settings', [
         60,
         120,
     ], function () {
         return Setting::first()->value;
-    })[$key] ?? null;
+    });
+
+    // If no key is provided, return the whole setting object
+    if (is_null($key)) {
+        return $setting;
+    }
+
+    return $setting[$key] ?? null;
 }
