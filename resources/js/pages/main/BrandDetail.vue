@@ -23,8 +23,8 @@ const setting = page?.props?.setting;
 // Form data using Inertia's useForm
 const form = useForm({
     type: props.brand.settings?.type || 'id',
-    account_id: '36688862',
-    server_id: '2052',
+    account_id: '', // 36688862
+    server_id: '', // 2052
     product_id: null as number | null,
     email: user?.email || '',
     name: user?.name || '',
