@@ -44,6 +44,7 @@ defineProps<{
                         v-for="category in categories"
                         :href="index().url + '?category=' + category.slug"
                         :key="category.id"
+                        preserve-scroll
                     >
                         <button
                             class="flex min-w-[140px] flex-col items-center gap-2 rounded-lg border border-border/50 bg-card p-4 transition-all hover:scale-105 hover:border-primary/50 hover:shadow-md"
