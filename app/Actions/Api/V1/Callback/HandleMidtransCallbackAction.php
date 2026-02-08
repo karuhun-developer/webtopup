@@ -126,11 +126,11 @@ class HandleMidtransCallbackAction
             $serverId = $order->submited['server_id'] ?? '';
             $customer = $accountId . $serverId;
 
-            Digiflazz::createPrepaidTransaction(
-                productCode: $order->product->sku,
-                customerNo: $customer,
-                refId: $order->reference,
-            );
+            // Digiflazz::createPrepaidTransaction(
+            //     productCode: $order->product->sku,
+            //     customerNo: $customer,
+            //     refId: $order->reference,
+            // );
 
             // Send notification to user
             $message = getSetting('template_payment_confirmation');
