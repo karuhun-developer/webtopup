@@ -12,7 +12,7 @@ defineProps<{
 </script>
 
 <template>
-    <Head title="Detail Transaksi" />
+    <Head :title="'Detail Transaksi ' + order.reference" />
 
     <div class="flex min-h-screen flex-col bg-background">
         <!-- Header -->

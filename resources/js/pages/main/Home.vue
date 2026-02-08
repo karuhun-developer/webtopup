@@ -18,7 +18,7 @@ defineProps<{
 </script>
 
 <template>
-    <Head title="Home - GameStore" />
+    <Head title="Home" />
 
     <div class="min-h-screen bg-background">
         <!-- Header -->

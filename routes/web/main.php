@@ -3,6 +3,8 @@
 use Illuminate\Support\Facades\Route;
 
 Route::get('/', [App\Http\Controllers\Main\HomeController::class, 'index'])->name('home');
+Route::get('/privacy-policy', [App\Http\Controllers\Main\ContentController::class, 'privacyPolicy'])->name('privacy-policy');
+Route::get('/terms', [App\Http\Controllers\Main\ContentController::class, 'terms'])->name('terms');
 Route::get('/brand/{brand}', [App\Http\Controllers\Main\BrandController::class, 'show'])->name('product.show');
 
 Route::post('/checkout', [App\Http\Controllers\Main\TransactionController::class, 'store'])->name('checkout.store');

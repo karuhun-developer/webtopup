@@ -1,4 +1,6 @@
 <script setup lang="ts">
+import { home, privacyPolicy, terms } from '@/routes';
+import { check } from '@/routes/transaction';
 import { Link, usePage } from '@inertiajs/vue3';
 import { Facebook, Instagram, Mail, Phone, Twitter } from 'lucide-vue-next';
 const page = usePage();
@@ -46,23 +48,23 @@ const page = usePage();
                     <ul class="space-y-2 text-sm">
                         <li>
                             <Link
-                                href="#"
+                                :href="home().url"
                                 class="text-muted-foreground transition-colors hover:text-primary"
                             >
-                                Tentang Kami
+                                Home
                             </Link>
                         </li>
                         <li>
                             <Link
-                                href="#"
+                                :href="check().url"
                                 class="text-muted-foreground transition-colors hover:text-primary"
                             >
-                                Syarat & Ketentuan
+                                Cek Transaksi
                             </Link>
                         </li>
                         <li>
                             <Link
-                                href="#"
+                                :href="privacyPolicy().url"
                                 class="text-muted-foreground transition-colors hover:text-primary"
                             >
                                 Kebijakan Privasi
@@ -70,10 +72,10 @@ const page = usePage();
                         </li>
                         <li>
                             <Link
-                                href="#"
+                                :href="terms().url"
                                 class="text-muted-foreground transition-colors hover:text-primary"
                             >
-                                FAQ
+                                Syarat & Ketentuan
                             </Link>
                         </li>
                     </ul>
