@@ -64,7 +64,7 @@ Silakan coba melakukan pembelian kembali. Jika Anda memerlukan bantuan, jangan r
                     'providers' => [
                         'digiflazz' => true,
                         'gift' => true,
-                    ]
+                    ],
                 ],
             ]);
         }

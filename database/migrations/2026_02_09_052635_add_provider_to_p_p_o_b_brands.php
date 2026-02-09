@@ -12,7 +12,7 @@ return new class extends Migration
     public function up(): void
     {
         Schema::table('p_p_o_b_brands', function (Blueprint $table) {
-            $table->string('provider')->after('id')->default('digiflazz');
+            $table->string('provider')->after('name')->default('digiflazz');
         });
     }
 

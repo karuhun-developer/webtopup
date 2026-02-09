@@ -16,6 +16,7 @@ class UpdatePPOBBrandRequest extends FormRequest
         return [
             'p_p_o_b_category_id' => 'required|exists:p_p_o_b_categories,id',
             'name' => 'required|string|max:255',
+            'provider' => 'required|in:digiflazz,gift',
             'description' => 'nullable|string|max:1000',
             'featured' => 'required|boolean',
             'order' => 'required|integer|min:1',

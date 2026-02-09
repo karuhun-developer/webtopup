@@ -44,8 +44,9 @@ const emit = defineEmits<{
                         v-if="product.image"
                         :src="product.image"
                         :alt="product.name"
-                        class="h-12 w-12 object-contain"
+                        class="object-contain"
                     />
+                    <!-- h-12 w-12  -->
                 </div>
                 <div class="text-sm font-semibold text-foreground">
                     {{ product.name }}

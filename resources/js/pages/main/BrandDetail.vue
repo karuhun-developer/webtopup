@@ -8,13 +8,21 @@ import PaymentMethodSelection from '@/components/brand-detail/PaymentMethodSelec
 import ProductSelection from '@/components/brand-detail/ProductSelection.vue';
 import MainFooter from '@/components/MainFooter.vue';
 import MainHeader from '@/components/MainHeader.vue';
+import {
+    Collapsible,
+    CollapsibleContent,
+    CollapsibleTrigger,
+} from '@/components/ui/collapsible';
 import { useSwal } from '@/composables/useSwal';
 import { PPOBBrandDataItem, PPOBProductDataItem } from '@/types/cms/ppob';
+import { FaqDataItem } from '@/types/cms/web';
 import { Head, useForm, usePage } from '@inertiajs/vue3';
+import { ChevronDown } from 'lucide-vue-next';
 import { computed } from 'vue';
 
 const props = defineProps<{
     brand: PPOBBrandDataItem;
+    faqs: FaqDataItem[];
 }>();
 const page = usePage();
 const user = page?.props?.auth?.user;
@@ -239,6 +247,20 @@ const handleCheckout = () => {
                             :manual-bank="manualBank"
                             :payment-methods="paymentMethods"
                         />
+
+                        <!-- Brand Description -->
+                        <div
+                            v-if="brand.description"
+                            class="rounded-lg border bg-card p-4 text-card-foreground"
+                        >
+                            <h2 class="mb-2 text-lg font-semibold">
+                                Deskripsi
+                            </h2>
+                            <div
+                                v-html="brand.description"
+                                class="text-sm"
+                            ></div>
+                        </div>
                     </div>
 
                     <!-- Right Column - Summary -->
@@ -256,6 +278,34 @@ const handleCheckout = () => {
                             @checkout="handleCheckout"
                         />
                     </div>
+                </div>
+            </div>
+
+            <!-- FAQ Section -->
+            <div v-if="faqs.length > 0" class="mx-auto mb-8 max-w-7xl px-4">
+                <h2 class="mb-4 text-xl font-semibold">Pertanyaan Umum</h2>
+                <div class="space-y-2">
+                    <Collapsible
+                        v-for="faq in faqs"
+                        :key="faq.id"
+                        v-slot="{ open }"
+                        class="rounded-lg border bg-card text-card-foreground"
+                    >
+                        <CollapsibleTrigger
+                            class="flex w-full items-center justify-between p-4 font-medium"
+                        >
+                            <span v-html="faq.question"></span>
+                            <ChevronDown
+                                class="h-4 w-4 transition-transform duration-200"
+                                :class="{ 'rotate-180': open }"
+                            />
+                        </CollapsibleTrigger>
+                        <CollapsibleContent
+                            class="p-4 pt-0 text-sm text-muted-foreground"
+                        >
+                            <div v-html="faq.answer"></div>
+                        </CollapsibleContent>
+                    </Collapsible>
                 </div>
             </div>
         </main>

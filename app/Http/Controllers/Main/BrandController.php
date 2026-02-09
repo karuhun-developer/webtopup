@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Main;
 
 use App\Http\Controllers\Controller;
 use App\Models\PPOB\PPOBBrand;
+use App\Models\Web\Faq;
 use Inertia\Response;
 
 class BrandController extends Controller
@@ -25,6 +26,7 @@ class BrandController extends Controller
 
         return inertia('main/BrandDetail', [
             'brand' => $brand,
+            'faqs' => Faq::where('status', true)->orderBy('order', 'asc')->get(),
         ]);
     }
 }

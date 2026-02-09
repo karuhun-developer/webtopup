@@ -122,6 +122,28 @@ const deleteServer = (index: number) => {
                 </div>
 
                 <div class="grid gap-2">
+                    <Label for="provider">Provider</Label>
+                    <InputDescription>
+                        Select the provider for this PPOB brand.
+                    </InputDescription>
+                    <Select
+                        name="provider"
+                        :default-value="brand.provider || 'digiflazz'"
+                    >
+                        <SelectTrigger id="provider" class="mt-1 w-full">
+                            <SelectValue placeholder="Select a provider" />
+                        </SelectTrigger>
+                        <SelectContent>
+                            <SelectItem value="digiflazz">
+                                Digiflazz
+                            </SelectItem>
+                            <SelectItem value="gift"> Gift </SelectItem>
+                        </SelectContent>
+                    </Select>
+                    <InputError :message="errors.provider" />
+                </div>
+
+                <div class="grid gap-2">
                     <Label for="description">Description</Label>
                     <InputDescription>
                         A brief description of the PPOB brand.

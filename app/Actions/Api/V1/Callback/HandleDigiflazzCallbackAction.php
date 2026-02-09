@@ -25,7 +25,9 @@ class HandleDigiflazzCallbackAction
          */
         $secret = config('digiflazz.webhook_secret');
 
-        if (!Webhook::validate($signature, $payload, $secret)) throw new \Exception('Invalid signature');
+        if (! Webhook::validate($signature, $payload, $secret)) {
+            throw new \Exception('Invalid signature');
+        }
 
         // Find order by reference ID
         $order = Order::where('reference', $data['ref_id'])->firstOrFail();

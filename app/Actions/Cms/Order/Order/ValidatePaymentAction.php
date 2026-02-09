@@ -40,16 +40,19 @@ class ValidatePaymentAction
                 'payment_status' => PaymentStatusEnum::SETTLEMENT,
             ]);
 
-            // Process Digiflazz Transaction
+            // Proccess Transaction
             $accountId = $order->submited['account_id'] ?? '';
             $serverId = $order->submited['server_id'] ?? '';
             $customer = $accountId.$serverId;
 
-            // Digiflazz::createPrepaidTransaction(
-            //     productCode: $order->product->sku,
-            //     customerNo: $customer,
-            //     refId: $order->reference,
-            // );
+            // If the provider is Digiflazz, create transaction to Digiflazz
+            if ($order->brand->provider === 'digiflazz') {
+                // Digiflazz::createPrepaidTransaction(
+                //     productCode: $order->product->sku,
+                //     customerNo: $customer,
+                //     refId: $order->reference,
+                // );
+            }
 
             // Send success notification
             $this->sendNotification($order, true);

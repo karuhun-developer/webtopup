@@ -43,9 +43,13 @@ class PPOBBrandController extends Controller
         $search = $request?->search ?? '';
 
         $model = $this->getDataWithFilter(
-            model: PPOBBrand::with('media', 'category')->when($request->has('filter_category_id'), function ($query) use ($request) {
-                $query->where('p_p_o_b_category_id', $request->filter_category_id);
-            }),
+            model: PPOBBrand::with('media', 'category')
+                ->when($request->has('filter_category_id'), function ($query) use ($request) {
+                    $query->where('p_p_o_b_category_id', $request->filter_category_id);
+                })
+                ->when($request->has('filter_provider'), function ($query) use ($request) {
+                    $query->where('provider', $request->filter_provider);
+                }),
             searchBy: [
                 'name',
                 'description',

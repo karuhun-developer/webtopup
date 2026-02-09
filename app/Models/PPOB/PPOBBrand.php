@@ -15,6 +15,7 @@ class PPOBBrand extends Model implements HasMedia
     protected $fillable = [
         'p_p_o_b_category_id',
         'name',
+        'provider',
         'slug',
         'description',
         'featured',

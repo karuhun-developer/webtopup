@@ -14,6 +14,7 @@ export interface PPOBBrandDataItem {
     id: number;
     p_p_o_b_category_id: number;
     name: string;
+    provider: string;
     slug: string;
     description?: string;
     featured: boolean;

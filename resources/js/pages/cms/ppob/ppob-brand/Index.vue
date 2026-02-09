@@ -16,6 +16,7 @@ import {
     SelectTrigger,
     SelectValue,
 } from '@/components/ui/select';
+import { useFilter } from '@/composables/useFilter';
 import { usePermission } from '@/composables/usePermission';
 import { useSwal } from '@/composables/useSwal';
 import AppLayout from '@/layouts/AppLayout.vue';
@@ -39,6 +40,7 @@ defineProps<{
 
 const { confirm, toast } = useSwal();
 const { hasPermission } = usePermission();
+const { updateParams } = useFilter();
 
 const title = 'PPOB Brands';
 const description =
@@ -46,6 +48,7 @@ const description =
 
 const columns = [
     { label: 'Category', key: 'category', sortable: false },
+    { label: 'Provider', key: 'provider', sortable: true },
     { label: 'Name', key: 'name', sortable: true },
     { label: 'Description', key: 'description', sortable: true },
     { label: 'Image', key: 'image', sortable: false },
@@ -75,15 +78,17 @@ const breadcrumbItems: BreadcrumbItem[] = [
 
 // Filter State
 const filter_category_id = ref<number | null>(null);
+const filter_provider = ref<string | null>(null);
 
 watch(filter_category_id, (newValue) => {
-    const query: Record<string, any> = {};
-    if (newValue) {
-        query.filter_category_id = newValue;
-    }
-    router.get(index().url, query, {
-        preserveState: true,
-        replace: true,
+    updateParams({
+        filter_category_id: newValue || undefined,
+    });
+});
+
+watch(filter_provider, (newValue) => {
+    updateParams({
+        filter_provider: newValue || undefined,
     });
 });
 </script>
@@ -110,7 +115,7 @@ watch(filter_category_id, (newValue) => {
             </div>
             <div class="grid grid-cols-1 gap-4 md:grid-cols-3">
                 <div class="flex flex-col">
-                    <Label for="status" class="mb-3">Category Filter</Label>
+                    <Label for="filter_category_id" class="mb-3">Category Filter</Label>
                     <Select
                         name="filter_category_id"
                         v-model="filter_category_id"
@@ -131,6 +136,31 @@ watch(filter_category_id, (newValue) => {
                                 :value="category.id"
                             >
                                 {{ category.name }}
+                            </SelectItem>
+                        </SelectContent>
+                    </Select>
+                </div>
+                <div class="flex flex-col">
+                    <Label for="filter_provider" class="mb-3">Provider Filter</Label>
+                    <Select
+                        name="filter_provider"
+                        v-model="filter_provider"
+                    >
+                        <SelectTrigger
+                            id="filter_provider"
+                            class="mt-1 w-full"
+                        >
+                            <SelectValue placeholder="Select a Provider" />
+                        </SelectTrigger>
+                        <SelectContent>
+                            <SelectItem :value="null">
+                                -- All Providers --
+                            </SelectItem>
+                            <SelectItem value="digiflazz">
+                                Digiflazz
+                            </SelectItem>
+                            <SelectItem value="gift">
+                                Gift
                             </SelectItem>
                         </SelectContent>
                     </Select>

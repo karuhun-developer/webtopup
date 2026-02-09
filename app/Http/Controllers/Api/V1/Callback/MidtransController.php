@@ -20,6 +20,7 @@ class MidtransController extends Controller
             Log::error('Midtrans Callback Error', [
                 'error' => $e->getMessage(),
             ]);
+
             return $this->responseWithError($e->getMessage(), 400);
         }
 

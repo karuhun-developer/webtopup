@@ -25,6 +25,7 @@ class DigiflazzController extends Controller
             Log::error('Digiflazz Callback Error', [
                 'error' => $e->getMessage(),
             ]);
+
             return $this->responseWithError($e->getMessage(), 400);
         }
 
