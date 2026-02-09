@@ -23,6 +23,11 @@ class UpdatePPOBCategoryAction
             );
         }
 
-        return $category->update($data);
+        $category->update($data);
+
+        // Update the status of the brands and products that belong to this category
+        $category->brands()->update(['status' => $category->status]);
+
+        return true;
     }
 }

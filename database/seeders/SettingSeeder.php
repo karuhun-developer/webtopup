@@ -61,6 +61,10 @@ Silakan coba melakukan pembelian kembali. Jika Anda memerlukan bantuan, jangan r
                     'manual_transfer_bank_logo' => '/public/images/MANDIRI.svg',
                     'manual_transfer_account_name' => 'PT TopupWok Indonesia',
                     'manual_transfer_account_number' => '1234567890',
+                    'providers' => [
+                        'digiflazz' => true,
+                        'gift' => true,
+                    ]
                 ],
             ]);
         }
