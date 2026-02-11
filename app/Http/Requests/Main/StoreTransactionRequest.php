@@ -47,23 +47,24 @@ class StoreTransactionRequest extends FormRequest
                 uid: $this->account_id,
             );
 
-            if (! $isValid['status']) {
-                Account::updateOrCreate(
-                    [
-                        'game' => 'mobilelegends',
-                        'uid' => $this->account_id,
-                        'server' => $this->server_id,
-                    ],
-                    [
-                        'username' => $isValid['nickname'] ?? 'Unknown',
-                        'meta' => $isValid['meta'] ?? null,
-                    ]
-                );
-
+            if ($isValid['status']) {
                 throw \Illuminate\Validation\ValidationException::withMessages([
                     'account_id' => 'Game id or server is invalid',
                 ]);
             }
+
+            // Update or create account
+            Account::updateOrCreate(
+                [
+                    'game' => 'mobilelegends',
+                    'uid' => $this->account_id,
+                    'server' => $this->server_id,
+                ],
+                [
+                    'username' => $isValid['nickname'] ?? 'Unknown',
+                    'meta' => $isValid['meta'] ?? null,
+                ]
+            );
         }
 
         // Merge additional data
