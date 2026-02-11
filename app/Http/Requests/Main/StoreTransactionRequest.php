@@ -47,7 +47,7 @@ class StoreTransactionRequest extends FormRequest
                 uid: $this->account_id,
             );
 
-            if ($isValid['status']) {
+            if (!$isValid['status']) {
                 throw \Illuminate\Validation\ValidationException::withMessages([
                     'account_id' => 'Game id or server is invalid',
                 ]);
