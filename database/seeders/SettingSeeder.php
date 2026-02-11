@@ -57,6 +57,18 @@ Detail pesanan anda bisa dilihat di link berikut:
 {link}
 
 Silakan coba melakukan pembelian kembali. Jika Anda memerlukan bantuan, jangan ragu untuk menghubungi kami di {cs_link}.',
+                    'template_gift_order_admin_friend_request' => '🎁 Permintaan Penambahan Teman untuk Gift Order *order_id*
+Halo *{customer_name}*, untuk memproses gift order Anda, kami telah melakukan penambahan teman pada akun penerima hadiah.
+Silakan konfirmasi penambahan teman tersebut dengan mengirimkan bukti screenshot accept friend request kepada kami di {cs_link}.
+Terima kasih atas kerjasamanya!',
+                    'template_gift_order_user_friend_confirmation' => '✅ Konfirmasi Penambahan Teman untuk Gift Order *{order_id}*
+Halo *{customer_name}*, terima kasih telah mengonfirmasi penambahan teman pada gift order Anda.
+Kami akan segera memproses pengiriman hadiah Anda, Silahkan tunggu 7 hari kerja untuk pengiriman hadiah Anda.
+Jika Anda memiliki pertanyaan lebih lanjut, silakan hubungi kami di {cs_link}. Kami siap membantu Anda!',
+                    'template_gift_order_completion' => '🎉 Gift Order Selesai!
+Halo *{customer_name}*, hadiah untuk gift order Anda dengan ID *{order_id}* telah berhasil dikirimkan kepada penerima.
+Terima kasih telah mempercayakan pembelian hadiah Anda kepada {app_name}!
+Jika Anda memiliki pertanyaan lebih lanjut, silakan hubungi kami di {cs_link}. Kami siap membantu Anda!',
                     'manual_transfer_bank' => 'Bank BCA',
                     'manual_transfer_bank_logo' => '/public/images/MANDIRI.svg',
                     'manual_transfer_account_name' => 'PT TopupWok Indonesia',

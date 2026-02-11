@@ -48,11 +48,20 @@ class SuperadminMenuSeeder extends Seeder
     {
         Menu::create([
             'role_id' => $this->role->id,
-            'name' => 'Orders',
-            'url' => '/cms/order/orders',
+            'name' => 'Topup Orders',
+            'url' => '/cms/order/topup-orders',
             'icon' => 'ShoppingCart',
             'order' => 5,
-            'active_pattern' => '/cms/order/orders',
+            'active_pattern' => '/cms/order/topup-orders',
+            'status' => 1,
+        ]);
+        Menu::create([
+            'role_id' => $this->role->id,
+            'name' => 'Gift Orders',
+            'url' => '/cms/order/gift-orders',
+            'icon' => 'Gift',
+            'order' => 6,
+            'active_pattern' => '/cms/order/gift-orders',
             'status' => 1,
         ]);
     }

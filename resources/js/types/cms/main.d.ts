@@ -20,6 +20,17 @@ export interface PaymentDataItem {
     updated_at: string;
 }
 
+export interface OrderNotificationDataItem {
+    id: number;
+    order_id: number;
+    provider: string;
+    title: string;
+    content: string;
+    error: string | null;
+    created_at: string;
+    updated_at: string;
+}
+
 export interface OrderDataItem {
     id: number;
     user_id: number;
@@ -42,4 +53,5 @@ export interface OrderDataItem {
     product?: PPOBProductDataItem;
     brand?: PPOBBrandDataItem;
     payment?: PaymentDataItem;
+    notifications?: OrderNotificationDataItem[];
 }

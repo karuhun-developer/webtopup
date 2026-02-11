@@ -7,20 +7,31 @@ interface FilterOption {
     value: string | number;
 }
 
-const props = defineProps<{
-    paymentFilters?: string[];
-    topupFilters?: string[];
-}>();
+const props = withDefaults(
+    defineProps<{
+        paymentFilters?: string[];
+        topupFilters?: string[];
+        giftSendFilters?: string[];
+        showTopupFilter?: boolean;
+        showPaymentFilter?: boolean;
+        showGiftSendFilter?: boolean;
+    }>(),
+    {
+        showTopupFilter: true,
+        showPaymentFilter: true,
+        showGiftSendFilter: false,
+    },
+);
 
 const emit = defineEmits<{
     'update:paymentFilters': [value: string[]];
     'update:topupFilters': [value: string[]];
+    'update:giftSendFilters': [value: string[]];
 }>();
 
 const localPaymentFilters = ref<string[]>(props.paymentFilters || []);
-const localTopupFilters = ref<string[]>(
-    (props.topupFilters || []).map(String),
-);
+const localTopupFilters = ref<string[]>((props.topupFilters || []).map(String));
+const localGiftSendFilters = ref<string[]>((props.giftSendFilters || []).map(String));
 
 // Watch for prop changes
 watch(
@@ -37,6 +48,13 @@ watch(
     },
 );
 
+watch(
+    () => props.giftSendFilters,
+    (newVal) => {
+        localGiftSendFilters.value = (newVal || []).map(String);
+    },
+);
+
 const paymentStatusOptions: FilterOption[] = [
     { label: 'Pending', value: 'pending' },
     { label: 'Settlement', value: 'settlement' },
@@ -48,6 +66,11 @@ const topupStatusOptions: FilterOption[] = [
     { label: 'On Progress', value: 1 },
     { label: 'Success', value: 2 },
     { label: 'Failed', value: 3 },
+];
+
+const giftSendStatusOptions: FilterOption[] = [
+    { label: 'Belum Selesai', value: 0 },
+    { label: 'Selesai', value: 1 },
 ];
 
 const togglePaymentFilter = (value: string) => {
@@ -70,12 +93,23 @@ const toggleTopupFilter = (value: number) => {
     }
     emit('update:topupFilters', localTopupFilters.value);
 };
+
+const toggleGiftSendFilter = (value: number) => {
+    const valueStr = String(value);
+    const index = localGiftSendFilters.value.indexOf(valueStr);
+    if (index > -1) {
+        localGiftSendFilters.value.splice(index, 1);
+    } else {
+        localGiftSendFilters.value.push(valueStr);
+    }
+    emit('update:giftSendFilters', localGiftSendFilters.value);
+};
 </script>
 
 <template>
     <div class="space-y-3">
         <!-- Payment Status Filters -->
-        <div class="flex flex-col gap-2">
+        <div class="flex flex-col gap-2" v-if="showPaymentFilter">
             <span class="text-sm font-medium text-foreground"
                 >Payment Status</span
             >
@@ -97,7 +131,7 @@ const toggleTopupFilter = (value: number) => {
         </div>
 
         <!-- Topup Status Filters -->
-        <div class="flex flex-col gap-2">
+        <div class="flex flex-col gap-2" v-if="showTopupFilter">
             <span class="text-sm font-medium text-foreground"
                 >Topup Status</span
             >
@@ -112,6 +146,28 @@ const toggleTopupFilter = (value: number) => {
                             localTopupFilters.includes(String(option.value)),
                     }"
                     @click="toggleTopupFilter(Number(option.value))"
+                >
+                    {{ option.label }}
+                </Button>
+            </div>
+        </div>
+
+        <!-- Gift Send Status Filters -->
+        <div class="flex flex-col gap-2" v-if="showGiftSendFilter">
+            <span class="text-sm font-medium text-foreground"
+                >Gift Send Status</span
+            >
+            <div class="flex flex-wrap gap-2">
+                <Button
+                    v-for="option in giftSendStatusOptions"
+                    :key="option.value"
+                    variant="outline"
+                    size="sm"
+                    :class="{
+                        'bg-primary text-primary-foreground hover:bg-primary/90':
+                            localGiftSendFilters.includes(String(option.value)),
+                    }"
+                    @click="toggleGiftSendFilter(Number(option.value))"
                 >
                     {{ option.label }}
                 </Button>

@@ -109,7 +109,10 @@ defineProps<{
                         type="payment"
                     />
                 </div>
-                <div class="flex items-center justify-between">
+                <div
+                    class="flex items-center justify-between"
+                    v-if="order.brand?.provider === 'digiflazz'"
+                >
                     <span class="text-sm text-muted-foreground">
                         Status Top Up
                     </span>

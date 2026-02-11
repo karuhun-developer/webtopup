@@ -11,6 +11,9 @@ export interface SettingValue {
     template_payment_rejected?: string;
     template_order_completed?: string;
     template_order_failed?: string;
+    template_gift_order_admin_friend_request?: string;
+    template_gift_order_user_friend_confirmation?: string;
+    template_gift_order_completion?: string;
     manual_transfer_bank?: string;
     manual_transfer_bank_logo?: string;
     manual_transfer_account_name?: string;

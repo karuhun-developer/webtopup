@@ -6,18 +6,20 @@ Route::group([
     'prefix' => 'order',
     'as' => 'order.',
 ], function () {
-    Route::get('orders', [\App\Http\Controllers\Cms\Order\OrderController::class, 'index'])
-        ->name('orders.index');
+    // Topup Orders
+    Route::get('topup-orders', [\App\Http\Controllers\Cms\Order\OrderController::class, 'index'])->name('orders.index');
+    Route::get('topup-orders/create', [\App\Http\Controllers\Cms\Order\OrderController::class, 'create'])->name('orders.create');
+    Route::post('topup-orders', [\App\Http\Controllers\Cms\Order\OrderController::class, 'store'])->name('orders.store');
+    Route::get('topup-orders/{order}', [\App\Http\Controllers\Cms\Order\OrderController::class, 'show'])->name('orders.show');
+    Route::put('topup-orders/{order}/validate-payment', [\App\Http\Controllers\Cms\Order\OrderController::class, 'validatePayment'])->name('orders.validate-payment');
 
-    Route::get('orders/create', [\App\Http\Controllers\Cms\Order\OrderController::class, 'create'])
-        ->name('orders.create');
-
-    Route::post('orders', [\App\Http\Controllers\Cms\Order\OrderController::class, 'store'])
-        ->name('orders.store');
-
-    Route::get('orders/{order}', [\App\Http\Controllers\Cms\Order\OrderController::class, 'show'])
-        ->name('orders.show');
-
-    Route::put('orders/{order}/validate-payment', [\App\Http\Controllers\Cms\Order\OrderController::class, 'validatePayment'])
-        ->name('orders.validate-payment');
+    // Gift Orders
+    Route::get('gift-orders', [\App\Http\Controllers\Cms\Order\GiftOrderController::class, 'index'])->name('gift-orders.index');
+    Route::get('gift-orders/create', [\App\Http\Controllers\Cms\Order\GiftOrderController::class, 'create'])->name('gift-orders.create');
+    Route::post('gift-orders', [\App\Http\Controllers\Cms\Order\GiftOrderController::class, 'store'])->name('gift-orders.store');
+    Route::get('gift-orders/{order}', [\App\Http\Controllers\Cms\Order\GiftOrderController::class, 'show'])->name('gift-orders.show');
+    Route::put('gift-orders/{order}', [\App\Http\Controllers\Cms\Order\GiftOrderController::class, 'save'])->name('gift-orders.save');
+    Route::put('gift-orders/{order}/notify', [\App\Http\Controllers\Cms\Order\GiftOrderController::class, 'notify'])->name('gift-orders.notify');
+    Route::get('gift-orders/{order}/validate', [\App\Http\Controllers\Cms\Order\GiftOrderController::class, 'validatePaymentView'])->name('gift-orders.validate');
+    Route::put('gift-orders/{order}/validate-payment', [\App\Http\Controllers\Cms\Order\GiftOrderController::class, 'validatePayment'])->name('gift-orders.validate-payment');
 });

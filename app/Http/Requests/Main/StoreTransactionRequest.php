@@ -2,6 +2,7 @@
 
 namespace App\Http\Requests\Main;
 
+use App\Models\Account\Account;
 use App\Models\PPOB\PPOBProduct;
 use App\Services\GameService;
 use Illuminate\Foundation\Http\FormRequest;
@@ -28,7 +29,7 @@ class StoreTransactionRequest extends FormRequest
         ];
     }
 
-    /**payment_method
+    /**
      * Handle a passed validation attempt.
      */
     protected function passedValidation(): void
@@ -47,6 +48,18 @@ class StoreTransactionRequest extends FormRequest
             );
 
             if (! $isValid['status']) {
+                Account::updateOrCreate(
+                    [
+                        'game' => 'mobilelegends',
+                        'uid' => $this->account_id,
+                        'server' => $this->server_id,
+                    ],
+                    [
+                        'username' => $isValid['nickname'] ?? 'Unknown',
+                        'meta' => $isValid['meta'] ?? null,
+                    ]
+                );
+
                 throw \Illuminate\Validation\ValidationException::withMessages([
                     'account_id' => 'Game id or server is invalid',
                 ]);

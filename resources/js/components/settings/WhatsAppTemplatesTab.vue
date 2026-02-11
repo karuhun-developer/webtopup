@@ -106,6 +106,66 @@ defineProps<{
                     {cs_link}
                 </p>
             </div>
+
+            <div class="grid gap-2">
+                <Label for="template_gift_order_admin_friend_request"
+                    >Gift Order - Admin Friend Request Template</Label
+                >
+                <Textarea
+                    id="template_gift_order_admin_friend_request"
+                    name="value[template_gift_order_admin_friend_request]"
+                    :default-value="setting?.template_gift_order_admin_friend_request"
+                    placeholder="WhatsApp template for gift order admin friend request"
+                    rows="8"
+                />
+                <InputError
+                    :message="errors['value.template_gift_order_admin_friend_request']"
+                />
+                <p class="text-xs text-muted-foreground">
+                    Available variables: {customer_name}, {order_id},
+                    {cs_link}
+                </p>
+            </div>
+
+            <div class="grid gap-2">
+                <Label for="template_gift_order_user_friend_confirmation"
+                    >Gift Order - User Friend Confirmation Template</Label
+                >
+                <Textarea
+                    id="template_gift_order_user_friend_confirmation"
+                    name="value[template_gift_order_user_friend_confirmation]"
+                    :default-value="setting?.template_gift_order_user_friend_confirmation"
+                    placeholder="WhatsApp template for gift order user friend confirmation"
+                    rows="8"
+                />
+                <InputError
+                    :message="errors['value.template_gift_order_user_friend_confirmation']"
+                />
+                <p class="text-xs text-muted-foreground">
+                    Available variables: {customer_name}, {order_id},
+                    {app_name}, {cs_link}
+                </p>
+            </div>
+
+            <div class="grid gap-2">
+                <Label for="template_gift_order_completion"
+                    >Gift Order - Completion Template</Label
+                >
+                <Textarea
+                    id="template_gift_order_completion"
+                    name="value[template_gift_order_completion]"
+                    :default-value="setting?.template_gift_order_completion"
+                    placeholder="WhatsApp template for gift order completion"
+                    rows="8"
+                />
+                <InputError
+                    :message="errors['value.template_gift_order_completion']"
+                />
+                <p class="text-xs text-muted-foreground">
+                    Available variables: {customer_name}, {order_id},
+                    {app_name}, {cs_link}
+                </p>
+            </div>
         </div>
     </div>
 </template>

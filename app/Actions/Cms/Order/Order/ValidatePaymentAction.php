@@ -20,10 +20,6 @@ class ValidatePaymentAction
     {
         $payment = $order->payment;
 
-        if (! $payment || $payment->driver !== 'manual') {
-            throw new \Exception('Payment not found or not manual transfer');
-        }
-
         if ($payment->paid_at) {
             throw new \Exception('Payment already validated');
         }
@@ -97,10 +93,24 @@ class ValidatePaymentAction
         }
 
         // Send message via Voda
-        $this->vodaService->sendMessage(
-            phone: $order->phone,
-            message: $message,
-            linkPreview: true,
-        );
+        $isNotificationError = false;
+        try {
+            $this->vodaService->sendMessage(
+                phone: $order->phone,
+                message: $message,
+                linkPreview: true,
+            );
+        } catch (\Exception $e) {
+            Log::error('Failed to send Voda message: '.$e->getMessage());
+            $isNotificationError = true;
+        }
+
+        // Create notification record
+        $order->notifications()->create([
+            'provider' => 'voda',
+            'title' => 'Payment '.($isSuccess ? 'Confirmed' : 'Rejected'),
+            'content' => $message,
+            'error' => $isNotificationError,
+        ]);
     }
 }

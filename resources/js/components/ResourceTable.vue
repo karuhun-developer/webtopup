@@ -18,7 +18,6 @@ import {
 } from '@/components/ui/table';
 import { useFilter } from '@/composables/useFilter';
 import { PaginationItem } from '@/types';
-import { router } from '@inertiajs/vue3';
 import { useDebounceFn } from '@vueuse/core';
 import {
     ChevronDown,

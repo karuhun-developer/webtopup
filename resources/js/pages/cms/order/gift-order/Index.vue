@@ -2,7 +2,8 @@
 import {
     create,
     show,
-} from '@/actions/App/Http/Controllers/Cms/Order/OrderController';
+    validatePaymentView,
+} from '@/actions/App/Http/Controllers/Cms/Order/GiftOrderController';
 import Heading from '@/components/Heading.vue';
 import OrderStatusFilter from '@/components/order/OrderStatusFilter.vue';
 import ResourceTable from '@/components/ResourceTable.vue';
@@ -12,7 +13,7 @@ import { usePermission } from '@/composables/usePermission';
 import AppLayout from '@/layouts/AppLayout.vue';
 import { PaginationItem, type BreadcrumbItem } from '@/types';
 import { OrderDataItem } from '@/types/cms/main';
-import { Head } from '@inertiajs/vue3';
+import { Head, Link } from '@inertiajs/vue3';
 import { ModalLink } from '@inertiaui/modal-vue';
 import dayjs from 'dayjs';
 import { CheckCircle, Eye, Plus } from 'lucide-vue-next';
@@ -26,20 +27,25 @@ const props = defineProps<{
     paginate?: number;
     resource: string;
     paymentStatusFilter?: string[];
-    topupStatusFilter?: string[];
+    giftSendFilter?: string[];
 }>();
 
 const { hasPermission } = usePermission();
 const { updateParams } = useFilter();
 
-const title = 'Topup Orders';
-const description = 'Manage and monitor all topup orders placed by customers.';
+const title = 'Gift Orders';
+const description = 'Manage and monitor all gift orders placed by customers.';
 
 const columns = [
     { label: 'Reference', key: 'reference', sortable: true },
     { label: 'Customer', key: 'name', sortable: true },
-    { label: 'Payment', key: 'payment_status', sortable: true },
-    { label: 'Topup', key: 'topup_status', sortable: true },
+    {
+        label: 'Payment',
+        key: 'payment_status',
+        actualKey: 'gift_status',
+        sortable: true,
+    },
+    { label: 'Gift Status', key: 'gift_status', sortable: false },
     { label: 'Created At', key: 'created_at', sortable: true },
     { label: 'Expired At', key: 'expired_at', sortable: false },
     {
@@ -60,7 +66,7 @@ const breadcrumbItems: BreadcrumbItem[] = [
 
 // Filter state
 const paymentFilters = ref<string[]>(props.paymentStatusFilter || []);
-const topupFilters = ref<string[]>((props.topupStatusFilter || []).map(String));
+const giftSendFilters = ref<string[]>(props.giftSendFilter || []);
 
 // Watch for prop changes to update local state
 watch(
@@ -71,9 +77,9 @@ watch(
 );
 
 watch(
-    () => props.topupStatusFilter,
+    () => props.giftSendFilter,
     (newVal) => {
-        topupFilters.value = (newVal || []).map(String);
+        giftSendFilters.value = newVal || [];
     },
 );
 
@@ -86,10 +92,10 @@ const handlePaymentFiltersUpdate = (filters: string[]) => {
     });
 };
 
-const handleTopupFiltersUpdate = (filters: string[]) => {
-    topupFilters.value = filters;
+const handleGiftSendFiltersUpdate = (filters: string[]) => {
+    giftSendFilters.value = filters;
     updateParams({
-        topup_status: filters.length > 0 ? filters : undefined,
+        gift_send: filters.length > 0 ? filters : undefined,
         page: 1,
     });
 };
@@ -117,9 +123,11 @@ const handleTopupFiltersUpdate = (filters: string[]) => {
             <!-- Filter Tabs -->
             <OrderStatusFilter
                 :payment-filters="paymentFilters"
-                :topup-filters="topupFilters"
+                :gift-send-filters="giftSendFilters"
+                :show-topup-filter="false"
+                :show-gift-send-filter="true"
                 @update:payment-filters="handlePaymentFiltersUpdate"
-                @update:topup-filters="handleTopupFiltersUpdate"
+                @update:gift-send-filters="handleGiftSendFiltersUpdate"
             />
 
             <ResourceTable
@@ -179,29 +187,17 @@ const handleTopupFiltersUpdate = (filters: string[]) => {
                         </span>
                     </div>
                 </template>
-                <template #topup_status="{ row }">
+                <template #gift_status="{ row }">
                     <span
-                        class="inline-flex items-center rounded-md px-2.5 py-1 text-xs font-semibold"
+                        class="inline-flex w-fit items-center rounded-md px-2.5 py-1 text-xs font-semibold"
                         :class="{
                             'bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-400':
-                                row.topup_status === 2,
+                                row.submited.gift_send,
                             'bg-yellow-100 text-yellow-800 dark:bg-yellow-900/30 dark:text-yellow-400':
-                                row.topup_status === 0,
-                            'bg-blue-100 text-blue-800 dark:bg-blue-900/30 dark:text-blue-400':
-                                row.topup_status === 1,
-                            'bg-red-100 text-red-800 dark:bg-red-900/30 dark:text-red-400':
-                                row.topup_status === 3,
+                                !row.submited.gift_send,
                         }"
                     >
-                        {{
-                            row.topup_status === 2
-                                ? 'Success'
-                                : row.topup_status === 0
-                                  ? 'Pending'
-                                  : row.topup_status === 1
-                                    ? 'On Progress'
-                                    : 'Failed'
-                        }}
+                        {{ row.submited.gift_send ? 'Sent' : 'Not Sent' }}
                     </span>
                 </template>
                 <template #created_at="{ row }">
@@ -222,7 +218,10 @@ const handleTopupFiltersUpdate = (filters: string[]) => {
                                 row.payment_status === 0 &&
                                 hasPermission('update' + resource)
                             "
-                            :href="show({ order: row.reference }).url"
+                            :href="
+                                validatePaymentView({ order: row.reference })
+                                    .url
+                            "
                             slideover
                         >
                             <Button
@@ -235,13 +234,9 @@ const handleTopupFiltersUpdate = (filters: string[]) => {
                         </ModalLink>
 
                         <!-- View Order Details -->
-                        <ModalLink
+                        <Link
                             :href="show({ order: row.reference }).url"
-                            slideover
-                            v-if="
-                                row.payment_status !== 0 &&
-                                hasPermission('view' + resource)
-                            "
+                            v-if="hasPermission('view' + resource)"
                         >
                             <Button
                                 variant="ghost"
@@ -250,7 +245,7 @@ const handleTopupFiltersUpdate = (filters: string[]) => {
                             >
                                 <Eye class="h-4 w-4" />
                             </Button>
-                        </ModalLink>
+                        </Link>
                     </div>
                 </template>
             </ResourceTable>

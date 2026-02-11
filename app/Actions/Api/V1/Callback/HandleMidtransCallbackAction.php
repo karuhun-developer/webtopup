@@ -144,13 +144,6 @@ class HandleMidtransCallbackAction
                 'order' => $order,
             ]), $message);
             $message = str_replace('{cs_link}', getSetting('cs'), $message);
-
-            // Send message via Voda
-            $this->vodaService->sendMessage(
-                phone: $order->phone,
-                message: $message,
-                linkPreview: true,
-            );
         } else {
             // Send notification to user
             $message = getSetting('template_payment_rejected');
@@ -161,13 +154,28 @@ class HandleMidtransCallbackAction
                 'order' => $order,
             ]), $message);
             $message = str_replace('{cs_link}', getSetting('cs'), $message);
+        }
 
+        // Send message via Voda
+        $isNotificationError = false;
+        try {
             // Send message via Voda
             $this->vodaService->sendMessage(
                 phone: $order->phone,
                 message: $message,
                 linkPreview: true,
             );
+        } catch (\Exception $e) {
+            Log::error('Failed to send Voda message: '.$e->getMessage());
+            $isNotificationError = true;
         }
+
+        // Create notification record
+        $order->notifications()->create([
+            'provider' => 'voda',
+            'title' => 'Payment '.($isSuccess ? 'Confirmed' : 'Rejected'),
+            'content' => $message,
+            'error' => $isNotificationError,
+        ]);
     }
 }

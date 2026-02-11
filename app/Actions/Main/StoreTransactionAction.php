@@ -8,6 +8,7 @@ use App\Models\PPOB\PPOBProduct;
 use App\Services\MidtransService;
 use App\Services\VodaService;
 use App\Traits\WithGenerateReference;
+use Illuminate\Support\Facades\Log;
 
 class StoreTransactionAction
 {
@@ -47,6 +48,21 @@ class StoreTransactionAction
         } else {
             $data['fee'] = 0;
             $data['total_amount'] = $data['amount'];
+        }
+
+        // If brand provider is gift then add step to submited data
+        if ($product->brand->provider === 'gift') {
+            $data['submited'] = [
+                ...$data['submited'],
+                'admin_account_ign' => '',
+                'admin_add_friend' => false,
+                'admin_add_friend_timestamp' => '',
+                'user_confirm_friend' => false,
+                'user_confirm_friend_timestamp' => '',
+                'gift_send' => false,
+                'dispute' => false,
+                'done' => false,
+            ];
         }
 
         $order = Order::create($data);
@@ -112,11 +128,25 @@ class StoreTransactionAction
         $message = str_replace('{cs_link}', getSetting('cs'), $message);
 
         // Send message via Voda
-        $this->vodaService->sendMessage(
-            phone: $order->phone,
-            message: $message,
-            linkPreview: true,
-        );
+        $isNotificationError = false;
+        try {
+            $this->vodaService->sendMessage(
+                phone: $order->phone,
+                message: $message,
+                linkPreview: true,
+            );
+        } catch (\Exception $e) {
+            Log::error('Failed to send Voda message: '.$e->getMessage());
+            $isNotificationError = true;
+        }
+
+        // Create notification record
+        $order->notifications()->create([
+            'provider' => 'voda',
+            'title' => 'Order Created',
+            'content' => $message,
+            'error' => $isNotificationError,
+        ]);
 
         return $order;
     }

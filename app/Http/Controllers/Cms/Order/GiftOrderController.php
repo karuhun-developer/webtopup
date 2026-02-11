@@ -2,17 +2,22 @@
 
 namespace App\Http\Controllers\Cms\Order;
 
+use App\Actions\Cms\Order\GiftOrder\SendNotificationAction;
+use App\Actions\Cms\Order\GiftOrder\UpdateProgressAction;
 use App\Actions\Cms\Order\Order\StoreOrderAction;
 use App\Actions\Cms\Order\Order\ValidatePaymentAction;
 use App\Http\Controllers\Controller;
+use App\Http\Requests\Cms\Order\GiftOrder\SendNotificationRequest;
+use App\Http\Requests\Cms\Order\GiftOrder\UpdateProgressRequest;
 use App\Http\Requests\Cms\Order\Order\StoreOrderRequest;
 use App\Http\Requests\Cms\Order\Order\ValidatePaymentRequest;
+use App\Models\Account\Account;
 use App\Models\Order\Order;
 use App\Traits\WithGetFilterData;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Gate;
 
-class OrderController extends Controller
+class GiftOrderController extends Controller
 {
     use WithGetFilterData;
 
@@ -31,9 +36,9 @@ class OrderController extends Controller
         $searchBySpecific = $request?->searchBySpecific ?? '';
         $search = $request?->search ?? '';
         $paymentStatusFilter = $request?->payment_status ?? [];
-        $topupStatusFilter = $request?->topup_status ?? [];
+        $giftSendFilter = $request?->gift_send ?? [];
 
-        $query = Order::with('brand', 'product', 'payment.media')->whereHas('brand', fn ($q) => $q->where('provider', 'digiflazz'));
+        $query = Order::with('brand', 'product', 'payment.media')->whereHas('brand', fn ($q) => $q->where('provider', 'gift'));
 
         // Apply payment status filter
         if (! empty($paymentStatusFilter)) {
@@ -50,9 +55,13 @@ class OrderController extends Controller
             });
         }
 
-        // Apply topup status filter
-        if (! empty($topupStatusFilter)) {
-            $query->whereIn('topup_status', $topupStatusFilter);
+        // Apply gift send filter
+        if (! empty($giftSendFilter)) {
+            $query->where(function ($q) use ($giftSendFilter) {
+                foreach ($giftSendFilter as $status) {
+                    $q->orWhere('submited->gift_send', (bool) $status);
+                }
+            });
         }
 
         $model = $this->getDataWithFilter(
@@ -80,7 +89,7 @@ class OrderController extends Controller
             return $item;
         });
 
-        return inertia('cms/order/order/Index', [
+        return inertia('cms/order/gift-order/Index', [
             'data' => $model,
             'order' => $order,
             'orderBy' => $orderBy,
@@ -89,7 +98,7 @@ class OrderController extends Controller
             'search' => $search,
             'resource' => $this->resource,
             'paymentStatusFilter' => $paymentStatusFilter,
-            'topupStatusFilter' => $topupStatusFilter,
+            'giftSendFilter' => $giftSendFilter,
         ]);
     }
 
@@ -100,7 +109,7 @@ class OrderController extends Controller
     {
         Gate::authorize('create'.$this->resource);
 
-        return inertia('cms/order/order/Create');
+        return inertia('cms/order/gift-order/Create');
     }
 
     /**
@@ -122,6 +131,61 @@ class OrderController extends Controller
     {
         Gate::authorize('view'.$this->resource);
 
+        $order->load('brand', 'product', 'notifications', 'media');
+
+        // Try to get Mobile Legends account nickname
+        $mlAccount = null;
+        if (isset($order->submited['account_id']) && isset($order->submited['server_id'])) {
+            $mlAccount = Account::where('game', 'mobilelegends')
+                ->where('uid', $order->submited['account_id'])
+                ->where('server', $order->submited['server_id'])
+                ->first();
+        }
+
+        // Load media admin_add_friend_proof user_confirm_friend_proof gift_send_proof
+        $submittedData = $order->submited;
+        $submittedData['admin_add_friend_proof'] = $order->getFirstMediaUrl('admin_add_friend_proof');
+        $submittedData['user_confirm_friend_proof'] = $order->getFirstMediaUrl('user_confirm_friend_proof');
+        $submittedData['gift_send_proof'] = $order->getFirstMediaUrl('gift_send_proof');
+        $order->submited = $submittedData;
+
+        return inertia('cms/order/gift-order/Show', [
+            'order' => $order,
+            'mlAccountNickname' => $mlAccount?->username,
+        ]);
+    }
+
+    /**
+     * Save order updates.
+     */
+    public function save(Order $order, UpdateProgressRequest $request, UpdateProgressAction $action)
+    {
+        Gate::authorize('update'.$this->resource);
+
+        $action->handle($order, $request->validated());
+
+        return back()->with('success', 'Progress pengiriman berhasil disimpan');
+    }
+
+    /**
+     * Send Notification
+     */
+    public function notify(Order $order, SendNotificationRequest $request, SendNotificationAction $action)
+    {
+        Gate::authorize('update'.$this->resource);
+
+        $action->handle($order, $request->validated());
+
+        return back()->with('success', 'Notifikasi berhasil dikirim');
+    }
+
+    /**
+     * Display validate payment modal.
+     */
+    public function validatePaymentView(Order $order)
+    {
+        Gate::authorize('update'.$this->resource);
+
         $order->load('brand', 'product', 'payment.media');
 
         // Load payment image if manual
@@ -131,7 +195,7 @@ class OrderController extends Controller
 
         $order->payment?->makeHidden('media');
 
-        return inertia('cms/order/order/Show', [
+        return inertia('cms/order/gift-order/ValidatePayment', [
             'order' => $order,
         ]);
     }

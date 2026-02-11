@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { validatePayment } from '@/actions/App/Http/Controllers/Cms/Order/OrderController';
+import { validatePayment } from '@/actions/App/Http/Controllers/Cms/Order/GiftOrderController';
 import StatusBadge from '@/components/transaction/StatusBadge.vue';
 import { Button } from '@/components/ui/button';
 import { useSwal } from '@/composables/useSwal';
@@ -109,7 +109,7 @@ const rejectPayment = async (close: () => void) => {
                             class="h-20 w-20 rounded-lg object-cover"
                         />
                         <div class="flex-1">
-                            <p class="text-xs text-muted-foreground uppercase">
+                            <p class="text-xs uppercase text-muted-foreground">
                                 {{ order?.brand?.name }}
                             </p>
                             <h3 class="text-lg font-bold">
@@ -125,12 +125,12 @@ const rejectPayment = async (close: () => void) => {
                         <div>
                             <p class="text-xs text-muted-foreground">
                                 ID Akun
-                                {{ order.submited.server_id ? '/ Server' : '' }}
+                                {{ order.submited?.server_id ? '/ Server' : '' }}
                             </p>
                             <p class="font-mono font-medium">
-                                {{ order.submited.account_id }}
+                                {{ order.submited?.account_id || '-' }}
                                 {{
-                                    order.submited.server_id
+                                    order.submited?.server_id
                                         ? `/ ${order.submited.server_id}`
                                         : ''
                                 }}
@@ -234,16 +234,12 @@ const rejectPayment = async (close: () => void) => {
                     <div class="grid grid-cols-2 gap-4">
                         <div class="rounded-lg border bg-card p-3">
                             <p class="mb-2 text-xs text-muted-foreground">
-                                Status Pembayaran | Topup
+                                Status
                             </p>
                             <div class="flex gap-2">
                                 <StatusBadge
                                     :status="order.payment_status"
                                     type="payment"
-                                />
-                                <StatusBadge
-                                    :status="order.topup_status"
-                                    type="topup"
                                 />
                             </div>
                         </div>

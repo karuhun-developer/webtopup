@@ -3,9 +3,13 @@
 namespace App\Models\Order;
 
 use Illuminate\Database\Eloquent\Model;
+use Spatie\MediaLibrary\HasMedia;
+use Spatie\MediaLibrary\InteractsWithMedia;
 
-class Order extends Model
+class Order extends Model implements HasMedia
 {
+    use InteractsWithMedia;
+
     protected $fillable = [
         'user_id',
         'p_p_o_b_brand_id',
@@ -54,5 +58,10 @@ class Order extends Model
     public function payment()
     {
         return $this->morphOne(\App\Models\Payment\Payment::class, 'payable');
+    }
+
+    public function notifications()
+    {
+        return $this->hasMany(OrderNotification::class);
     }
 }

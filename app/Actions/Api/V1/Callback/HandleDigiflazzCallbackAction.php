@@ -50,11 +50,26 @@ class HandleDigiflazzCallbackAction
             $message = str_replace('{cs_link}', getSetting('cs'), $message);
 
             // Send message via Voda
-            $this->vodaService->sendMessage(
-                phone: $order->phone,
-                message: $message,
-                linkPreview: true,
-            );
+            $isNotificationError = false;
+            try {
+                // Send message via Voda
+                $this->vodaService->sendMessage(
+                    phone: $order->phone,
+                    message: $message,
+                    linkPreview: true,
+                );
+            } catch (\Exception $e) {
+                Log::error('Failed to send Voda message: '.$e->getMessage());
+                $isNotificationError = true;
+            }
+
+            // Create notification record
+            $order->notifications()->create([
+                'provider' => 'voda',
+                'title' => 'Order Completed',
+                'content' => $message,
+                'error' => $isNotificationError,
+            ]);
         }
     }
 }

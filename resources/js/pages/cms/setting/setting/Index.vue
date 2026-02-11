@@ -57,9 +57,7 @@ const activeTab = ref<Tab>('general');
                 v-slot="{ errors, processing }"
             >
                 <!-- Tabs Header with Save Button -->
-                <div
-                    class="flex items-center justify-between border-b bg-card"
-                >
+                <div class="flex items-center justify-between border-b bg-card">
                     <div class="flex gap-6 px-6">
                         <Button
                             type="button"
@@ -75,7 +73,7 @@ const activeTab = ref<Tab>('general');
                             General Information
                             <span
                                 v-if="activeTab === 'general'"
-                                class="absolute bottom-0 left-0 right-0 h-0.5 bg-primary"
+                                class="absolute right-0 bottom-0 left-0 h-0.5 bg-primary"
                             ></span>
                         </Button>
 
@@ -93,7 +91,7 @@ const activeTab = ref<Tab>('general');
                             Content Pages
                             <span
                                 v-if="activeTab === 'content'"
-                                class="absolute bottom-0 left-0 right-0 h-0.5 bg-primary"
+                                class="absolute right-0 bottom-0 left-0 h-0.5 bg-primary"
                             ></span>
                         </Button>
 
@@ -111,7 +109,7 @@ const activeTab = ref<Tab>('general');
                             WhatsApp Templates
                             <span
                                 v-if="activeTab === 'templates'"
-                                class="absolute bottom-0 left-0 right-0 h-0.5 bg-primary"
+                                class="absolute right-0 bottom-0 left-0 h-0.5 bg-primary"
                             ></span>
                         </Button>
 
@@ -129,7 +127,7 @@ const activeTab = ref<Tab>('general');
                             Manual Transfer
                             <span
                                 v-if="activeTab === 'transfer'"
-                                class="absolute bottom-0 left-0 right-0 h-0.5 bg-primary"
+                                class="absolute right-0 bottom-0 left-0 h-0.5 bg-primary"
                             ></span>
                         </Button>
                     </div>
@@ -166,6 +164,13 @@ const activeTab = ref<Tab>('general');
                         :setting="setting?.value"
                         :errors="errors"
                     />
+                </div>
+
+                <!-- Bottom Save Button -->
+                <div class="flex justify-end rounded-lg border bg-card p-4">
+                    <Button :disabled="processing" size="default">
+                        Save Settings
+                    </Button>
                 </div>
             </Form>
         </div>
