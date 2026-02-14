@@ -5,7 +5,7 @@ import { Label } from '@/components/ui/label';
 import { useSwal } from '@/composables/useSwal';
 import { formatCurrency } from '@/lib/utils';
 import { PaymentDataItem } from '@/types/cms/main';
-import { useForm } from '@inertiajs/vue3';
+import { useForm, usePage } from '@inertiajs/vue3';
 import dayjs from 'dayjs';
 import { Clock, Copy, Upload } from 'lucide-vue-next';
 import { ref } from 'vue';
@@ -16,6 +16,8 @@ const props = defineProps<{
     totalAmount: number;
 }>();
 
+const page = usePage();
+const setting = page.props.setting;
 const { toast } = useSwal();
 const fileInput = ref<HTMLInputElement | null>(null);
 
@@ -203,7 +205,10 @@ const uploadProof = () => {
 
         <!-- Manual Payment -->
         <div v-else-if="payment.driver === 'manual'" class="space-y-4">
-            <div class="rounded-lg bg-muted/50 p-4">
+            <div
+                class="rounded-lg bg-muted/50 p-4"
+                v-if="setting.manual_transfer_type === 'rekening'"
+            >
                 <p class="mb-2 text-sm text-muted-foreground">
                     Transfer ke Rekening:
                 </p>
@@ -237,6 +242,28 @@ const uploadProof = () => {
                             {{ payment.account_code }}
                         </p>
                     </div>
+                </div>
+            </div>
+
+            <div
+                class="rounded-lg bg-muted/50 p-4"
+                v-else-if="setting.manual_transfer_type === 'qris'"
+            >
+                <p class="mb-2 text-sm text-muted-foreground">
+                    Scan QR Code untuk Bayar:
+                </p>
+                <div>
+                    <p class="text-xs text-muted-foreground">Atas Nama:</p>
+                    <p class="font-medium text-foreground">
+                        {{ payment.account_code }}
+                    </p>
+                </div>
+                <div class="flex justify-center">
+                    <img
+                        :src="setting.manual_transfer_bank_logo"
+                        alt="QR Code"
+                        class="h-64 w-64 rounded-lg border border-border"
+                    />
                 </div>
             </div>
 

@@ -57,6 +57,7 @@ const handlePaymentTypeChange = (type: 'manual' | 'automatic') => {
                         : 'border-border/50 text-muted-foreground hover:border-primary/50'
                 "
                 @click="handlePaymentTypeChange('automatic')"
+                v-if="false"
             >
                 Otomatis
             </button>

@@ -3,7 +3,6 @@ import { show } from '@/actions/App/Http/Controllers/Main/BrandController';
 import { PPOBBrandDataItem } from '@/types/cms/ppob';
 import { Link } from '@inertiajs/vue3';
 import { ShoppingBag } from 'lucide-vue-next';
-import InputDescription from './InputDescription.vue';
 
 const props = defineProps<{
     brand: PPOBBrandDataItem;
@@ -50,9 +49,6 @@ const props = defineProps<{
                 >
                     {{ brand.name }}
                 </h3>
-                <InputDescription>
-                    <span v-html="brand.description" />
-                </InputDescription>
             </div>
         </Link>
     </div>

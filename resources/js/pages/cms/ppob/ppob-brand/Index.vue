@@ -3,7 +3,6 @@ import {
     create,
     destroy,
     edit,
-    index,
 } from '@/actions/App/Http/Controllers/Cms/PPOB/PPOBBrandController';
 import Heading from '@/components/Heading.vue';
 import ResourceTable from '@/components/ResourceTable.vue';
@@ -50,7 +49,6 @@ const columns = [
     { label: 'Category', key: 'category', sortable: false },
     { label: 'Provider', key: 'provider', sortable: true },
     { label: 'Name', key: 'name', sortable: true },
-    { label: 'Description', key: 'description', sortable: true },
     { label: 'Image', key: 'image', sortable: false },
     { label: 'Order', key: 'order', sortable: true },
     { label: 'Featured', key: 'featured', sortable: true },
@@ -115,7 +113,9 @@ watch(filter_provider, (newValue) => {
             </div>
             <div class="grid grid-cols-1 gap-4 md:grid-cols-3">
                 <div class="flex flex-col">
-                    <Label for="filter_category_id" class="mb-3">Category Filter</Label>
+                    <Label for="filter_category_id" class="mb-3"
+                        >Category Filter</Label
+                    >
                     <Select
                         name="filter_category_id"
                         v-model="filter_category_id"
@@ -141,15 +141,11 @@ watch(filter_provider, (newValue) => {
                     </Select>
                 </div>
                 <div class="flex flex-col">
-                    <Label for="filter_provider" class="mb-3">Provider Filter</Label>
-                    <Select
-                        name="filter_provider"
-                        v-model="filter_provider"
+                    <Label for="filter_provider" class="mb-3"
+                        >Provider Filter</Label
                     >
-                        <SelectTrigger
-                            id="filter_provider"
-                            class="mt-1 w-full"
-                        >
+                    <Select name="filter_provider" v-model="filter_provider">
+                        <SelectTrigger id="filter_provider" class="mt-1 w-full">
                             <SelectValue placeholder="Select a Provider" />
                         </SelectTrigger>
                         <SelectContent>
@@ -159,9 +155,7 @@ watch(filter_provider, (newValue) => {
                             <SelectItem value="digiflazz">
                                 Digiflazz
                             </SelectItem>
-                            <SelectItem value="gift">
-                                Gift
-                            </SelectItem>
+                            <SelectItem value="gift"> Gift </SelectItem>
                         </SelectContent>
                     </Select>
                 </div>
@@ -176,9 +170,6 @@ watch(filter_provider, (newValue) => {
             >
                 <template #category="{ row }">
                     {{ row.category?.name }}
-                </template>
-                <template #description="{ row }">
-                    <span v-html="row.description"></span>
                 </template>
                 <template #image="{ row }">
                     <img

@@ -124,7 +124,7 @@ class SuperadminMenuSeeder extends Seeder
         ]);
         $web->subMenu()->create([
             'role_id' => $this->role->id,
-            'name' => 'Sliders',
+            'name' => 'Banner',
             'url' => '/cms/web/sliders',
             'order' => 1,
             'active_pattern' => '/cms/web/sliders',

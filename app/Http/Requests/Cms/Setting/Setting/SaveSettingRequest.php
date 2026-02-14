@@ -34,6 +34,7 @@ class SaveSettingRequest extends FormRequest
             'value.manual_transfer_bank_logo' => 'nullable|image:allow_svg|max:2048',
             'value.manual_transfer_account_name' => 'nullable|string',
             'value.manual_transfer_account_number' => 'nullable|string',
+            'value.manual_transfer_type' => 'nullable|in:rekening,qris',
         ];
     }
 }

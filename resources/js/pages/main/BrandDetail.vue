@@ -37,7 +37,8 @@ const form = useForm({
     email: user?.email || '',
     name: user?.name || '',
     phone: user?.phone || '',
-    payment_type: 'automatic' as 'manual' | 'automatic',
+    // payment_type: 'automatic' as 'manual' | 'automatic',
+    payment_type: 'manual' as 'manual' | 'automatic',
     payment_method: null as string | null,
 });
 

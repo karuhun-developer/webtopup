@@ -73,6 +73,7 @@ Jika Anda memiliki pertanyaan lebih lanjut, silakan hubungi kami di {cs_link}. K
                     'manual_transfer_bank_logo' => '/public/images/MANDIRI.svg',
                     'manual_transfer_account_name' => 'PT TopupWok Indonesia',
                     'manual_transfer_account_number' => '1234567890',
+                    'manual_transfer_type' => 'rekening', // rekening/qris
                     'providers' => [
                         'digiflazz' => true,
                         'gift' => true,

@@ -57,7 +57,6 @@ const columns = [
     { label: 'Brand', key: 'brand', sortable: false },
     { label: 'Name', key: 'name', sortable: true },
     { label: 'Sku', key: 'sku', sortable: true },
-    { label: 'Description', key: 'description', sortable: false },
     { label: 'Buy Price', key: 'buy_price', sortable: true },
     { label: 'Sell Price', key: 'sell_price', sortable: true },
     { label: 'Image', key: 'image', sortable: false },
@@ -208,9 +207,6 @@ watch(filter_brand_id, (newValue) => {
                 </template>
                 <template #sell_price="{ row }">
                     {{ formatCurrency(row.sell_price) }}
-                </template>
-                <template #description="{ row }">
-                    <span v-html="row.description"></span>
                 </template>
                 <template #status="{ row }">
                     <span

@@ -3,6 +3,13 @@ import ImageUploadPreview from '@/components/ImageUploadPreview.vue';
 import InputError from '@/components/InputError.vue';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
+import {
+    Select,
+    SelectContent,
+    SelectItem,
+    SelectTrigger,
+    SelectValue,
+} from '@/components/ui/select';
 import { type SettingValue } from '@/types/cms/setting';
 
 defineProps<{
@@ -14,6 +21,25 @@ defineProps<{
 <template>
     <div class="space-y-6">
         <div class="grid gap-6 md:grid-cols-3">
+            <div class="grid gap-2">
+                <Label for="manual_transfer_type">Type</Label>
+                <Select
+                    name="value[manual_transfer_type]"
+                    :default-value="setting?.manual_transfer_type"
+                >
+                    <SelectTrigger id="manual_transfer_type" class="mt-1 w-full">
+                        <SelectValue placeholder="Select type" />
+                    </SelectTrigger>
+                    <SelectContent>
+                        <SelectItem value="rekening">Rekening</SelectItem>
+                        <SelectItem value="qris">QRIS</SelectItem>
+                    </SelectContent>
+                </Select>
+                <InputError
+                    :message="errors['value.manual_transfer_type']"
+                />
+            </div>
+
             <div class="grid gap-2">
                 <Label for="manual_transfer_bank">Bank Name</Label>
                 <Input

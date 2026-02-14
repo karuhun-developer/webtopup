@@ -18,6 +18,7 @@ export interface SettingValue {
     manual_transfer_bank_logo?: string;
     manual_transfer_account_name?: string;
     manual_transfer_account_number?: string;
+    manual_transfer_type?: 'rekening' | 'qris';
 }
 
 export interface Setting {
