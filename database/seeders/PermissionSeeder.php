@@ -100,6 +100,11 @@ class PermissionSeeder extends Seeder
                     $roleUser->givePermissionTo($permissionName);
                 }
 
+                // Assign permissions to admin role
+                if (in_array($permissionName, $this->adminPermissions)) {
+                    $roleAdmin->givePermissionTo($permissionName);
+                }
+
                 // Exclude superadmin permissions
                 if (! in_array($permissionName, $this->superAdminExcludePermission)) {
                     $roleSuperAdmin->givePermissionTo($permissionName);
