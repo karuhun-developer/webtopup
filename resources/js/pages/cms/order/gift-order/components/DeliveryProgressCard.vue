@@ -57,10 +57,10 @@ const adminProofPreview = ref<string | null>(null);
 const userProofPreview = ref<string | null>(null);
 const giftProofPreview = ref<string | null>(null);
 
-// Calculate countdown from admin_add_friend_at
+// Calculate countdown from admin_add_friend_timestamp
 const adminAddFriendAt = computed(() => {
-    return props.order.submited?.admin_add_friend_at
-        ? dayjs(props.order.submited.admin_add_friend_at)
+    return props.order.submited?.admin_add_friend_timestamp
+        ? dayjs(props.order.submited.admin_add_friend_timestamp)
         : null;
 });
 
@@ -72,7 +72,7 @@ const countdownRemaining = computed(() => {
     if (!countdownEndDate.value) return null;
     const now = dayjs();
     const diff = countdownEndDate.value.diff(now);
-    if (diff <= 0) return 'Expired';
+    if (diff <= 0) return 'READY TO SEND';
 
     const days = Math.floor(diff / (1000 * 60 * 60 * 24));
     const hours = Math.floor((diff % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
@@ -522,9 +522,9 @@ const sendGiftCompletionNotification = () => {
                 v-if="countdownEndDate"
                 class="rounded-lg border p-4"
                 :class="
-                    countdownRemaining === 'Expired'
+                    countdownRemaining === 'READY TO SEND'
                         ? 'border-red-500/50 bg-red-500/10'
-                        : 'border-blue-500/50 bg-blue-500/10'
+                        : 'border-orange-500/50 bg-orange-500/10'
                 "
             >
                 <div class="flex items-center justify-between">
@@ -535,9 +535,9 @@ const sendGiftCompletionNotification = () => {
                     <span
                         class="font-mono text-lg font-bold"
                         :class="
-                            countdownRemaining === 'Expired'
-                                ? 'text-red-500'
-                                : 'text-blue-500'
+                            countdownRemaining === 'READY TO SEND'
+                                ? 'text-red-500 animate-pulse text-xl'
+                                : 'text-orange-500'
                         "
                     >
                         {{ countdownRemaining }}
@@ -548,16 +548,21 @@ const sendGiftCompletionNotification = () => {
                         <span
                             >Started:
                             {{
-                                adminAddFriendAt?.format('MMM DD, HH:mm A')
+                                adminAddFriendAt?.format('DD MMMM, HH:mm')
                             }}</span
                         >
                         <span
                             >Ends:
                             {{
-                                countdownEndDate.format('MMM DD, HH:mm A')
+                                countdownEndDate.format('DD MMMM, HH:mm')
                             }}</span
                         >
                     </div>
+                </div>
+                <div v-if="countdownRemaining === 'READY TO SEND'" class="mt-3 text-center">
+                    <p class="text-lg font-bold text-red-500">
+                        GIFT IS READY TO BE SENT!
+                    </p>
                 </div>
             </div>
 
