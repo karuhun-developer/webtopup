@@ -262,7 +262,7 @@ const uploadProof = () => {
                     <img
                         :src="setting.manual_transfer_bank_logo"
                         alt="QR Code"
-                        class="h-64 w-64 rounded-lg border border-border"
+                        class="h-70 w-64 rounded-lg border border-border"
                     />
                 </div>
             </div>
