@@ -46,6 +46,17 @@ const page = usePage();
         <meta property="image" content="/favicon.svg" />
         <meta property="canonical" :content="privacyPolicy().url" />
         <meta name="robots" content="index, follow" />
+        <component :is="'script'" type="application/ld+json">
+            {{
+                JSON.stringify({
+                    '@context': 'https://schema.org',
+                    '@type': 'WebPage',
+                    name: 'Kebijakan Privasi',
+                    description: `Kebijakan Privasi ${page.props.setting.title}. Pelajari bagaimana kami mengumpulkan, menggunakan, dan melindungi informasi pribadi Anda saat menggunakan layanan kami.`,
+                    url: privacyPolicy().url,
+                })
+            }}
+        </component>
     </Head>
 
     <div class="min-h-screen bg-background">

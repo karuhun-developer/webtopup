@@ -245,6 +245,28 @@ const handleCheckout = () => {
             :content="show({ brand: brand.slug }).url"
         />
         <meta name="robots" content="index, follow" />
+        <component :is="'script'" type="application/ld+json">
+            {{
+                JSON.stringify({
+                    '@context': 'https://schema.org',
+                    '@type': 'Product',
+                    name: brand.name,
+                    description: `Top up ${brand.name} termurah dan terpercaya di ${setting.title}.`,
+                    image: brand.image,
+                    brand: {
+                        '@type': 'Brand',
+                        name: brand.name,
+                    },
+                    offers: {
+                        '@type': 'AggregateOffer',
+                        lowPrice: brand.products && brand.products.length > 0 ? Math.min(...brand.products.map(p => p.sell_price)) : 0,
+                        highPrice: brand.products && brand.products.length > 0 ? Math.max(...brand.products.map(p => p.sell_price)) : 0,
+                        priceCurrency: 'IDR',
+                        offerCount: brand.products ? brand.products.length : 0,
+                    },
+                })
+            }}
+        </component>
     </Head>
 
     <div class="flex min-h-screen flex-col bg-background">

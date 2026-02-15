@@ -76,6 +76,17 @@ const handleSearch = () => {
         <meta property="image" content="/favicon.svg" />
         <meta property="canonical" :content="check().url" />
         <meta name="robots" content="index, follow" />
+        <component :is="'script'" type="application/ld+json">
+            {{
+                JSON.stringify({
+                    '@context': 'https://schema.org',
+                    '@type': 'WebPage',
+                    name: 'Cek Transaksi',
+                    description: `Cek status transaksi ${page.props.setting.title} dengan mudah. Masukkan nomor invoice Anda untuk melihat detail pembelian dan status pembayaran terkini.`,
+                    url: check().url,
+                })
+            }}
+        </component>
     </Head>
 
     <div class="flex min-h-screen flex-col bg-background">

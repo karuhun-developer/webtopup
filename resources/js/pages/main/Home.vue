@@ -59,6 +59,24 @@ const setting = page.props.setting;
         <meta property="image" content="/favicon.svg" />
         <meta property="canonical" :content="index().url" />
         <meta name="robots" content="index, follow" />
+        <component :is="'script'" type="application/ld+json">
+            {{
+                JSON.stringify({
+                    '@context': 'https://schema.org',
+                    '@type': 'WebSite',
+                    name: setting.title,
+                    url: index().url,
+                    potentialAction: {
+                        '@type': 'SearchAction',
+                        target: {
+                            '@type': 'EntryPoint',
+                            urlTemplate: `${index().url}?search={search_term_string}`,
+                        },
+                        'query-input': 'required name=search_term_string',
+                    },
+                })
+            }}
+        </component>
     </Head>
 
     <div class="min-h-screen bg-background">

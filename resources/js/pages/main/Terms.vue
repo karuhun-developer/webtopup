@@ -46,6 +46,17 @@ const page = usePage();
         <meta property="image" content="/favicon.svg" />
         <meta property="canonical" :content="terms().url" />
         <meta name="robots" content="index, follow" />
+        <component :is="'script'" type="application/ld+json">
+            {{
+                JSON.stringify({
+                    '@context': 'https://schema.org',
+                    '@type': 'WebPage',
+                    name: 'Syarat & Ketentuan',
+                    description: `Syarat & Ketentuan ${page.props.setting.title}. Baca ketentuan penggunaan layanan kami untuk pengalaman transaksi yang aman dan nyaman.`,
+                    url: terms().url,
+                })
+            }}
+        </component>
     </Head>
 
     <div class="min-h-screen bg-background">
