@@ -244,6 +244,24 @@ watch(selectedCategory, () => {
                 </div>
 
                 <div class="grid gap-2">
+                    <Label for="delay">Delay</Label>
+                    <InputDescription>
+                        Is it a delayed product? Delayed products may take
+                        longer to process.
+                    </InputDescription>
+                    <Select name="delay" :default-value="String(product.delay)">
+                        <SelectTrigger id="delay" class="mt-1 w-full">
+                            <SelectValue placeholder="Select a delay" />
+                        </SelectTrigger>
+                        <SelectContent>
+                            <SelectItem value="1">Delay</SelectItem>
+                            <SelectItem value="0">Instan</SelectItem>
+                        </SelectContent>
+                    </Select>
+                    <InputError :message="errors.delay" />
+                </div>
+
+                <div class="grid gap-2">
                     <Label for="status">Status</Label>
                     <InputDescription>
                         Select the status of the product.

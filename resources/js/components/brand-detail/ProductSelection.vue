@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { formatCurrency } from '@/lib/utils';
 import { PPOBProductDataItem } from '@/types/cms/ppob';
+import { ClockIcon } from 'lucide-vue-next';
 
 defineProps<{
     products: PPOBProductDataItem[];
@@ -62,9 +63,21 @@ const emit = defineEmits<{
                         </div>
                     </div>
                     <div
-                        class="mt-5 flex w-full gap-1 bg-background p-4 text-xs font-semibold text-foreground"
+                        class="mt-5 flex w-full flex-col gap-2 bg-background p-4 text-xs font-semibold text-foreground"
                     >
-                        <span v-html="product.description"></span>
+                        <div
+                            class="flex items-center gap-2"
+                            v-if="product.delay"
+                        >
+                            <ClockIcon
+                                class="h-4 w-4 flex-shrink-0 text-muted-foreground"
+                            />
+                            <span>Delay</span>
+                        </div>
+                        <span
+                            v-html="product.description"
+                            class="text-muted-foreground"
+                        ></span>
                     </div>
                 </div>
             </button>

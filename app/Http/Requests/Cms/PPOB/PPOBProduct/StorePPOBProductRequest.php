@@ -18,6 +18,7 @@ class StorePPOBProductRequest extends FormRequest
             'name' => 'required|string|max:255',
             'sku' => 'nullable|string|max:100|unique:p_p_o_b_products,sku',
             'description' => 'nullable|string|max:1000',
+            'delay' => 'required|boolean',
             'buy_price' => 'required|numeric|min:0',
             'sell_price' => 'required|numeric|min:0',
             'image' => 'nullable|image|max:2048', // max 2MB

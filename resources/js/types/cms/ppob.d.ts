@@ -42,6 +42,7 @@ export interface PPOBProductDataItem {
     slug: string;
     sku: string;
     description?: string;
+    delay: boolean;
     buy_price: number;
     sell_price: number;
     image?: string;
