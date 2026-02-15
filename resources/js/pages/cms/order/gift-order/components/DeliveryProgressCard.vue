@@ -21,7 +21,7 @@ import {
     Upload,
     UserPlus,
 } from 'lucide-vue-next';
-import { computed, ref } from 'vue';
+import { computed, ref, watch } from 'vue';
 
 const props = defineProps<{
     order: OrderDataItem;
@@ -268,6 +268,38 @@ const sendGiftCompletionNotification = () => {
         },
     );
 };
+
+watch(
+    () => adminAddFriendForm?.admin_add_friend_timestamp,
+    (newVal) => {
+        if (newVal) {
+            adminAddFriendForm.put(
+                save({
+                    order: props.order.reference,
+                }).url,
+                {
+                    preserveScroll: true,
+                },
+            );
+        }
+    },
+);
+
+watch(
+    () => userAddFriendForm?.user_confirm_friend_timestamp,
+    (newVal) => {
+        if (newVal) {
+            userAddFriendForm.put(
+                save({
+                    order: props.order.reference,
+                }).url,
+                {
+                    preserveScroll: true,
+                },
+            );
+        }
+    },
+);
 </script>
 
 <template>
@@ -536,7 +568,7 @@ const sendGiftCompletionNotification = () => {
                         class="font-mono text-lg font-bold"
                         :class="
                             countdownRemaining === 'READY TO SEND'
-                                ? 'text-red-500 animate-pulse text-xl'
+                                ? 'animate-pulse text-xl text-red-500'
                                 : 'text-orange-500'
                         "
                     >
@@ -559,7 +591,10 @@ const sendGiftCompletionNotification = () => {
                         >
                     </div>
                 </div>
-                <div v-if="countdownRemaining === 'READY TO SEND'" class="mt-3 text-center">
+                <div
+                    v-if="countdownRemaining === 'READY TO SEND'"
+                    class="mt-3 text-center"
+                >
                     <p class="text-lg font-bold text-red-500">
                         GIFT IS READY TO BE SENT!
                     </p>
