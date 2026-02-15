@@ -40,6 +40,8 @@ const appUrl = page.props.app_url;
             property="og:image"
             :content="`${appUrl}${setting?.favicon || '/favicon.svg'}`"
         />
+        <meta property="og:image:width" content="1200" />
+        <meta property="og:image:height" content="630" />
         <meta
             property="twitter:title"
             :content="`Kebijakan Privasi - ${setting?.title}`"
