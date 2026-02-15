@@ -53,10 +53,7 @@ const setting = page.props.setting;
         />
         <meta property="twitter:card" content="summary_large_image" />
         <meta property="twitter:site" :content="setting?.title" />
-        <meta
-            property="image"
-            :content="setting?.favicon || '/favicon.svg'"
-        />
+        <meta property="image" :content="setting?.favicon || '/favicon.svg'" />
         <meta property="canonical" :content="terms().url" />
         <meta name="robots" content="index, follow" />
         <component :is="'script'" type="application/ld+json">
@@ -84,7 +81,7 @@ const setting = page.props.setting;
                 </h1>
 
                 <div
-                    class="prose prose-sm max-w-none text-muted-foreground prose-headings:text-foreground prose-a:text-primary prose-strong:text-foreground"
+                    class="prose prose-sm prose-headings:text-foreground prose-a:text-primary prose-strong:text-foreground max-w-none text-muted-foreground"
                     v-html="setting?.terms"
                 />
             </div>

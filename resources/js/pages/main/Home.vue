@@ -70,10 +70,7 @@ const setting = page.props.setting;
             property="shortcut icon"
             :href="setting?.favicon || '/favicon.svg'"
         />
-        <meta
-            property="image"
-            :content="setting?.favicon || '/favicon.svg'"
-        />
+        <meta property="image" :content="setting?.favicon || '/favicon.svg'" />
         <meta property="canonical" :content="index().url" />
         <meta name="robots" content="index, follow" />
         <component :is="'script'" type="application/ld+json">

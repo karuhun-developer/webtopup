@@ -83,10 +83,7 @@ const handleSearch = () => {
         />
         <meta property="twitter:card" content="summary_large_image" />
         <meta property="twitter:site" :content="setting?.title" />
-        <meta
-            property="image"
-            :content="setting?.favicon || '/favicon.svg'"
-        />
+        <meta property="image" :content="setting?.favicon || '/favicon.svg'" />
         <meta property="canonical" :content="check().url" />
         <meta name="robots" content="index, follow" />
         <component :is="'script'" type="application/ld+json">

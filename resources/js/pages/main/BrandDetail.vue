@@ -206,7 +206,7 @@ const handleCheckout = () => {
         <link
             rel="icon"
             type="image/svg+xml"
-            :href="setting?.favicon || '/favicon.svg'"
+            :href="setting?.icon || '/favicon.svg'"
         />
         <meta
             name="description"
@@ -243,10 +243,7 @@ const handleCheckout = () => {
         <meta property="twitter:card" content="summary_large_image" />
         <meta property="twitter:site" :content="setting?.title" />
         <meta property="image" :content="brand.image || '/favicon.svg'" />
-        <meta
-            property="canonical"
-            :content="show({ brand: brand.slug }).url"
-        />
+        <meta property="canonical" :content="show({ brand: brand.slug }).url" />
         <meta name="robots" content="index, follow" />
         <component :is="'script'" type="application/ld+json">
             {{
@@ -262,8 +259,22 @@ const handleCheckout = () => {
                     },
                     offers: {
                         '@type': 'AggregateOffer',
-                        lowPrice: brand.products && brand.products.length > 0 ? Math.min(...brand.products.map(p => p.sell_price)) : 0,
-                        highPrice: brand.products && brand.products.length > 0 ? Math.max(...brand.products.map(p => p.sell_price)) : 0,
+                        lowPrice:
+                            brand.products && brand.products.length > 0
+                                ? Math.min(
+                                      ...brand.products.map(
+                                          (p) => p.sell_price,
+                                      ),
+                                  )
+                                : 0,
+                        highPrice:
+                            brand.products && brand.products.length > 0
+                                ? Math.max(
+                                      ...brand.products.map(
+                                          (p) => p.sell_price,
+                                      ),
+                                  )
+                                : 0,
                         priceCurrency: 'IDR',
                         offerCount: brand.products ? brand.products.length : 0,
                     },
