@@ -40,5 +40,19 @@ class UserSeeder extends Seeder
 
         // Add role to the user
         $user->assignRole('user');
+
+        $admin = User::firstOrCreate(
+            [
+                'email' => 'admin@admin.com',
+            ],
+            [
+                'name' => 'Admin',
+                'phone' => '081234567892',
+                'password' => bcrypt('password'),
+            ],
+        );
+
+        // Add role to the admin user
+        $admin->assignRole('admin');
     }
 }

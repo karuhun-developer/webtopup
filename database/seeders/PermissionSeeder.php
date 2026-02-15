@@ -2,7 +2,10 @@
 
 namespace Database\Seeders;
 
+use App\Models\Order\Order;
 use App\Models\User;
+use App\Models\Web\Faq;
+use App\Models\Web\Slider;
 use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use Illuminate\Database\Seeder;
 use Illuminate\Support\Facades\File;
@@ -36,6 +39,29 @@ class PermissionSeeder extends Seeder
     ];
 
     // List user permissions
+    private $adminPermissions = [
+        'view'.User::class,
+        'show'.User::class,
+        'create'.User::class,
+        'update'.User::class,
+        'view'.Order::class,
+        'show'.Order::class,
+        'create'.Order::class,
+        'update'.Order::class,
+        'delete'.Order::class,
+        'view'.Slider::class,
+        'show'.Slider::class,
+        'create'.Slider::class,
+        'update'.Slider::class,
+        'delete'.Slider::class,
+        'view'.Faq::class,
+        'show'.Faq::class,
+        'create'.Faq::class,
+        'update'.Faq::class,
+        'delete'.Faq::class,
+    ];
+
+    // List user permissions
     private $userPermissions = [
         'view'.User::class,
         'update'.User::class,
@@ -54,6 +80,7 @@ class PermissionSeeder extends Seeder
 
         // Create roles
         $roleSuperAdmin = Role::findOrCreate('superadmin', $this->guardName);
+        $roleAdmin = Role::findOrCreate('admin', $this->guardName);
         $roleUser = Role::findOrCreate('user', $this->guardName);
 
         // Loop through each model and create permissions

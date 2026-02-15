@@ -18,7 +18,7 @@ Route::patch('/password', [App\Http\Controllers\Main\PasswordController::class, 
 
 // After login
 Route::get('/after-login', function () {
-    if (auth()->user()->hasRole('superadmin')) {
+    if (auth()->user()->hasRole(['superadmin', 'admin'])) {
         return to_route('cms.dashboard');
     } else {
         return to_route('home');
