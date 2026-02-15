@@ -49,7 +49,7 @@ const emit = defineEmits<{
                                 v-if="product.image"
                                 :src="product.image"
                                 :alt="product.name"
-                                class="object-contain object-right duration-300 group-hover/flashsale:scale-110 group-hover/variant:rotate-12"
+                                class="h-8 object-cover"
                             />
                         </div>
                         <div>
