@@ -48,7 +48,10 @@ const setting = page.props.setting;
             :content="`Selamat datang di ${setting?.title}, tempat topup game termurah dan terpercaya! Nikmati berbagai penawaran menarik untuk topup game favoritmu dengan harga terbaik. Bergabunglah sekarang dan rasakan pengalaman topup yang mudah, cepat, dan aman hanya di ${setting?.title}!`"
         />
         <meta property="og:url" :content="index().url" />
-        <meta property="og:image" content="/favicon.svg" />
+        <meta
+            property="og:image"
+            :content="setting?.favicon || '/favicon.svg'"
+        />
         <meta
             property="twitter:title"
             :content="setting?.title + ' - Topup Game Termurah dan Terpercaya'"
@@ -57,11 +60,20 @@ const setting = page.props.setting;
             property="twitter:description"
             :content="`Selamat datang di ${setting?.title}, tempat topup game termurah dan terpercaya! Nikmati berbagai penawaran menarik untuk topup game favoritmu dengan harga terbaik. Bergabunglah sekarang dan rasakan pengalaman topup yang mudah, cepat, dan aman hanya di ${setting?.title}!`"
         />
-        <meta property="twitter:image" content="/favicon.svg" />
+        <meta
+            property="twitter:image"
+            :content="setting?.favicon || '/favicon.svg'"
+        />
         <meta property="twitter:card" content="summary_large_image" />
         <meta property="twitter:site" :content="setting?.title" />
-        <meta property="shortcut icon" href="/favicon.svg" />
-        <meta property="image" content="/favicon.svg" />
+        <meta
+            property="shortcut icon"
+            :href="setting?.favicon || '/favicon.svg'"
+        />
+        <meta
+            property="image"
+            :content="setting?.favicon || '/favicon.svg'"
+        />
         <meta property="canonical" :content="index().url" />
         <meta name="robots" content="index, follow" />
         <component :is="'script'" type="application/ld+json">
