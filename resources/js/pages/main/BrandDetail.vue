@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import { show } from '@/actions/App/Http/Controllers/Main/BrandController';
 import { store } from '@/actions/App/Http/Controllers/Main/TransactionController';
 import AccountDataForm from '@/components/brand-detail/AccountDataForm.vue';
 import BrandBanner from '@/components/brand-detail/BrandBanner.vue';
@@ -31,8 +32,8 @@ const setting = page?.props?.setting;
 // Form data using Inertia's useForm
 const form = useForm({
     type: props.brand.settings?.type || 'id',
-    account_id: '36688862', // 36688862
-    server_id: '2052', // 2052
+    account_id: '', // 36688862
+    server_id: '', // 2052
     product_id: null as number | null,
     email: user?.email || '',
     name: user?.name || '',
@@ -200,7 +201,51 @@ const handleCheckout = () => {
 </script>
 
 <template>
-    <Head :title="`${brand.name} - Top Up`" />
+    <Head>
+        <title>{{ `${brand.name} - Top Up Murah & Cepat` }}</title>
+        <meta
+            name="description"
+            :content="`Top up ${brand.name} termurah dan terpercaya di ${setting.title}. Proses instan, tersedia berbagai metode pembayaran. Beli ${brand.name} sekarang!`"
+        />
+        <meta
+            name="keywords"
+            :content="`top up ${brand.name}, beli ${brand.name}, harga ${brand.name}, ${brand.name} murah, ${setting.title}, topup game`"
+        />
+        <meta name="author" :content="setting.title" />
+        <meta name="type" content="website" />
+        <meta name="application-name" :content="setting.title" />
+        <meta
+            property="og:title"
+            :content="`${brand.name} - Top Up Murah & Cepat | ${setting.title}`"
+        />
+        <meta
+            property="og:description"
+            :content="`Top up ${brand.name} termurah dan terpercaya di ${setting.title}. Proses instan, tersedia berbagai metode pembayaran.`"
+        />
+        <meta property="og:url" :content="show({ brand: brand.slug }).url" />
+        <meta property="og:image" :content="brand.image || '/favicon.svg'" />
+        <meta
+            property="twitter:title"
+            :content="`${brand.name} - Top Up Murah & Cepat | ${setting.title}`"
+        />
+        <meta
+            property="twitter:description"
+            :content="`Top up ${brand.name} termurah dan terpercaya di ${setting.title}. Proses instan, tersedia berbagai metode pembayaran.`"
+        />
+        <meta
+            property="twitter:image"
+            :content="brand.image || '/favicon.svg'"
+        />
+        <meta property="twitter:card" content="summary_large_image" />
+        <meta property="twitter:site" :content="setting.title" />
+        <meta property="shortcut icon" href="/favicon.svg" />
+        <meta property="image" :content="brand.image || '/favicon.svg'" />
+        <meta
+            property="canonical"
+            :content="show({ brand: brand.slug }).url"
+        />
+        <meta name="robots" content="index, follow" />
+    </Head>
 
     <div class="flex min-h-screen flex-col bg-background">
         <!-- Header -->

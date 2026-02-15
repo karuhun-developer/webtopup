@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import { terms } from '@/actions/App/Http/Controllers/Main/ContentController';
 import MainFooter from '@/components/MainFooter.vue';
 import MainHeader from '@/components/MainHeader.vue';
 import { Head, usePage } from '@inertiajs/vue3';
@@ -7,7 +8,45 @@ const page = usePage();
 </script>
 
 <template>
-    <Head title="Syarat & Ketentuan" />
+    <Head>
+        <title>Syarat & Ketentuan</title>
+        <meta
+            name="description"
+            :content="`Syarat & Ketentuan ${page.props.setting.title}. Baca ketentuan penggunaan layanan kami untuk pengalaman transaksi yang aman dan nyaman.`"
+        />
+        <meta
+            name="keywords"
+            :content="`syarat dan ketentuan, terms and conditions, ${page.props.setting.title}, aturan penggunaan, perjanjian pengguna`"
+        />
+        <meta name="author" :content="page.props.setting.title" />
+        <meta name="type" content="website" />
+        <meta name="application-name" :content="page.props.setting.title" />
+        <meta
+            property="og:title"
+            :content="`Syarat & Ketentuan - ${page.props.setting.title}`"
+        />
+        <meta
+            property="og:description"
+            :content="`Syarat & Ketentuan ${page.props.setting.title}. Baca ketentuan penggunaan layanan kami untuk pengalaman transaksi yang aman dan nyaman.`"
+        />
+        <meta property="og:url" :content="terms().url" />
+        <meta property="og:image" content="/favicon.svg" />
+        <meta
+            property="twitter:title"
+            :content="`Syarat & Ketentuan - ${page.props.setting.title}`"
+        />
+        <meta
+            property="twitter:description"
+            :content="`Syarat & Ketentuan ${page.props.setting.title}. Baca ketentuan penggunaan layanan kami untuk pengalaman transaksi yang aman dan nyaman.`"
+        />
+        <meta property="twitter:image" content="/favicon.svg" />
+        <meta property="twitter:card" content="summary_large_image" />
+        <meta property="twitter:site" :content="page.props.setting.title" />
+        <meta property="shortcut icon" href="/favicon.svg" />
+        <meta property="image" content="/favicon.svg" />
+        <meta property="canonical" :content="terms().url" />
+        <meta name="robots" content="index, follow" />
+    </Head>
 
     <div class="min-h-screen bg-background">
         <!-- Header -->

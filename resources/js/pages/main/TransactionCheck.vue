@@ -7,7 +7,7 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { useSwal } from '@/composables/useSwal';
 import { OrderDataItem } from '@/types/cms/main';
-import { Head, useForm } from '@inertiajs/vue3';
+import { Head, useForm, usePage } from '@inertiajs/vue3';
 import dayjs from 'dayjs';
 
 defineProps<{
@@ -18,6 +18,7 @@ const form = useForm({
     reference: '',
 });
 
+const page = usePage();
 const { toast } = useSwal();
 
 const handleSearch = () => {
@@ -37,7 +38,45 @@ const handleSearch = () => {
 </script>
 
 <template>
-    <Head title="Cek Transaksi" />
+    <Head>
+        <title>Cek Transaksi</title>
+        <meta
+            name="description"
+            :content="`Cek status transaksi ${page.props.setting.title} dengan mudah. Masukkan nomor invoice Anda untuk melihat detail pembelian dan status pembayaran terkini.`"
+        />
+        <meta
+            name="keywords"
+            :content="`cek transaksi, cek invoice, status pembelian, riwayat transaksi, ${page.props.setting.title}, topup game`"
+        />
+        <meta name="author" :content="page.props.setting.title" />
+        <meta name="type" content="website" />
+        <meta name="application-name" :content="page.props.setting.title" />
+        <meta
+            property="og:title"
+            :content="`Cek Transaksi - ${page.props.setting.title}`"
+        />
+        <meta
+            property="og:description"
+            :content="`Cek status transaksi ${page.props.setting.title} dengan mudah. Masukkan nomor invoice Anda untuk melihat detail pembelian dan status pembayaran terkini.`"
+        />
+        <meta property="og:url" :content="check().url" />
+        <meta property="og:image" content="/favicon.svg" />
+        <meta
+            property="twitter:title"
+            :content="`Cek Transaksi - ${page.props.setting.title}`"
+        />
+        <meta
+            property="twitter:description"
+            :content="`Cek status transaksi ${page.props.setting.title} dengan mudah. Masukkan nomor invoice Anda untuk melihat detail pembelian dan status pembayaran terkini.`"
+        />
+        <meta property="twitter:image" content="/favicon.svg" />
+        <meta property="twitter:card" content="summary_large_image" />
+        <meta property="twitter:site" :content="page.props.setting.title" />
+        <meta property="shortcut icon" href="/favicon.svg" />
+        <meta property="image" content="/favicon.svg" />
+        <meta property="canonical" :content="check().url" />
+        <meta name="robots" content="index, follow" />
+    </Head>
 
     <div class="flex min-h-screen flex-col bg-background">
         <!-- Header -->

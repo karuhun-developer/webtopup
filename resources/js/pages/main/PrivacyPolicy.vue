@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import { privacyPolicy } from '@/actions/App/Http/Controllers/Main/ContentController';
 import MainFooter from '@/components/MainFooter.vue';
 import MainHeader from '@/components/MainHeader.vue';
 import { Head, usePage } from '@inertiajs/vue3';
@@ -7,7 +8,45 @@ const page = usePage();
 </script>
 
 <template>
-    <Head title="Kebijakan Privasi" />
+    <Head>
+        <title>Kebijakan Privasi</title>
+        <meta
+            name="description"
+            :content="`Kebijakan Privasi ${page.props.setting.title}. Pelajari bagaimana kami mengumpulkan, menggunakan, dan melindungi informasi pribadi Anda saat menggunakan layanan kami.`"
+        />
+        <meta
+            name="keywords"
+            :content="`kebijakan privasi, privacy policy, ${page.props.setting.title}, perlindungan data, keamanan informasi`"
+        />
+        <meta name="author" :content="page.props.setting.title" />
+        <meta name="type" content="website" />
+        <meta name="application-name" :content="page.props.setting.title" />
+        <meta
+            property="og:title"
+            :content="`Kebijakan Privasi - ${page.props.setting.title}`"
+        />
+        <meta
+            property="og:description"
+            :content="`Kebijakan Privasi ${page.props.setting.title}. Pelajari bagaimana kami mengumpulkan, menggunakan, dan melindungi informasi pribadi Anda saat menggunakan layanan kami.`"
+        />
+        <meta property="og:url" :content="privacyPolicy().url" />
+        <meta property="og:image" content="/favicon.svg" />
+        <meta
+            property="twitter:title"
+            :content="`Kebijakan Privasi - ${page.props.setting.title}`"
+        />
+        <meta
+            property="twitter:description"
+            :content="`Kebijakan Privasi ${page.props.setting.title}. Pelajari bagaimana kami mengumpulkan, menggunakan, dan melindungi informasi pribadi Anda saat menggunakan layanan kami.`"
+        />
+        <meta property="twitter:image" content="/favicon.svg" />
+        <meta property="twitter:card" content="summary_large_image" />
+        <meta property="twitter:site" :content="page.props.setting.title" />
+        <meta property="shortcut icon" href="/favicon.svg" />
+        <meta property="image" content="/favicon.svg" />
+        <meta property="canonical" :content="privacyPolicy().url" />
+        <meta name="robots" content="index, follow" />
+    </Head>
 
     <div class="min-h-screen bg-background">
         <!-- Header -->
