@@ -58,11 +58,13 @@ const activeTab = ref<Tab>('general');
             >
                 <!-- Tabs Header with Save Button -->
                 <div class="flex items-center justify-between border-b bg-card">
-                    <div class="flex gap-6 px-6">
+                    <div
+                        class="flex w-full gap-6 overflow-x-auto px-6 md:w-auto"
+                    >
                         <Button
                             type="button"
                             variant="ghost"
-                            class="relative rounded-none px-0 py-4 text-sm font-medium hover:bg-transparent"
+                            class="relative whitespace-nowrap rounded-none px-0 py-4 text-sm font-medium hover:bg-transparent"
                             :class="
                                 activeTab === 'general'
                                     ? 'text-foreground'
@@ -80,7 +82,7 @@ const activeTab = ref<Tab>('general');
                         <Button
                             type="button"
                             variant="ghost"
-                            class="relative rounded-none px-0 py-4 text-sm font-medium hover:bg-transparent"
+                            class="relative whitespace-nowrap rounded-none px-0 py-4 text-sm font-medium hover:bg-transparent"
                             :class="
                                 activeTab === 'content'
                                     ? 'text-foreground'
@@ -98,7 +100,7 @@ const activeTab = ref<Tab>('general');
                         <Button
                             type="button"
                             variant="ghost"
-                            class="relative rounded-none px-0 py-4 text-sm font-medium hover:bg-transparent"
+                            class="relative whitespace-nowrap rounded-none px-0 py-4 text-sm font-medium hover:bg-transparent"
                             :class="
                                 activeTab === 'templates'
                                     ? 'text-foreground'
@@ -116,7 +118,7 @@ const activeTab = ref<Tab>('general');
                         <Button
                             type="button"
                             variant="ghost"
-                            class="relative rounded-none px-0 py-4 text-sm font-medium hover:bg-transparent"
+                            class="relative whitespace-nowrap rounded-none px-0 py-4 text-sm font-medium hover:bg-transparent"
                             :class="
                                 activeTab === 'transfer'
                                     ? 'text-foreground'
@@ -132,7 +134,7 @@ const activeTab = ref<Tab>('general');
                         </Button>
                     </div>
 
-                    <div class="px-6 py-2">
+                    <div class="hidden px-6 py-2 md:block">
                         <Button :disabled="processing" size="default">
                             Save Settings
                         </Button>
