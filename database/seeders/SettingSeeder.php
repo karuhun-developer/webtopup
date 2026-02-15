@@ -57,7 +57,7 @@ Detail pesanan anda bisa dilihat di link berikut:
 {link}
 
 Silakan coba melakukan pembelian kembali. Jika Anda memerlukan bantuan, jangan ragu untuk menghubungi kami di {cs_link}.',
-                    'template_gift_order_admin_friend_request' => '🎁 Permintaan Penambahan Teman untuk Gift Order *order_id*
+                    'template_gift_order_admin_friend_request' => '🎁 Permintaan Penambahan Teman untuk Gift Order *{order_id}*
 Halo *{customer_name}*, untuk memproses gift order Anda, kami telah melakukan penambahan teman pada akun penerima hadiah.
 Silakan konfirmasi penambahan teman tersebut dengan mengirimkan bukti screenshot accept friend request kepada kami di {cs_link}.
 Terima kasih atas kerjasamanya!',
