@@ -64,6 +64,7 @@ class HandleInertiaRequests extends Middleware
                 }) : [],
             ],
             'setting' => getSetting(),
+            'app_url' => config('app.url'),
             'sidebarOpen' => ! $request->hasCookie('sidebar_state') || $request->cookie('sidebar_state') === 'true',
         ];
     }

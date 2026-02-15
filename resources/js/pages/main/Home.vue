@@ -18,6 +18,7 @@ defineProps<{
 
 const page = usePage();
 const setting = page.props.setting;
+const appUrl = page.props.app_url;
 </script>
 
 <template>
@@ -50,7 +51,7 @@ const setting = page.props.setting;
         <meta property="og:url" :content="index().url" />
         <meta
             property="og:image"
-            :content="setting?.favicon || '/favicon.svg'"
+            :content="`${appUrl}${setting?.favicon || '/favicon.svg'}`"
         />
         <meta
             property="twitter:title"
@@ -62,7 +63,7 @@ const setting = page.props.setting;
         />
         <meta
             property="twitter:image"
-            :content="setting?.favicon || '/favicon.svg'"
+            :content="`${appUrl}${setting?.favicon || '/favicon.svg'}`"
         />
         <meta property="twitter:card" content="summary_large_image" />
         <meta property="twitter:site" :content="setting?.title" />
@@ -70,7 +71,10 @@ const setting = page.props.setting;
             property="shortcut icon"
             :href="setting?.favicon || '/favicon.svg'"
         />
-        <meta property="image" :content="setting?.favicon || '/favicon.svg'" />
+        <meta
+            property="image"
+            :content="`${appUrl}${setting?.favicon || '/favicon.svg'}`"
+        />
         <meta property="canonical" :content="index().url" />
         <meta name="robots" content="index, follow" />
         <component :is="'script'" type="application/ld+json">

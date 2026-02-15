@@ -28,6 +28,7 @@ const props = defineProps<{
 const page = usePage();
 const user = page.props.auth.user;
 const setting = page.props.setting;
+const appUrl = page.props.app_url;
 
 // Form data using Inertia's useForm
 const form = useForm({
@@ -227,7 +228,14 @@ const handleCheckout = () => {
             :content="`Top up ${brand.name} termurah dan terpercaya di ${setting?.title}. Proses instan, tersedia berbagai metode pembayaran.`"
         />
         <meta property="og:url" :content="show({ brand: brand.slug }).url" />
-        <meta property="og:image" :content="brand.image || '/favicon.svg'" />
+        <meta
+            property="og:image"
+            :content="
+                brand.image
+                    ? brand.image
+                    : `${appUrl}${setting?.favicon || '/favicon.svg'}`
+            "
+        />
         <meta
             property="twitter:title"
             :content="`${brand.name} - Top Up Murah & Cepat | ${setting?.title}`"
@@ -238,11 +246,22 @@ const handleCheckout = () => {
         />
         <meta
             property="twitter:image"
-            :content="brand.image || '/favicon.svg'"
+            :content="
+                brand.image
+                    ? brand.image
+                    : `${appUrl}${setting?.favicon || '/favicon.svg'}`
+            "
         />
         <meta property="twitter:card" content="summary_large_image" />
         <meta property="twitter:site" :content="setting?.title" />
-        <meta property="image" :content="brand.image || '/favicon.svg'" />
+        <meta
+            property="image"
+            :content="
+                brand.image
+                    ? brand.image
+                    : `${appUrl}${setting?.favicon || '/favicon.svg'}`
+            "
+        />
         <meta property="canonical" :content="show({ brand: brand.slug }).url" />
         <meta name="robots" content="index, follow" />
         <component :is="'script'" type="application/ld+json">

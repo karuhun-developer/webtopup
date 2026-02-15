@@ -48,6 +48,7 @@ export type AppPageProps<
     quote: { message: string; author: string };
     auth: Auth;
     setting: SettingValue;
+    app_url: string;
     sidebarOpen: boolean;
 };
 
