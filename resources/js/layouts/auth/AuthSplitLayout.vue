@@ -4,7 +4,8 @@ import { home } from '@/routes';
 import { Link, usePage } from '@inertiajs/vue3';
 
 const page = usePage();
-const name = page.props.name;
+const name = page.props.setting?.title || page.props.name;
+const logo = page.props.setting?.logo;
 const quote = page.props.quote;
 
 defineProps<{
@@ -25,7 +26,13 @@ defineProps<{
                 :href="home()"
                 class="relative z-20 flex items-center text-lg font-medium"
             >
-                <AppLogoIcon class="mr-2 size-8 fill-current text-white" />
+                <img
+                    v-if="logo"
+                    :src="logo"
+                    alt="Logo"
+                    class="mr-2 h-8 w-8 rounded-md object-cover"
+                />
+                <AppLogoIcon v-else class="mr-2 size-8 fill-current text-white" />
                 {{ name }}
             </Link>
             <div v-if="quote" class="relative z-20 mt-auto">

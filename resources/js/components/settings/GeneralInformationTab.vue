@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import ImageUploadPreview from '@/components/ImageUploadPreview.vue';
 import InputError from '@/components/InputError.vue';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
@@ -70,6 +71,41 @@ defineProps<{
                 rows="3"
             />
             <InputError :message="errors['value.footer_description']" />
+        </div>
+
+        <div class="grid gap-6 md:grid-cols-3">
+            <ImageUploadPreview
+                input-id="logo"
+                input-name="value[logo]"
+                label="Website Logo"
+                description="Upload website logo"
+                :max-size="2"
+                preview-height="100px"
+                :initial-preview="setting?.logo || ''"
+                :errors="errors['value.logo']"
+            />
+
+            <ImageUploadPreview
+                input-id="icon"
+                input-name="value[icon]"
+                label="App Icon"
+                description="Upload app icon (square)"
+                :max-size="2"
+                preview-height="100px"
+                :initial-preview="setting?.icon || ''"
+                :errors="errors['value.icon']"
+            />
+
+            <ImageUploadPreview
+                input-id="favicon"
+                input-name="value[favicon]"
+                label="Favicon"
+                description="Upload favicon"
+                :max-size="1"
+                preview-height="100px"
+                :initial-preview="setting?.favicon || ''"
+                :errors="errors['value.favicon']"
+            />
         </div>
     </div>
 </template>

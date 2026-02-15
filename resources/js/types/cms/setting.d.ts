@@ -2,6 +2,9 @@ export interface SettingValue {
     title: string;
     email: string;
     phone: string;
+    logo: string;
+    icon: string;
+    favicon: string;
     privacy_policy: string;
     terms: string;
     footer_description: string;

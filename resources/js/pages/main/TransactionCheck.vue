@@ -19,6 +19,7 @@ const form = useForm({
 });
 
 const page = usePage();
+const setting = page.props.setting;
 const { toast } = useSwal();
 
 const handleSearch = () => {
@@ -40,40 +41,52 @@ const handleSearch = () => {
 <template>
     <Head>
         <title>Cek Transaksi</title>
+        <link
+            rel="icon"
+            type="image/svg+xml"
+            :href="setting?.favicon || '/favicon.svg'"
+        />
         <meta
             name="description"
-            :content="`Cek status transaksi ${page.props.setting.title} dengan mudah. Masukkan nomor invoice Anda untuk melihat detail pembelian dan status pembayaran terkini.`"
+            :content="`Cek status transaksi top up game Anda di ${setting?.title}. Masukkan nomor transaksi untuk melihat detail pesanan Anda.`"
         />
         <meta
             name="keywords"
-            :content="`cek transaksi, cek invoice, status pembelian, riwayat transaksi, ${page.props.setting.title}, topup game`"
+            :content="`cek transaksi, status pesanan, lacak pesanan, ${setting?.title}, topup game`"
         />
-        <meta name="author" :content="page.props.setting.title" />
-        <meta name="type" content="website" />
-        <meta name="application-name" :content="page.props.setting.title" />
+        <meta name="author" :content="setting?.title" />
+        <meta name="application-name" :content="setting?.title" />
         <meta
             property="og:title"
-            :content="`Cek Transaksi - ${page.props.setting.title}`"
+            :content="`Cek Transaksi - ${setting?.title}`"
         />
         <meta
             property="og:description"
-            :content="`Cek status transaksi ${page.props.setting.title} dengan mudah. Masukkan nomor invoice Anda untuk melihat detail pembelian dan status pembayaran terkini.`"
+            :content="`Cek status transaksi top up game Anda di ${setting?.title}. Masukkan nomor transaksi untuk melihat detail pesanan Anda.`"
         />
         <meta property="og:url" :content="check().url" />
-        <meta property="og:image" content="/favicon.svg" />
+        <meta
+            property="og:image"
+            :content="setting?.favicon || '/favicon.svg'"
+        />
         <meta
             property="twitter:title"
-            :content="`Cek Transaksi - ${page.props.setting.title}`"
+            :content="`Cek Transaksi - ${setting?.title}`"
         />
         <meta
             property="twitter:description"
-            :content="`Cek status transaksi ${page.props.setting.title} dengan mudah. Masukkan nomor invoice Anda untuk melihat detail pembelian dan status pembayaran terkini.`"
+            :content="`Cek status transaksi top up game Anda di ${setting?.title}. Masukkan nomor transaksi untuk melihat detail pesanan Anda.`"
         />
-        <meta property="twitter:image" content="/favicon.svg" />
+        <meta
+            property="twitter:image"
+            :content="setting?.favicon || '/favicon.svg'"
+        />
         <meta property="twitter:card" content="summary_large_image" />
-        <meta property="twitter:site" :content="page.props.setting.title" />
-        <meta property="shortcut icon" href="/favicon.svg" />
-        <meta property="image" content="/favicon.svg" />
+        <meta property="twitter:site" :content="setting?.title" />
+        <meta
+            property="image"
+            :content="setting?.favicon || '/favicon.svg'"
+        />
         <meta property="canonical" :content="check().url" />
         <meta name="robots" content="index, follow" />
         <component :is="'script'" type="application/ld+json">
@@ -82,7 +95,7 @@ const handleSearch = () => {
                     '@context': 'https://schema.org',
                     '@type': 'WebPage',
                     name: 'Cek Transaksi',
-                    description: `Cek status transaksi ${page.props.setting.title} dengan mudah. Masukkan nomor invoice Anda untuk melihat detail pembelian dan status pembayaran terkini.`,
+                    description: `Cek status transaksi top up game Anda di ${setting?.title}. Masukkan nomor transaksi untuk melihat detail pesanan Anda.`,
                     url: check().url,
                 })
             }}

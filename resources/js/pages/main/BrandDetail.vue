@@ -26,8 +26,8 @@ const props = defineProps<{
     faqs: FaqDataItem[];
 }>();
 const page = usePage();
-const user = page?.props?.auth?.user;
-const setting = page?.props?.setting;
+const user = page.props.auth.user;
+const setting = page.props.setting;
 
 // Form data using Inertia's useForm
 const form = useForm({
@@ -203,42 +203,45 @@ const handleCheckout = () => {
 <template>
     <Head>
         <title>{{ `${brand.name} - Top Up Murah & Cepat` }}</title>
+        <link
+            rel="icon"
+            type="image/svg+xml"
+            :href="setting?.favicon || '/favicon.svg'"
+        />
         <meta
             name="description"
-            :content="`Top up ${brand.name} termurah dan terpercaya di ${setting.title}. Proses instan, tersedia berbagai metode pembayaran. Beli ${brand.name} sekarang!`"
+            :content="`Top up ${brand.name} termurah dan terpercaya di ${setting?.title}. Proses instan, tersedia berbagai metode pembayaran. Beli ${brand.name} sekarang!`"
         />
         <meta
             name="keywords"
-            :content="`top up ${brand.name}, beli ${brand.name}, harga ${brand.name}, ${brand.name} murah, ${setting.title}, topup game`"
+            :content="`top up ${brand.name}, beli ${brand.name}, harga ${brand.name}, ${brand.name} murah, ${setting?.title}, topup game`"
         />
-        <meta name="author" :content="setting.title" />
-        <meta name="type" content="website" />
-        <meta name="application-name" :content="setting.title" />
+        <meta name="author" :content="setting?.title" />
+        <meta name="application-name" :content="setting?.title" />
         <meta
             property="og:title"
-            :content="`${brand.name} - Top Up Murah & Cepat | ${setting.title}`"
+            :content="`${brand.name} - Top Up Murah & Cepat | ${setting?.title}`"
         />
         <meta
             property="og:description"
-            :content="`Top up ${brand.name} termurah dan terpercaya di ${setting.title}. Proses instan, tersedia berbagai metode pembayaran.`"
+            :content="`Top up ${brand.name} termurah dan terpercaya di ${setting?.title}. Proses instan, tersedia berbagai metode pembayaran.`"
         />
         <meta property="og:url" :content="show({ brand: brand.slug }).url" />
         <meta property="og:image" :content="brand.image || '/favicon.svg'" />
         <meta
             property="twitter:title"
-            :content="`${brand.name} - Top Up Murah & Cepat | ${setting.title}`"
+            :content="`${brand.name} - Top Up Murah & Cepat | ${setting?.title}`"
         />
         <meta
             property="twitter:description"
-            :content="`Top up ${brand.name} termurah dan terpercaya di ${setting.title}. Proses instan, tersedia berbagai metode pembayaran.`"
+            :content="`Top up ${brand.name} termurah dan terpercaya di ${setting?.title}. Proses instan, tersedia berbagai metode pembayaran.`"
         />
         <meta
             property="twitter:image"
             :content="brand.image || '/favicon.svg'"
         />
         <meta property="twitter:card" content="summary_large_image" />
-        <meta property="twitter:site" :content="setting.title" />
-        <meta property="shortcut icon" href="/favicon.svg" />
+        <meta property="twitter:site" :content="setting?.title" />
         <meta property="image" :content="brand.image || '/favicon.svg'" />
         <meta
             property="canonical"
@@ -251,7 +254,7 @@ const handleCheckout = () => {
                     '@context': 'https://schema.org',
                     '@type': 'Product',
                     name: brand.name,
-                    description: `Top up ${brand.name} termurah dan terpercaya di ${setting.title}.`,
+                    description: `Top up ${brand.name} termurah dan terpercaya di ${setting?.title}.`,
                     image: brand.image,
                     brand: {
                         '@type': 'Brand',

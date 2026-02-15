@@ -5,45 +5,58 @@ import MainHeader from '@/components/MainHeader.vue';
 import { Head, usePage } from '@inertiajs/vue3';
 
 const page = usePage();
+const setting = page.props.setting;
 </script>
 
 <template>
     <Head>
         <title>Syarat & Ketentuan</title>
+        <link
+            rel="icon"
+            type="image/svg+xml"
+            :href="setting?.favicon || '/favicon.svg'"
+        />
         <meta
             name="description"
-            :content="`Syarat & Ketentuan ${page.props.setting.title}. Baca ketentuan penggunaan layanan kami untuk pengalaman transaksi yang aman dan nyaman.`"
+            :content="`Syarat & Ketentuan ${setting?.title}. Baca ketentuan penggunaan layanan kami untuk pengalaman transaksi yang aman dan nyaman.`"
         />
         <meta
             name="keywords"
-            :content="`syarat dan ketentuan, terms and conditions, ${page.props.setting.title}, aturan penggunaan, perjanjian pengguna`"
+            :content="`syarat dan ketentuan, terms and conditions, ${setting?.title}, aturan penggunaan, perjanjian pengguna`"
         />
-        <meta name="author" :content="page.props.setting.title" />
-        <meta name="type" content="website" />
-        <meta name="application-name" :content="page.props.setting.title" />
+        <meta name="author" :content="setting?.title" />
+        <meta name="application-name" :content="setting?.title" />
         <meta
             property="og:title"
-            :content="`Syarat & Ketentuan - ${page.props.setting.title}`"
+            :content="`Syarat & Ketentuan - ${setting?.title}`"
         />
         <meta
             property="og:description"
-            :content="`Syarat & Ketentuan ${page.props.setting.title}. Baca ketentuan penggunaan layanan kami untuk pengalaman transaksi yang aman dan nyaman.`"
+            :content="`Syarat & Ketentuan ${setting?.title}. Baca ketentuan penggunaan layanan kami untuk pengalaman transaksi yang aman dan nyaman.`"
         />
         <meta property="og:url" :content="terms().url" />
-        <meta property="og:image" content="/favicon.svg" />
+        <meta
+            property="og:image"
+            :content="setting?.favicon || '/favicon.svg'"
+        />
         <meta
             property="twitter:title"
-            :content="`Syarat & Ketentuan - ${page.props.setting.title}`"
+            :content="`Syarat & Ketentuan - ${setting?.title}`"
         />
         <meta
             property="twitter:description"
-            :content="`Syarat & Ketentuan ${page.props.setting.title}. Baca ketentuan penggunaan layanan kami untuk pengalaman transaksi yang aman dan nyaman.`"
+            :content="`Syarat & Ketentuan ${setting?.title}. Baca ketentuan penggunaan layanan kami untuk pengalaman transaksi yang aman dan nyaman.`"
         />
-        <meta property="twitter:image" content="/favicon.svg" />
+        <meta
+            property="twitter:image"
+            :content="setting?.favicon || '/favicon.svg'"
+        />
         <meta property="twitter:card" content="summary_large_image" />
-        <meta property="twitter:site" :content="page.props.setting.title" />
-        <meta property="shortcut icon" href="/favicon.svg" />
-        <meta property="image" content="/favicon.svg" />
+        <meta property="twitter:site" :content="setting?.title" />
+        <meta
+            property="image"
+            :content="setting?.favicon || '/favicon.svg'"
+        />
         <meta property="canonical" :content="terms().url" />
         <meta name="robots" content="index, follow" />
         <component :is="'script'" type="application/ld+json">
@@ -52,7 +65,7 @@ const page = usePage();
                     '@context': 'https://schema.org',
                     '@type': 'WebPage',
                     name: 'Syarat & Ketentuan',
-                    description: `Syarat & Ketentuan ${page.props.setting.title}. Baca ketentuan penggunaan layanan kami untuk pengalaman transaksi yang aman dan nyaman.`,
+                    description: `Syarat & Ketentuan ${setting?.title}. Baca ketentuan penggunaan layanan kami untuk pengalaman transaksi yang aman dan nyaman.`,
                     url: terms().url,
                 })
             }}
@@ -72,7 +85,7 @@ const page = usePage();
 
                 <div
                     class="prose prose-sm max-w-none text-muted-foreground prose-headings:text-foreground prose-a:text-primary prose-strong:text-foreground"
-                    v-html="page.props.setting.terms"
+                    v-html="setting?.terms"
                 />
             </div>
         </main>

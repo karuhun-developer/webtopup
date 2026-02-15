@@ -1,18 +1,26 @@
 <script setup lang="ts">
-import { Input } from '@/components/ui/input';
-import { useSwal } from '@/composables/useSwal';
-import { Link, router, usePage } from '@inertiajs/vue3';
-import { ArrowLeft, LogIn, Menu, UserPlus, X } from 'lucide-vue-next';
-import { ref } from 'vue';
-import Button from './ui/button/Button.vue';
 import {
     DropdownMenu,
     DropdownMenuContent,
     DropdownMenuItem,
     DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
+import { Input } from '@/components/ui/input';
 import { useAppearance } from '@/composables/useAppearance';
-import { Monitor, Moon, Sun } from 'lucide-vue-next';
+import { useSwal } from '@/composables/useSwal';
+import { Link, router, usePage } from '@inertiajs/vue3';
+import {
+    ArrowLeft,
+    LogIn,
+    Menu,
+    Monitor,
+    Moon,
+    Sun,
+    UserPlus,
+    X,
+} from 'lucide-vue-next';
+import { ref } from 'vue';
+import Button from './ui/button/Button.vue';
 
 interface Props {
     showSearch?: boolean;
@@ -23,6 +31,10 @@ const page = usePage();
 const mobileMenuOpen = ref(false);
 const { confirm } = useSwal();
 const { appearance, updateAppearance } = useAppearance();
+
+// Use setting title or default
+const appName = page.props.setting?.title || 'GameStore';
+const appLogo = page.props.setting?.logo;
 
 withDefaults(defineProps<Props>(), {
     showSearch: false,
@@ -62,15 +74,24 @@ const logout = () => {
             <div class="flex items-center justify-between gap-4">
                 <!-- Logo -->
                 <Link href="/" class="flex items-center gap-2">
+                    <img
+                        v-if="appLogo"
+                        :src="appLogo"
+                        alt="Logo"
+                        class="h-10 w-10 rounded-lg object-cover"
+                    />
                     <div
+                        v-else
                         class="flex h-10 w-10 items-center justify-center rounded-lg bg-primary"
                     >
-                        <span class="text-xl font-bold text-white">G</span>
+                        <span class="text-xl font-bold text-white">{{
+                            appName.charAt(0)
+                        }}</span>
                     </div>
                     <span
                         class="hidden text-xl font-bold text-foreground md:inline"
                     >
-                        GameStore
+                        {{ appName }}
                     </span>
                 </Link>
 
@@ -120,21 +141,20 @@ const logout = () => {
                             >
                                 <Sun
                                     v-if="appearance === 'light'"
-                                    class="h-[1.2rem] w-[1.2rem] rotate-0 scale-100 transition-all dark:-rotate-90 dark:scale-0"
+                                    class="h-[1.2rem] w-[1.2rem] scale-100 rotate-0 transition-all dark:scale-0 dark:-rotate-90"
                                 />
                                 <Moon
                                     v-else-if="appearance === 'dark'"
-                                    class="absolute h-[1.2rem] w-[1.2rem] rotate-90 scale-0 transition-all dark:rotate-0 dark:scale-100"
+                                    class="absolute h-[1.2rem] w-[1.2rem] scale-0 rotate-90 transition-all dark:scale-100 dark:rotate-0"
                                 />
-                                <Monitor
-                                    v-else
-                                    class="h-[1.2rem] w-[1.2rem]"
-                                />
+                                <Monitor v-else class="h-[1.2rem] w-[1.2rem]" />
                                 <span class="sr-only">Toggle theme</span>
                             </Button>
                         </DropdownMenuTrigger>
                         <DropdownMenuContent align="end">
-                            <DropdownMenuItem @click="updateAppearance('light')">
+                            <DropdownMenuItem
+                                @click="updateAppearance('light')"
+                            >
                                 <Sun class="mr-2 h-4 w-4" />
                                 <span>Light</span>
                             </DropdownMenuItem>
@@ -142,7 +162,9 @@ const logout = () => {
                                 <Moon class="mr-2 h-4 w-4" />
                                 <span>Dark</span>
                             </DropdownMenuItem>
-                            <DropdownMenuItem @click="updateAppearance('system')">
+                            <DropdownMenuItem
+                                @click="updateAppearance('system')"
+                            >
                                 <Monitor class="mr-2 h-4 w-4" />
                                 <span>System</span>
                             </DropdownMenuItem>

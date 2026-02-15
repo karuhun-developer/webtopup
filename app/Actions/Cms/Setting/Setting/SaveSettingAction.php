@@ -29,6 +29,30 @@ class SaveSettingAction
             $data['value']['manual_transfer_bank_logo'] = '/storage/'.$file;
         }
 
+        if ($data['value']['logo'] ?? null instanceof UploadedFile) {
+            $file = $this->saveFile(
+                file: $data['value']['logo'],
+                base_file_name: 'logo_'.time(),
+            );
+            $data['value']['logo'] = '/storage/'.$file;
+        }
+
+        if ($data['value']['icon'] ?? null instanceof UploadedFile) {
+            $file = $this->saveFile(
+                file: $data['value']['icon'],
+                base_file_name: 'icon_'.time(),
+            );
+            $data['value']['icon'] = '/storage/'.$file;
+        }
+
+        if ($data['value']['favicon'] ?? null instanceof UploadedFile) {
+            $file = $this->saveFile(
+                file: $data['value']['favicon'],
+                base_file_name: 'favicon_'.time(),
+            );
+            $data['value']['favicon'] = '/storage/'.$file;
+        }
+
         return $setting->update([
             'value' => [
                 ...$setting->value,
