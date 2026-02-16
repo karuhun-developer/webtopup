@@ -70,7 +70,7 @@ const handlePaymentTypeChange = (type: 'manual' | 'automatic') => {
                 "
                 @click="handlePaymentTypeChange('manual')"
             >
-                Manual (Transfer Bank)
+                Manual (Transfer Bank / QRIS)
             </button>
         </div>
 
@@ -96,7 +96,11 @@ const handlePaymentTypeChange = (type: 'manual' | 'automatic') => {
                         {{ manualBank.name }}
                     </div>
                     <div class="text-xs text-muted-foreground">
-                        {{ manualBank.account_number }} -
+                        {{
+                            manualBank.account_number
+                                ? manualBank.account_number + ' - '
+                                : ''
+                        }}
                         {{ manualBank.account_name }}
                     </div>
                 </div>
