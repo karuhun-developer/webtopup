@@ -34,6 +34,7 @@ class SyncPPOBProductAction
                     'name' => $productData['brand'],
                 ],
                 [
+                    'provider' => 'digiflazz',
                     'description' => 'Imported from Digiflazz',
                     'featured' => false,
                     'order' => PPOBBrand::max('order') + 1,
@@ -50,6 +51,7 @@ class SyncPPOBProductAction
                     'sku' => $productData['buyer_sku_code'],
                 ],
                 [
+                    'provider' => 'digiflazz',
                     'name' => $productData['product_name'],
                     'description' => 'Imported from Digiflazz',
                     'buy_price' => $productData['price'],
