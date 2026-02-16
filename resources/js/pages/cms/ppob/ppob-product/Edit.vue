@@ -17,6 +17,7 @@ import {
 } from '@/components/ui/select';
 import usePPOBQuery from '@/composables/query/usePPOBQuery';
 import { useSwal } from '@/composables/useSwal';
+
 import { PPOBCategoryDataItem, PPOBProductDataItem } from '@/types/cms/ppob';
 import { Form } from '@inertiajs/vue3';
 import { Modal } from '@inertiaui/modal-vue';
@@ -33,10 +34,14 @@ const { toast } = useSwal();
 const { fetchBrands } = usePPOBQuery();
 
 // Selected category state
-const selectedCategory = ref<number>(
-    props.product?.brand?.p_p_o_b_category_id || 0,
+const selectedCategory = ref<string>(
+    props.product?.brand?.p_p_o_b_category_id
+        ? String(props.product?.brand?.p_p_o_b_category_id)
+        : '',
 );
-const selectedBrand = ref<number | null>(props.product?.brand?.id || null);
+const selectedBrand = ref<string | null>(
+    props.product?.brand?.id ? String(props.product?.brand?.id) : null,
+);
 
 // Fetch brands
 const {
@@ -54,8 +59,34 @@ const {
 const description = ref<string>(props.product?.description || '');
 
 // Reset selectedBrand when selectedCategory changes
-watch(selectedCategory, () => {
-    selectedBrand.value = null;
+// Only reset if logic requires it. Since we initialize both correctly,
+// watch might be redundant or incorrectly firing on initialization
+// if types mismatch. Since types are now consistent,
+// watch will only fire on user change.
+watch(selectedCategory, (newValue, oldValue) => {
+    // Only reset if we are NOT in the initial load phase where oldValue is undefined/empty
+    // But ref initialization happens before watch setup usually?
+    // Actually, Vue watch source (ref) checks value change.
+    // If initialization sets value, watch (lazy) doesn't fire.
+    // If user changes category, we want to reset brand.
+    if (newValue !== oldValue) {
+        selectedBrand.value = null;
+    }
+});
+
+// Provider state
+const provider = ref<string>(
+    props.product?.provider || props.product?.brand?.provider || '',
+);
+
+watch(selectedBrand, () => {
+    const selectedBrandData = brandsData.value?.find(
+        (brand) => brand.id === Number(selectedBrand.value),
+    );
+    // Only update provider if brand data found and differs
+    if (selectedBrandData) {
+        provider.value = selectedBrandData.provider;
+    }
 });
 </script>
 
@@ -91,9 +122,6 @@ watch(selectedCategory, () => {
                         name="p_p_o_b_category_id"
                         v-model="selectedCategory"
                         :disabled="isBrandsFetching"
-                        :default-value="
-                            String(product.brand?.p_p_o_b_category_id)
-                        "
                     >
                         <SelectTrigger
                             id="p_p_o_b_category_id"
@@ -119,11 +147,7 @@ watch(selectedCategory, () => {
                     <InputDescription>
                         Select the brand for this PPOB product.
                     </InputDescription>
-                    <Select
-                        name="p_p_o_b_brand_id"
-                        v-model="selectedBrand"
-                        :default-value="String(product.brand?.id)"
-                    >
+                    <Select name="p_p_o_b_brand_id" v-model="selectedBrand">
                         <SelectTrigger
                             id="p_p_o_b_brand_id"
                             class="mt-1 w-full"
@@ -158,6 +182,28 @@ watch(selectedCategory, () => {
                         :default-value="product.name"
                     />
                     <InputError :message="errors.name" />
+                </div>
+
+                <div class="grid gap-2">
+                    <Label for="provider">Provider</Label>
+                    <InputDescription>
+                        Select the provider for this PPOB brand.
+                    </InputDescription>
+                    <Select name="provider" v-model="provider">
+                        <SelectTrigger id="provider" class="mt-1 w-full">
+                            <SelectValue placeholder="Select a provider" />
+                        </SelectTrigger>
+                        <SelectContent>
+                            <SelectItem value="digiflazz">
+                                Digiflazz
+                            </SelectItem>
+                            <SelectItem value="gift"> Gift </SelectItem>
+                            <SelectItem value="manual_topup">
+                                Manual Topup
+                            </SelectItem>
+                        </SelectContent>
+                    </Select>
+                    <InputError :message="errors.provider" />
                 </div>
 
                 <div class="grid gap-2">

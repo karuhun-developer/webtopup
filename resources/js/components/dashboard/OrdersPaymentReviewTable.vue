@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { show } from '@/actions/App/Http/Controllers/Cms/Order/GiftOrderController';
+import { validatePaymentView } from '@/actions/App/Http/Controllers/Cms/Order/GiftOrderController';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import {
@@ -18,19 +18,28 @@ import {
     TableRow,
 } from '@/components/ui/table';
 import { OrderDataItem } from '@/types/cms/main';
-import { Link } from '@inertiajs/vue3';
+import { ModalLink } from '@inertiaui/modal-vue';
+import { CheckCircle } from 'lucide-vue-next';
 
 defineProps<{
     orders: OrderDataItem[];
 }>();
+
+const formatCurrency = (amount: number) => {
+    return new Intl.NumberFormat('id-ID', {
+        style: 'currency',
+        currency: 'IDR',
+        minimumFractionDigits: 0,
+    }).format(amount);
+};
 </script>
 
 <template>
     <Card class="flex flex-col">
         <CardHeader>
-            <CardTitle>Not Processed</CardTitle>
+            <CardTitle>Payment Review</CardTitle>
             <CardDescription>
-                New orders waiting tobe processed.
+                Manual transfer orders waiting for validation.
             </CardDescription>
         </CardHeader>
         <CardContent class="flex-1">
@@ -38,7 +47,7 @@ defineProps<{
                 <TableHeader>
                     <TableRow>
                         <TableHead>Reference</TableHead>
-                        <TableHead>Status</TableHead>
+                        <TableHead>Amount</TableHead>
                         <TableHead class="text-right">Action</TableHead>
                     </TableRow>
                 </TableHeader>
@@ -48,40 +57,42 @@ defineProps<{
                             <div class="flex flex-col">
                                 <span>{{ order.reference }}</span>
                                 <span class="text-xs text-muted-foreground">
-                                    {{ order.brand?.name }} -
-                                    {{ order.product?.name }}
+                                    {{ order.user?.name }}
                                 </span>
                             </div>
                         </TableCell>
                         <TableCell>
-                            <Badge
-                                :variant="
-                                    order.payment_status === 2
-                                        ? 'default'
-                                        : 'secondary'
-                                "
-                                class="whitespace-nowrap"
-                            >
-                                {{
-                                    order.payment_status === 2
-                                        ? 'Paid'
-                                        : order.payment_status === 0
-                                          ? 'Pending'
-                                          : 'Failed'
-                                }}
-                            </Badge>
+                            <div class="flex flex-col">
+                                <span class="font-medium">
+                                    {{ formatCurrency(order.payment?.amount || 0) }}
+                                </span>
+                                <Badge variant="secondary" class="w-fit text-[10px] px-1 py-0 h-4">
+                                    {{ order.brand?.name }}
+                                </Badge>
+                            </div>
                         </TableCell>
                         <TableCell class="text-right">
-                            <Link :href="show({ order: order.reference }).url">
-                                <Button variant="outline" size="sm">
-                                    Process
+                            <ModalLink
+                                :href="
+                                    validatePaymentView({ order: order.reference })
+                                        .url
+                                "
+                                slideover
+                            >
+                                <Button
+                                    variant="default"
+                                    size="sm"
+                                    title="Validate Payment"
+                                >
+                                    <CheckCircle class="h-3 w-3 mr-1" />
+                                    Validate
                                 </Button>
-                            </Link>
+                            </ModalLink>
                         </TableCell>
                     </TableRow>
                     <TableRow v-if="orders.length === 0">
                         <TableCell colspan="3" class="h-24 text-center">
-                            No pending orders.
+                            No orders pending review.
                         </TableCell>
                     </TableRow>
                 </TableBody>

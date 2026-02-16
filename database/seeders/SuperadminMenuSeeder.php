@@ -64,6 +64,15 @@ class SuperadminMenuSeeder extends Seeder
             'active_pattern' => '/cms/order/gift-orders',
             'status' => 1,
         ]);
+        Menu::create([
+            'role_id' => $this->role->id,
+            'name' => 'Manual Topup Orders',
+            'url' => '/cms/order/manual-topup-orders',
+            'icon' => 'CreditCard',
+            'order' => 7,
+            'active_pattern' => '/cms/order/manual-topup-orders',
+            'status' => 1,
+        ]);
     }
 
     public function ppobMenu()

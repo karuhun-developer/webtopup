@@ -2,6 +2,7 @@
 
 namespace App\Actions\Cms\PPOB\PPOBProduct;
 
+use App\Models\PPOB\PPOBBrand;
 use App\Models\PPOB\PPOBProduct;
 use App\Traits\WithMediaCollection;
 use Illuminate\Http\UploadedFile;

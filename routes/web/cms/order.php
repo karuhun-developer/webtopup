@@ -22,4 +22,12 @@ Route::group([
     Route::put('gift-orders/{order}/notify', [\App\Http\Controllers\Cms\Order\GiftOrderController::class, 'notify'])->name('gift-orders.notify');
     Route::get('gift-orders/{order}/validate', [\App\Http\Controllers\Cms\Order\GiftOrderController::class, 'validatePaymentView'])->name('gift-orders.validate');
     Route::put('gift-orders/{order}/validate-payment', [\App\Http\Controllers\Cms\Order\GiftOrderController::class, 'validatePayment'])->name('gift-orders.validate-payment');
+
+    // Manual Topup Orders
+    Route::get('manual-topup-orders', [\App\Http\Controllers\Cms\Order\ManualTopupOrderController::class, 'index'])->name('manual-topup-orders.index');
+    Route::get('manual-topup-orders/create', [\App\Http\Controllers\Cms\Order\ManualTopupOrderController::class, 'create'])->name('manual-topup-orders.create');
+    Route::post('manual-topup-orders', [\App\Http\Controllers\Cms\Order\ManualTopupOrderController::class, 'store'])->name('manual-topup-orders.store');
+    Route::get('manual-topup-orders/{order}', [\App\Http\Controllers\Cms\Order\ManualTopupOrderController::class, 'show'])->name('manual-topup-orders.show');
+    Route::put('manual-topup-orders/{order}', [\App\Http\Controllers\Cms\Order\ManualTopupOrderController::class, 'save'])->name('manual-topup-orders.save');
+    Route::put('manual-topup-orders/{order}/notify', [\App\Http\Controllers\Cms\Order\ManualTopupOrderController::class, 'notify'])->name('manual-topup-orders.notify');
 });

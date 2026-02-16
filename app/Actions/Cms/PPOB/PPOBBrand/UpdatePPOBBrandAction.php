@@ -3,6 +3,7 @@
 namespace App\Actions\Cms\PPOB\PPOBBrand;
 
 use App\Models\PPOB\PPOBBrand;
+use App\Models\PPOB\PPOBProduct;
 use App\Traits\WithMediaCollection;
 use Illuminate\Http\UploadedFile;
 
@@ -38,6 +39,10 @@ class UpdatePPOBBrandAction
                 collection: 'default_product_image',
             );
         }
+
+        $brand->products()->where('provider', $brand->provider)->update([
+            'provider' => $data['provider'] ?? $brand->provider,
+        ]);
 
         return $brand->update($data);
     }

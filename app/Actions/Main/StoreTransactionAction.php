@@ -50,8 +50,8 @@ class StoreTransactionAction
             $data['total_amount'] = $data['amount'];
         }
 
-        // If brand provider is gift then add step to submited data
-        if ($product->brand->provider === 'gift') {
+        // If product provider is gift then add step to submited data
+        if ($product->provider === 'gift') {
             $data['submited'] = [
                 ...$data['submited'],
                 'admin_account_ign' => '',
@@ -59,6 +59,16 @@ class StoreTransactionAction
                 'admin_add_friend_timestamp' => '',
                 'user_confirm_friend' => false,
                 'user_confirm_friend_timestamp' => '',
+                'gift_send' => false,
+                'dispute' => false,
+                'done' => false,
+            ];
+        }
+
+        // If product provider is manual_topup
+        if ($product->provider === 'manual_topup') {
+            $data['submited'] = [
+                ...$data['submited'],
                 'gift_send' => false,
                 'dispute' => false,
                 'done' => false,

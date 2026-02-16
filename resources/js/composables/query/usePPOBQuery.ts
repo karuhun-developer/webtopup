@@ -23,7 +23,6 @@ export default function usePPOBQuery() {
                 if (res.status !== 200) {
                     throw new Error('Failed to fetch PPOB brands');
                 }
-                console.log(res.data);
 
                 return res.data.data;
             },

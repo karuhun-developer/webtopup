@@ -17,6 +17,7 @@ class PPOBProduct extends Model implements HasMedia
         'name',
         'slug',
         'sku',
+        'provider',
         'description',
         'delay',
         'buy_price',

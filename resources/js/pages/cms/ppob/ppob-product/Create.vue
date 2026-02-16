@@ -54,6 +54,17 @@ const description = ref<string>('');
 watch(selectedCategory, () => {
     selectedBrand.value = null;
 });
+
+// Provider state
+const provider = ref<string>('');
+
+watch(selectedBrand, () => {
+    const selectedBrandData = brandsData.value?.find(
+        (brand) => brand.id === Number(selectedBrand.value),
+    );
+
+    provider.value = selectedBrandData?.provider || '';
+});
 </script>
 
 <template>
@@ -147,6 +158,28 @@ watch(selectedCategory, () => {
                         autofocus
                     />
                     <InputError :message="errors.name" />
+                </div>
+
+                <div class="grid gap-2">
+                    <Label for="provider">Provider</Label>
+                    <InputDescription>
+                        Select the provider for this PPOB brand.
+                    </InputDescription>
+                    <Select name="provider" v-model="provider">
+                        <SelectTrigger id="provider" class="mt-1 w-full">
+                            <SelectValue placeholder="Select a provider" />
+                        </SelectTrigger>
+                        <SelectContent>
+                            <SelectItem value="digiflazz">
+                                Digiflazz
+                            </SelectItem>
+                            <SelectItem value="gift"> Gift </SelectItem>
+                            <SelectItem value="manual_topup">
+                                Manual Topup
+                            </SelectItem>
+                        </SelectContent>
+                    </Select>
+                    <InputError :message="errors.provider" />
                 </div>
 
                 <div class="grid gap-2">

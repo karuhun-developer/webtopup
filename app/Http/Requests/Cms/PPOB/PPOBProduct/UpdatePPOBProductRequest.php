@@ -17,6 +17,7 @@ class UpdatePPOBProductRequest extends FormRequest
             'p_p_o_b_brand_id' => 'required|exists:p_p_o_b_brands,id',
             'name' => 'required|string|max:255',
             'sku' => 'nullable|string|max:100|unique:p_p_o_b_products,sku,'.$this->product->id,
+            'provider' => 'required|in:digiflazz,gift,manual_topup',
             'description' => 'nullable|string|max:1000',
             'delay' => 'required|boolean',
             'buy_price' => 'required|numeric|min:0',

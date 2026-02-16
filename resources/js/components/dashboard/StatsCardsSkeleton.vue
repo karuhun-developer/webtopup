@@ -4,8 +4,8 @@ import { Skeleton } from '@/components/ui/skeleton';
 </script>
 
 <template>
-    <div class="grid gap-4 md:grid-cols-2 lg:grid-cols-5">
-        <Card v-for="i in 5" :key="i">
+    <div class="grid gap-4 grid-cols-2 lg:grid-cols-3">
+        <Card v-for="i in 6" :key="i">
             <CardHeader
                 class="flex flex-row items-center justify-between space-y-0 pb-2"
             >

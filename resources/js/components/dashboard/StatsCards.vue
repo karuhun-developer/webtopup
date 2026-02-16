@@ -14,6 +14,7 @@ interface DashboardStats {
     ready: number;
     gifted: number;
     revenue: number;
+    paymentReview: number;
 }
 
 const props = defineProps<{
@@ -23,7 +24,7 @@ const props = defineProps<{
 </script>
 
 <template>
-    <div class="grid gap-4 md:grid-cols-2 lg:grid-cols-5">
+    <div class="grid gap-4 grid-cols-2 lg:grid-cols-3">
         <Card>
             <CardHeader
                 class="flex flex-row items-center justify-between space-y-0 pb-2"
@@ -39,6 +40,24 @@ const props = defineProps<{
                 </div>
                 <p class="text-xs text-muted-foreground">
                     Total from paid orders
+                </p>
+            </CardContent>
+        </Card>
+        <Card>
+            <CardHeader
+                class="flex flex-row items-center justify-between space-y-0 pb-2"
+            >
+                <CardTitle class="text-sm font-medium">
+                    Payment Review
+                </CardTitle>
+                <AlertCircle class="h-4 w-4 text-orange-500" />
+            </CardHeader>
+            <CardContent>
+                <div class="text-2xl font-bold text-orange-600">
+                    {{ stats.paymentReview }}
+                </div>
+                <p class="text-xs text-muted-foreground">
+                    Manual payments waiting validation
                 </p>
             </CardContent>
         </Card>

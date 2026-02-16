@@ -138,6 +138,9 @@ const deleteServer = (index: number) => {
                                 Digiflazz
                             </SelectItem>
                             <SelectItem value="gift"> Gift </SelectItem>
+                            <SelectItem value="manual_topup">
+                                Manual Topup
+                            </SelectItem>
                         </SelectContent>
                     </Select>
                     <InputError :message="errors.provider" />

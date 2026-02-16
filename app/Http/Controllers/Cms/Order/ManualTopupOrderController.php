@@ -2,13 +2,13 @@
 
 namespace App\Http\Controllers\Cms\Order;
 
-use App\Actions\Cms\Order\GiftOrder\SendNotificationAction;
-use App\Actions\Cms\Order\GiftOrder\UpdateProgressAction;
+use App\Actions\Cms\Order\ManualTopup\SendNotificationAction;
+use App\Actions\Cms\Order\ManualTopup\UpdateProgressAction;
 use App\Actions\Cms\Order\Order\StoreOrderAction;
 use App\Actions\Cms\Order\Order\ValidatePaymentAction;
 use App\Http\Controllers\Controller;
-use App\Http\Requests\Cms\Order\GiftOrder\SendNotificationRequest;
-use App\Http\Requests\Cms\Order\GiftOrder\UpdateProgressRequest;
+use App\Http\Requests\Cms\Order\ManualTopup\SendNotificationRequest;
+use App\Http\Requests\Cms\Order\ManualTopup\UpdateProgressRequest;
 use App\Http\Requests\Cms\Order\Order\StoreOrderRequest;
 use App\Http\Requests\Cms\Order\Order\ValidatePaymentRequest;
 use App\Models\Account\Account;
@@ -17,7 +17,7 @@ use App\Traits\WithGetFilterData;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Gate;
 
-class GiftOrderController extends Controller
+class ManualTopupOrderController extends Controller
 {
     use WithGetFilterData;
 
@@ -38,7 +38,7 @@ class GiftOrderController extends Controller
         $paymentStatusFilter = $request?->payment_status ?? [];
         $giftSendFilter = $request?->gift_send ?? [];
 
-        $query = Order::with('brand', 'product', 'payment.media')->whereHas('product', fn ($q) => $q->where('provider', 'gift'));
+        $query = Order::with('brand', 'product', 'payment.media')->whereHas('product', fn ($q) => $q->where('provider', 'manual_topup'));
 
         // Apply payment status filter
         if (! empty($paymentStatusFilter)) {
@@ -89,7 +89,7 @@ class GiftOrderController extends Controller
             return $item;
         });
 
-        return inertia('cms/order/gift-order/Index', [
+        return inertia('cms/order/manual-topup/Index', [
             'data' => $model,
             'order' => $order,
             'orderBy' => $orderBy,
@@ -109,7 +109,7 @@ class GiftOrderController extends Controller
     {
         Gate::authorize('create'.$this->resource);
 
-        return inertia('cms/order/gift-order/Create');
+        return inertia('cms/order/manual-topup/Create');
     }
 
     /**
@@ -142,14 +142,12 @@ class GiftOrderController extends Controller
                 ->first();
         }
 
-        // Load media admin_add_friend_proof user_confirm_friend_proof gift_send_proof
+        // Load media gift_send_proof
         $submittedData = $order->submited;
-        $submittedData['admin_add_friend_proof'] = $order->getFirstMediaUrl('admin_add_friend_proof');
-        $submittedData['user_confirm_friend_proof'] = $order->getFirstMediaUrl('user_confirm_friend_proof');
         $submittedData['gift_send_proof'] = $order->getFirstMediaUrl('gift_send_proof');
         $order->submited = $submittedData;
 
-        return inertia('cms/order/gift-order/Show', [
+        return inertia('cms/order/manual-topup/Show', [
             'order' => $order,
             'mlAccountNickname' => $mlAccount?->username,
         ]);
@@ -177,38 +175,5 @@ class GiftOrderController extends Controller
         $action->handle($order, $request->validated());
 
         return back()->with('success', 'Notifikasi berhasil dikirim');
-    }
-
-    /**
-     * Display validate payment modal.
-     */
-    public function validatePaymentView(Order $order)
-    {
-        Gate::authorize('update'.$this->resource);
-
-        $order->load('brand', 'product', 'payment.media');
-
-        // Load payment image if manual
-        if ($order->payment && $order->payment->driver === 'manual') {
-            $order->payment->image = $order->payment->getFirstMediaUrl('image');
-        }
-
-        $order->payment?->makeHidden('media');
-
-        return inertia('cms/order/gift-order/ValidatePayment', [
-            'order' => $order,
-        ]);
-    }
-
-    /**
-     * Validate payment for manual transfer.
-     */
-    public function validatePayment(Order $order, ValidatePaymentRequest $request, ValidatePaymentAction $action)
-    {
-        Gate::authorize('update'.$this->resource);
-
-        $action->handle($order, $request->validated()['status']);
-
-        return back()->with('success', 'Payment berhasil divalidasi');
     }
 }

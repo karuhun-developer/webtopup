@@ -38,6 +38,7 @@ export interface PPOBBrandDataItem {
 export interface PPOBProductDataItem {
     id: number;
     p_p_o_b_brand_id: number;
+    provider?: string;
     name: string;
     slug: string;
     sku: string;
