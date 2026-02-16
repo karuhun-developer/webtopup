@@ -22,7 +22,7 @@ class DashboardController extends Controller
                 // Stats: Not Processed
                 $notProcessedCount = (clone $giftOrderQuery)
                     ->whereNull('submited->user_confirm_friend_timestamp')
-                    ->whereNull('submited->admin_add_friend_timestamp')
+                    ->whereNotNull('submited->admin_add_friend_timestamp')
                     ->where(function ($q) {
                         $q->whereNull('submited->gift_send')
                             ->orWhere('submited->gift_send', false);
