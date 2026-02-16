@@ -21,12 +21,9 @@ class DashboardController extends Controller
             'stats' => inertia()->defer(function () use ($giftOrderQuery) {
                 // Stats: Not Processed
                 $notProcessedCount = (clone $giftOrderQuery)
-                    ->whereNull('submited->user_confirm_friend_timestamp')
-                    ->whereNotNull('submited->admin_add_friend_timestamp')
-                    ->where(function ($q) {
-                        $q->whereNull('submited->gift_send')
-                            ->orWhere('submited->gift_send', false);
-                    })
+                    ->where('submited->user_confirm_friend_timestamp', '=', '')
+                    ->where('submited->admin_add_friend_timestamp', '=', '')
+                    ->where('submited->gift_send', false)
                     ->count();
 
                 // Stats: Gifted
@@ -36,12 +33,9 @@ class DashboardController extends Controller
 
                 // Stats: Waiting vs Ready
                 $pendingGiftOrders = (clone $giftOrderQuery)
-                    ->whereNotNull('submited->admin_add_friend_timestamp')
-                    ->whereNotNull('submited->user_confirm_friend_timestamp')
-                    ->where(function ($q) {
-                        $q->whereNull('submited->gift_send')
-                            ->orWhere('submited->gift_send', false);
-                    })
+                    ->where('submited->admin_add_friend_timestamp', '!=', '')
+                    ->where('submited->user_confirm_friend_timestamp', '!=', '')
+                    ->where('submited->gift_send', false)
                     ->get();
 
                 $waitingCount = 0;
@@ -61,7 +55,7 @@ class DashboardController extends Controller
                 // Stats: Revenue
                 $revenue = (clone $giftOrderQuery)
                     ->whereHas('payment', fn ($q) => $q->whereNotNull('paid_at'))
-                    ->with(['payment'])
+                    ->with('payment')
                     ->get()
                     ->sum(function ($order) {
                         return $order->payment->amount;
@@ -78,12 +72,9 @@ class DashboardController extends Controller
             'ordersWaiting' => inertia()->defer(function () use ($giftOrderQuery) {
                 $ordersWaiting = (clone $giftOrderQuery)
                     ->with('brand', 'product', 'payment', 'user')
-                    ->whereNotNull('submited->admin_add_friend_timestamp')
-                    ->whereNotNull('submited->user_confirm_friend_timestamp')
-                    ->where(function ($q) {
-                        $q->whereNull('submited->gift_send')
-                            ->orWhere('submited->gift_send', false);
-                    })
+                    ->where('submited->admin_add_friend_timestamp', '!=', '')
+                    ->where('submited->user_confirm_friend_timestamp', '!=', '')
+                    ->where('submited->gift_send', false)
                     ->orderByRaw("CAST(JSON_UNQUOTE(JSON_EXTRACT(submited, '$.user_confirm_friend_timestamp')) AS DATETIME) ASC")
                     ->take(10)
                     ->get();
@@ -101,12 +92,9 @@ class DashboardController extends Controller
             'ordersNotProcessed' => inertia()->defer(function () use ($giftOrderQuery) {
                 $ordersNotProcessed = (clone $giftOrderQuery)
                     ->with('brand', 'product', 'payment', 'user')
-                    ->whereNull('submited->admin_add_friend_timestamp')
-                    ->whereNull('submited->user_confirm_friend_timestamp')
-                    ->where(function ($q) {
-                        $q->whereNull('submited->gift_send')
-                            ->orWhere('submited->gift_send', false);
-                    })
+                    ->where('submited->admin_add_friend_timestamp', '=', '')
+                    ->where('submited->user_confirm_friend_timestamp', '=', '')
+                    ->where('submited->gift_send', false)
                     ->orderBy('created_at', 'asc')
                     ->take(10)
                     ->get();
