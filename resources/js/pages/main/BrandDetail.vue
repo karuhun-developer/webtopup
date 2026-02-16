@@ -191,10 +191,12 @@ const handleCheckout = () => {
                 title: 'Transaksi berhasil dibuat',
             });
         },
-        onError: () => {
+        onError: (errors) => {
             toast.fire({
                 icon: 'error',
-                title: 'Terjadi kesalahan saat membuat transaksi',
+                title: errors.account_id
+                    ? 'Game ID/Server tidak valid'
+                    : 'Terjadi kesalahan',
             });
         },
     });
