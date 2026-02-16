@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\Cms;
 
+use App\Enums\PaymentStatusEnum;
 use App\Http\Controllers\Controller;
 use App\Models\Order\Order;
 use Carbon\Carbon;
@@ -23,6 +24,7 @@ class DashboardController extends Controller
                 $notProcessedCount = (clone $giftOrderQuery)
                     ->where('submited->user_confirm_friend_timestamp', '=', '')
                     ->where('submited->admin_add_friend_timestamp', '=', '')
+                    ->where('payment_status', PaymentStatusEnum::SETTLEMENT)
                     ->where('submited->gift_send', false)
                     ->count();
 
@@ -35,6 +37,7 @@ class DashboardController extends Controller
                 $pendingGiftOrders = (clone $giftOrderQuery)
                     ->where('submited->admin_add_friend_timestamp', '!=', '')
                     ->where('submited->user_confirm_friend_timestamp', '!=', '')
+                    ->where('payment_status', PaymentStatusEnum::SETTLEMENT)
                     ->where('submited->gift_send', false)
                     ->get();
 
@@ -75,6 +78,7 @@ class DashboardController extends Controller
                     ->where('submited->admin_add_friend_timestamp', '!=', '')
                     ->where('submited->user_confirm_friend_timestamp', '!=', '')
                     ->where('submited->gift_send', false)
+                    ->where('payment_status', PaymentStatusEnum::SETTLEMENT)
                     ->orderByRaw("CAST(JSON_UNQUOTE(JSON_EXTRACT(submited, '$.user_confirm_friend_timestamp')) AS DATETIME) ASC")
                     ->take(10)
                     ->get();
@@ -95,6 +99,7 @@ class DashboardController extends Controller
                     ->where('submited->admin_add_friend_timestamp', '=', '')
                     ->where('submited->user_confirm_friend_timestamp', '=', '')
                     ->where('submited->gift_send', false)
+                    ->where('payment_status', PaymentStatusEnum::SETTLEMENT)
                     ->orderBy('created_at', 'asc')
                     ->take(10)
                     ->get();
