@@ -90,9 +90,7 @@ defineProps<{
             </div>
 
             <div class="grid gap-2">
-                <Label for="template_order_failed"
-                    >Order Failed Template</Label
-                >
+                <Label for="template_order_failed">Order Failed Template</Label>
                 <Textarea
                     id="template_order_failed"
                     name="value[template_order_failed]"
@@ -114,16 +112,19 @@ defineProps<{
                 <Textarea
                     id="template_gift_order_admin_friend_request"
                     name="value[template_gift_order_admin_friend_request]"
-                    :default-value="setting?.template_gift_order_admin_friend_request"
+                    :default-value="
+                        setting?.template_gift_order_admin_friend_request
+                    "
                     placeholder="WhatsApp template for gift order admin friend request"
                     rows="8"
                 />
                 <InputError
-                    :message="errors['value.template_gift_order_admin_friend_request']"
+                    :message="
+                        errors['value.template_gift_order_admin_friend_request']
+                    "
                 />
                 <p class="text-xs text-muted-foreground">
-                    Available variables: {customer_name}, {order_id},
-                    {cs_link}
+                    Available variables: {customer_name}, {order_id}, {cs_link}
                 </p>
             </div>
 
@@ -134,12 +135,18 @@ defineProps<{
                 <Textarea
                     id="template_gift_order_user_friend_confirmation"
                     name="value[template_gift_order_user_friend_confirmation]"
-                    :default-value="setting?.template_gift_order_user_friend_confirmation"
+                    :default-value="
+                        setting?.template_gift_order_user_friend_confirmation
+                    "
                     placeholder="WhatsApp template for gift order user friend confirmation"
                     rows="8"
                 />
                 <InputError
-                    :message="errors['value.template_gift_order_user_friend_confirmation']"
+                    :message="
+                        errors[
+                            'value.template_gift_order_user_friend_confirmation'
+                        ]
+                    "
                 />
                 <p class="text-xs text-muted-foreground">
                     Available variables: {customer_name}, {order_id},

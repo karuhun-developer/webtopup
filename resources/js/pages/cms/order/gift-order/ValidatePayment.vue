@@ -109,7 +109,7 @@ const rejectPayment = async (close: () => void) => {
                             class="h-20 w-20 rounded-lg object-cover"
                         />
                         <div class="flex-1">
-                            <p class="text-xs uppercase text-muted-foreground">
+                            <p class="text-xs text-muted-foreground uppercase">
                                 {{ order?.brand?.name }}
                             </p>
                             <h3 class="text-lg font-bold">
@@ -125,7 +125,9 @@ const rejectPayment = async (close: () => void) => {
                         <div>
                             <p class="text-xs text-muted-foreground">
                                 ID Akun
-                                {{ order.submited?.server_id ? '/ Server' : '' }}
+                                {{
+                                    order.submited?.server_id ? '/ Server' : ''
+                                }}
                             </p>
                             <p class="font-mono font-medium">
                                 {{ order.submited?.account_id || '-' }}

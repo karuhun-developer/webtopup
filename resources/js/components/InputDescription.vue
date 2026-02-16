@@ -7,7 +7,7 @@ defineProps<Props>();
 </script>
 
 <template>
-    <p class="text-[0.8rem] text-muted-foreground break-words line-clamp-3">
+    <p class="line-clamp-3 text-[0.8rem] break-words text-muted-foreground">
         <slot>{{ message }}</slot>
     </p>
 </template>

@@ -31,7 +31,9 @@ const emit = defineEmits<{
 
 const localPaymentFilters = ref<string[]>(props.paymentFilters || []);
 const localTopupFilters = ref<string[]>((props.topupFilters || []).map(String));
-const localGiftSendFilters = ref<string[]>((props.giftSendFilters || []).map(String));
+const localGiftSendFilters = ref<string[]>(
+    (props.giftSendFilters || []).map(String),
+);
 
 // Watch for prop changes
 watch(

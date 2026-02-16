@@ -27,7 +27,10 @@ defineProps<{
                     name="value[manual_transfer_type]"
                     :default-value="setting?.manual_transfer_type"
                 >
-                    <SelectTrigger id="manual_transfer_type" class="mt-1 w-full">
+                    <SelectTrigger
+                        id="manual_transfer_type"
+                        class="mt-1 w-full"
+                    >
                         <SelectValue placeholder="Select type" />
                     </SelectTrigger>
                     <SelectContent>
@@ -35,9 +38,7 @@ defineProps<{
                         <SelectItem value="qris">QRIS</SelectItem>
                     </SelectContent>
                 </Select>
-                <InputError
-                    :message="errors['value.manual_transfer_type']"
-                />
+                <InputError :message="errors['value.manual_transfer_type']" />
             </div>
 
             <div class="grid gap-2">

@@ -211,12 +211,13 @@ const handleGiftSendFiltersUpdate = (filters: string[]) => {
                             <span
                                 v-if="
                                     dayjs(
-                                        row.submited?.admin_add_friend_timestamp,
+                                        row.submited
+                                            ?.admin_add_friend_timestamp,
                                     )
                                         .add(7, 'day')
                                         .diff(dayjs()) <= 0
                                 "
-                                class="inline-flex items-center rounded-md bg-red-100 px-2.5 py-1 text-xs font-semibold text-red-800 animate-pulse dark:bg-red-900/30 dark:text-red-400"
+                                class="inline-flex animate-pulse items-center rounded-md bg-red-100 px-2.5 py-1 text-xs font-semibold text-red-800 dark:bg-red-900/30 dark:text-red-400"
                             >
                                 READY TO SEND
                             </span>

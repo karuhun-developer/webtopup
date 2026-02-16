@@ -23,7 +23,7 @@ defineProps<{
                 class="h-24 w-24 rounded-lg object-cover"
             />
             <div class="flex-1">
-                <p class="text-xs uppercase text-muted-foreground">
+                <p class="text-xs text-muted-foreground uppercase">
                     {{ order?.brand?.name }}
                 </p>
                 <h3 class="text-xl font-bold">
@@ -39,9 +39,7 @@ defineProps<{
 
         <div class="grid grid-cols-2 gap-4">
             <div>
-                <Label class="text-muted-foreground"
-                    >Account ID / Server</Label
-                >
+                <Label class="text-muted-foreground">Account ID / Server</Label>
                 <p class="font-mono font-medium">
                     {{ order.submited?.account_id || '-' }}
                     {{

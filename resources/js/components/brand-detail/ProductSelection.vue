@@ -32,7 +32,7 @@ const emit = defineEmits<{
             <button
                 v-for="product in products"
                 :key="product.id"
-                class="border-2 text-left transition-all"
+                class="flex h-full flex-col overflow-hidden rounded-xl border-2 text-left transition-all"
                 :class="
                     selectedProduct === product.id
                         ? 'border-primary bg-primary/5'
@@ -43,8 +43,10 @@ const emit = defineEmits<{
                 <div class="pt-4 pl-4 text-sm font-semibold text-foreground">
                     {{ product.name }}
                 </div>
-                <div class="mt-2 text-sm font-bold text-primary">
-                    <div class="flex h-full items-center gap-2 pl-4 md:gap-3">
+                <div
+                    class="mt-2 flex flex-1 flex-col justify-between text-sm font-bold text-primary"
+                >
+                    <div class="flex items-center gap-2 pl-4 md:gap-3">
                         <div class="flex aspect-square w-6 items-center md:w-8">
                             <img
                                 v-if="product.image"

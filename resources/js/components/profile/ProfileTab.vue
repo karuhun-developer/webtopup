@@ -5,8 +5,8 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { useSwal } from '@/composables/useSwal';
-import { Form, Link, usePage } from '@inertiajs/vue3';
 import { send } from '@/routes/verification';
+import { Form, Link, usePage } from '@inertiajs/vue3';
 
 defineProps<{
     mustVerifyEmail: boolean;
@@ -21,9 +21,7 @@ const { toast } = useSwal();
 
 <template>
     <div class="rounded-lg border border-border/50 bg-card p-6 shadow-sm">
-        <h2 class="mb-6 text-lg font-bold text-foreground">
-            Update Profile
-        </h2>
+        <h2 class="mb-6 text-lg font-bold text-foreground">Update Profile</h2>
 
         <Form
             v-bind="ProfileController.update.form()"
@@ -80,8 +78,7 @@ const { toast } = useSwal();
                     v-if="status === 'verification-link-sent'"
                     class="mt-2 text-sm font-medium text-green-600"
                 >
-                    A new verification link has been sent to your email
-                    address.
+                    A new verification link has been sent to your email address.
                 </div>
             </div>
 

@@ -35,9 +35,7 @@ const handleDeposit = () => {
 
 <template>
     <div class="rounded-lg border border-border/50 bg-card p-6 shadow-sm">
-        <h2 class="mb-6 text-lg font-bold text-foreground">
-            Deposit Balance
-        </h2>
+        <h2 class="mb-6 text-lg font-bold text-foreground">Deposit Balance</h2>
 
         <!-- Current Balance -->
         <div
@@ -85,10 +83,7 @@ const handleDeposit = () => {
                 </div>
             </div>
 
-            <Button
-                type="submit"
-                class="w-full bg-primary hover:bg-primary/90"
-            >
+            <Button type="submit" class="w-full bg-primary hover:bg-primary/90">
                 Deposit Now
             </Button>
         </form>

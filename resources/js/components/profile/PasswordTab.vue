@@ -12,9 +12,7 @@ const { toast } = useSwal();
 
 <template>
     <div class="rounded-lg border border-border/50 bg-card p-6 shadow-sm">
-        <h2 class="mb-6 text-lg font-bold text-foreground">
-            Change Password
-        </h2>
+        <h2 class="mb-6 text-lg font-bold text-foreground">Change Password</h2>
 
         <Form
             v-bind="PasswordController.update.form()"

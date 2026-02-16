@@ -38,28 +38,28 @@ defineProps<{
                         {{ notification.provider }}
                     </span>
                     <p class="text-xs text-muted-foreground">
-                        {{ dayjs(notification.created_at).format('DD MMM YYYY, HH:mm') }}
+                        {{
+                            dayjs(notification.created_at).format(
+                                'DD MMM YYYY, HH:mm',
+                            )
+                        }}
                     </p>
                 </div>
                 <h4 class="mt-2 font-semibold">
                     {{ notification.title }}
                 </h4>
-                <p class="mt-1 whitespace-pre-wrap text-sm text-muted-foreground">
+                <p
+                    class="mt-1 text-sm whitespace-pre-wrap text-muted-foreground"
+                >
                     {{ notification.content }}
                 </p>
-                <p
-                    v-if="notification.error"
-                    class="mt-2 text-sm text-red-600"
-                >
+                <p v-if="notification.error" class="mt-2 text-sm text-red-600">
                     Error: {{ notification.error }}
                 </p>
             </div>
         </div>
 
-        <div
-            v-else
-            class="rounded-lg border border-dashed p-8 text-center"
-        >
+        <div v-else class="rounded-lg border border-dashed p-8 text-center">
             <p class="text-sm text-muted-foreground">No notifications yet</p>
         </div>
     </Card>

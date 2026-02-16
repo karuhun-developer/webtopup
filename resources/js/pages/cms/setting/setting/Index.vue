@@ -64,7 +64,7 @@ const activeTab = ref<Tab>('general');
                         <Button
                             type="button"
                             variant="ghost"
-                            class="relative whitespace-nowrap rounded-none px-0 py-4 text-sm font-medium hover:bg-transparent"
+                            class="relative rounded-none px-0 py-4 text-sm font-medium whitespace-nowrap hover:bg-transparent"
                             :class="
                                 activeTab === 'general'
                                     ? 'text-foreground'
@@ -82,7 +82,7 @@ const activeTab = ref<Tab>('general');
                         <Button
                             type="button"
                             variant="ghost"
-                            class="relative whitespace-nowrap rounded-none px-0 py-4 text-sm font-medium hover:bg-transparent"
+                            class="relative rounded-none px-0 py-4 text-sm font-medium whitespace-nowrap hover:bg-transparent"
                             :class="
                                 activeTab === 'content'
                                     ? 'text-foreground'
@@ -100,7 +100,7 @@ const activeTab = ref<Tab>('general');
                         <Button
                             type="button"
                             variant="ghost"
-                            class="relative whitespace-nowrap rounded-none px-0 py-4 text-sm font-medium hover:bg-transparent"
+                            class="relative rounded-none px-0 py-4 text-sm font-medium whitespace-nowrap hover:bg-transparent"
                             :class="
                                 activeTab === 'templates'
                                     ? 'text-foreground'
@@ -118,7 +118,7 @@ const activeTab = ref<Tab>('general');
                         <Button
                             type="button"
                             variant="ghost"
-                            class="relative whitespace-nowrap rounded-none px-0 py-4 text-sm font-medium hover:bg-transparent"
+                            class="relative rounded-none px-0 py-4 text-sm font-medium whitespace-nowrap hover:bg-transparent"
                             :class="
                                 activeTab === 'transfer'
                                     ? 'text-foreground'

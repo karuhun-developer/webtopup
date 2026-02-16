@@ -32,7 +32,10 @@ defineProps<{
                     alt="Logo"
                     class="mr-2 h-8 w-8 rounded-md object-cover"
                 />
-                <AppLogoIcon v-else class="mr-2 size-8 fill-current text-white" />
+                <AppLogoIcon
+                    v-else
+                    class="mr-2 size-8 fill-current text-white"
+                />
                 {{ name }}
             </Link>
             <div v-if="quote" class="relative z-20 mt-auto">

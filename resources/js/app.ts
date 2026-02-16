@@ -3,11 +3,11 @@ import '../css/app.css';
 import { createInertiaApp, usePage } from '@inertiajs/vue3';
 import { putConfig, renderApp } from '@inertiaui/modal-vue';
 import { VueQueryPlugin } from '@tanstack/vue-query';
+import dayjs from 'dayjs';
+import 'dayjs/locale/id';
 import { resolvePageComponent } from 'laravel-vite-plugin/inertia-helpers';
 import type { DefineComponent } from 'vue';
 import { createApp } from 'vue';
-import dayjs from 'dayjs';
-import 'dayjs/locale/id';
 import { initializeTheme } from './composables/useAppearance';
 
 dayjs.locale('id');

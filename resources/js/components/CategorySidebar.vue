@@ -1,7 +1,7 @@
 <script setup lang="ts">
-import { ref } from 'vue';
 import { Checkbox } from '@/components/ui/checkbox';
 import { Label } from '@/components/ui/label';
+import { ref } from 'vue';
 
 interface Category {
     id: string;
@@ -38,7 +38,9 @@ const selectedPlatforms = ref<string[]>([]);
 </script>
 
 <template>
-    <aside class="w-full rounded-lg border border-border/50 bg-card p-4 shadow-sm lg:w-64">
+    <aside
+        class="w-full rounded-lg border border-border/50 bg-card p-4 shadow-sm lg:w-64"
+    >
         <!-- Categories Section -->
         <div class="mb-6">
             <h3 class="mb-3 text-sm font-bold text-foreground">Categories</h3>
