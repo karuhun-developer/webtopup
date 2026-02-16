@@ -40,7 +40,7 @@ class StoreTransactionRequest extends FormRequest
         $gameService = new GameService;
 
         // Check the brand if the brand is mobile legends, check the server and uid
-        if (strtolower($product->brand->name) === 'mobile legends') {
+        if (in_array(strtolower($product->brand->name), ['mobile legends', 'mobile legends gift'])) {
             $isValid = $gameService->isIdValid(
                 game: 'mobilelegends',
                 server: $this->server_id,
