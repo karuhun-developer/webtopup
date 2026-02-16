@@ -1,11 +1,29 @@
 <script setup lang="ts">
+import DashboardTableSkeleton from '@/components/dashboard/DashboardTableSkeleton.vue';
+import OrdersNotProcessedTable from '@/components/dashboard/OrdersNotProcessedTable.vue';
+import OrdersWaitingTable from '@/components/dashboard/OrdersWaitingTable.vue';
+import StatsCards from '@/components/dashboard/StatsCards.vue';
+import StatsCardsSkeleton from '@/components/dashboard/StatsCardsSkeleton.vue';
 import AppLayout from '@/layouts/AppLayout.vue';
 import { dashboard } from '@/routes/cms';
-import { type BreadcrumbItem } from '@/types';
-import { Head } from '@inertiajs/vue3';
-import PlaceholderPattern from '../components/PlaceholderPattern.vue';
+import { OrderDataItem } from '@/types/cms/main';
+import { Deferred, Head } from '@inertiajs/vue3';
 
-const breadcrumbs: BreadcrumbItem[] = [
+interface DashboardStats {
+    notProcessed: number;
+    waiting: number;
+    ready: number;
+    gifted: number;
+    revenue: number;
+}
+
+const props = defineProps<{
+    stats: DashboardStats;
+    ordersWaiting: OrderDataItem[];
+    ordersNotProcessed: OrderDataItem[];
+}>();
+
+const breadcrumbs = [
     {
         title: 'Dashboard',
         href: dashboard().url,
@@ -17,30 +35,31 @@ const breadcrumbs: BreadcrumbItem[] = [
     <Head title="Dashboard" />
 
     <AppLayout :breadcrumbs="breadcrumbs">
-        <div
-            class="flex h-full flex-1 flex-col gap-4 overflow-x-auto rounded-xl p-4"
-        >
-            <div class="grid auto-rows-min gap-4 md:grid-cols-3">
-                <div
-                    class="relative aspect-video overflow-hidden rounded-xl border border-sidebar-border/70 dark:border-sidebar-border"
-                >
-                    <PlaceholderPattern />
-                </div>
-                <div
-                    class="relative aspect-video overflow-hidden rounded-xl border border-sidebar-border/70 dark:border-sidebar-border"
-                >
-                    <PlaceholderPattern />
-                </div>
-                <div
-                    class="relative aspect-video overflow-hidden rounded-xl border border-sidebar-border/70 dark:border-sidebar-border"
-                >
-                    <PlaceholderPattern />
-                </div>
-            </div>
-            <div
-                class="relative min-h-[100vh] flex-1 rounded-xl border border-sidebar-border/70 md:min-h-min dark:border-sidebar-border"
-            >
-                <PlaceholderPattern />
+        <div class="flex h-full flex-1 flex-col gap-6 p-4">
+            <!-- Stats Cards -->
+            <Deferred data="stats">
+                <template #fallback>
+                    <StatsCardsSkeleton />
+                </template>
+                <StatsCards :stats="stats" />
+            </Deferred>
+
+            <div class="grid gap-6 md:grid-cols-2">
+                <!-- Orders Waiting Table -->
+                <Deferred data="ordersWaiting">
+                    <template #fallback>
+                        <DashboardTableSkeleton />
+                    </template>
+                    <OrdersWaitingTable :orders="ordersWaiting" />
+                </Deferred>
+
+                <!-- Orders Not Processed Table -->
+                <Deferred data="ordersNotProcessed">
+                    <template #fallback>
+                        <DashboardTableSkeleton />
+                    </template>
+                    <OrdersNotProcessedTable :orders="ordersNotProcessed" />
+                </Deferred>
             </div>
         </div>
     </AppLayout>

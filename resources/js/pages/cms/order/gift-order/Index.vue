@@ -204,7 +204,7 @@ const handleGiftSendFiltersUpdate = (filters: string[]) => {
                         <!-- Countdown -->
                         <div
                             v-if="
-                                row.submited?.admin_add_friend_timestamp &&
+                                row.submited?.user_confirm_friend_timestamp &&
                                 !row.submited.gift_send
                             "
                         >
@@ -212,7 +212,7 @@ const handleGiftSendFiltersUpdate = (filters: string[]) => {
                                 v-if="
                                     dayjs(
                                         row.submited
-                                            ?.admin_add_friend_timestamp,
+                                            ?.user_confirm_friend_timestamp,
                                     )
                                         .add(7, 'day')
                                         .diff(dayjs()) <= 0
@@ -229,7 +229,7 @@ const handleGiftSendFiltersUpdate = (filters: string[]) => {
                                     Math.floor(
                                         dayjs(
                                             row.submited
-                                                ?.admin_add_friend_timestamp,
+                                                ?.user_confirm_friend_timestamp,
                                         )
                                             .add(7, 'day')
                                             .diff(dayjs()) /
@@ -240,7 +240,7 @@ const handleGiftSendFiltersUpdate = (filters: string[]) => {
                                     Math.floor(
                                         (dayjs(
                                             row.submited
-                                                ?.admin_add_friend_timestamp,
+                                                ?.user_confirm_friend_timestamp,
                                         )
                                             .add(7, 'day')
                                             .diff(dayjs()) %

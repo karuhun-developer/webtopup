@@ -11,9 +11,7 @@ Route::group([
     Route::get('/', fn () => to_route('cms.dashboard'))->name('home');
 
     // Dashboard Route
-    Route::get('/dashboard', function () {
-        return inertia('Dashboard');
-    })->name('dashboard');
+    Route::get('/dashboard', [\App\Http\Controllers\Cms\DashboardController::class, 'index'])->name('dashboard');
 
     // Web Routes
     require 'cms/web.php';

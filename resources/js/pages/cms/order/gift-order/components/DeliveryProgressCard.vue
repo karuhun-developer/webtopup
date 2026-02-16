@@ -57,15 +57,15 @@ const adminProofPreview = ref<string | null>(null);
 const userProofPreview = ref<string | null>(null);
 const giftProofPreview = ref<string | null>(null);
 
-// Calculate countdown from admin_add_friend_timestamp
-const adminAddFriendAt = computed(() => {
-    return props.order.submited?.admin_add_friend_timestamp
-        ? dayjs(props.order.submited.admin_add_friend_timestamp)
+// Calculate countdown from user_confirm_friend_timestamp
+const userConfirmFriendAt = computed(() => {
+    return props.order.submited?.user_confirm_friend_timestamp
+        ? dayjs(props.order.submited.user_confirm_friend_timestamp)
         : null;
 });
 
 const countdownEndDate = computed(() => {
-    return adminAddFriendAt.value?.add(7, 'day') || null;
+    return userConfirmFriendAt.value?.add(7, 'day') || null;
 });
 
 const countdownRemaining = computed(() => {
@@ -580,7 +580,7 @@ watch(
                         <span
                             >Started:
                             {{
-                                adminAddFriendAt?.format('DD MMMM, HH:mm')
+                                userConfirmFriendAt?.format('DD MMMM, HH:mm')
                             }}</span
                         >
                         <span
