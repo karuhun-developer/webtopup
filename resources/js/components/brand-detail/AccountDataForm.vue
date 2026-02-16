@@ -8,6 +8,7 @@ import {
     SelectTrigger,
     SelectValue,
 } from '@/components/ui/select';
+import { CircleAlert } from 'lucide-vue-next';
 import { computed } from 'vue';
 import InputError from '../InputError.vue';
 
@@ -96,5 +97,12 @@ const hasServerDropdown = computed(
                 <InputError :message="formErrors.server_id" class="mt-1" />
             </div>
         </div>
+
+        <p
+            class="mt-6 flex items-start gap-2 rounded-md bg-secondary p-3 text-sm text-muted-foreground"
+        >
+            <CircleAlert class="inline h-4 w-4 text-destructive" />
+            Pastikan data akun yang kamu masukkan benar.
+        </p>
     </section>
 </template>

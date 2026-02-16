@@ -40,32 +40,32 @@ class StoreTransactionRequest extends FormRequest
         $gameService = new GameService;
 
         // Check the brand if the brand is mobile legends, check the server and uid
-        if (in_array(strtolower($product->brand->name), ['mobile legends', 'mobile legends gift'])) {
-            $isValid = $gameService->isIdValid(
-                game: 'mobilelegends',
-                server: $this->server_id,
-                uid: $this->account_id,
-            );
+        // if (in_array(strtolower($product->brand->name), ['mobile legends', 'mobile legends gift'])) {
+        //     $isValid = $gameService->isIdValid(
+        //         game: 'mobilelegends',
+        //         server: $this->server_id,
+        //         uid: $this->account_id,
+        //     );
 
-            if (! $isValid['status']) {
-                throw \Illuminate\Validation\ValidationException::withMessages([
-                    'account_id' => 'Game id or server is invalid',
-                ]);
-            }
+        //     if (! $isValid['status']) {
+        //         throw \Illuminate\Validation\ValidationException::withMessages([
+        //             'account_id' => 'Game id or server is invalid',
+        //         ]);
+        //     }
 
-            // Update or create account
-            Account::updateOrCreate(
-                [
-                    'game' => 'mobilelegends',
-                    'uid' => $this->account_id,
-                    'server' => $this->server_id,
-                ],
-                [
-                    'username' => $isValid['nickname'] ?? 'Unknown',
-                    'meta' => $isValid['meta'] ?? null,
-                ]
-            );
-        }
+        //     // Update or create account
+        //     Account::updateOrCreate(
+        //         [
+        //             'game' => 'mobilelegends',
+        //             'uid' => $this->account_id,
+        //             'server' => $this->server_id,
+        //         ],
+        //         [
+        //             'username' => $isValid['nickname'] ?? 'Unknown',
+        //             'meta' => $isValid['meta'] ?? null,
+        //         ]
+        //     );
+        // }
 
         // Merge additional data
         $this->merge([
