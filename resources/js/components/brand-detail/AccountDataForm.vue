@@ -99,9 +99,9 @@ const hasServerDropdown = computed(
         </div>
 
         <p
-            class="mt-6 flex items-start gap-2 rounded-md bg-secondary p-3 text-sm text-muted-foreground"
+            class="mt-6 flex items-center gap-2 rounded-md bg-secondary p-3 text-sm text-muted-foreground"
         >
-            <CircleAlert class="inline h-4 w-4 text-destructive" />
+            <CircleAlert class="h-4 w-4 flex-shrink-0 text-destructive" />
             Pastikan data akun yang kamu masukkan benar.
         </p>
     </section>
