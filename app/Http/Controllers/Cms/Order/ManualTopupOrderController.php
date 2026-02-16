@@ -4,17 +4,17 @@ namespace App\Http\Controllers\Cms\Order;
 
 use App\Actions\Cms\Order\ManualTopup\SendNotificationAction;
 use App\Actions\Cms\Order\ManualTopup\UpdateProgressAction;
-use App\Actions\Cms\Order\Order\StoreOrderAction;
-use App\Actions\Cms\Order\Order\ValidatePaymentAction;
+use App\Actions\Main\StoreTransactionAction;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Cms\Order\ManualTopup\SendNotificationRequest;
 use App\Http\Requests\Cms\Order\ManualTopup\UpdateProgressRequest;
-use App\Http\Requests\Cms\Order\Order\StoreOrderRequest;
-use App\Http\Requests\Cms\Order\Order\ValidatePaymentRequest;
+use App\Http\Requests\Main\StoreTransactionRequest;
 use App\Models\Account\Account;
 use App\Models\Order\Order;
+use App\Models\PPOB\PPOBProduct;
 use App\Traits\WithGetFilterData;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Gate;
 
 class ManualTopupOrderController extends Controller
@@ -109,19 +109,43 @@ class ManualTopupOrderController extends Controller
     {
         Gate::authorize('create'.$this->resource);
 
-        return inertia('cms/order/manual-topup/Create');
+        $products = PPOBProduct::query()
+            ->with('brand')
+            ->where('provider', 'manual_topup')
+            ->get();
+
+        return inertia('cms/order/manual-topup/Create', [
+            'products' => $products,
+        ]);
     }
 
     /**
      * Store a newly created resource in storage.
      */
-    public function store(StoreOrderRequest $request, StoreOrderAction $action)
+    public function store(StoreTransactionRequest $request, StoreTransactionAction $action)
     {
-        Gate::authorize('create'.$this->resource);
+        try {
+            $order = DB::transaction(function () use ($request, $action) {
+                return $action->handle($request->only([
+                    'type',
+                    'account_id',
+                    'server_id',
+                    'product_id',
+                    'email',
+                    'name',
+                    'phone',
+                    'payment_type',
+                    'payment_method',
+                    'p_p_o_b_brand_id',
+                    'p_p_o_b_product_id',
+                    'submited',
+                ]));
+            });
 
-        $action->handle($request->validated());
-
-        return back();
+            return back()->with('success', 'Order berhasil dibuat');
+        } catch (\Exception $e) {
+            return back()->withErrors(['error' => $e->getMessage()])->withInput();
+        }
     }
 
     /**

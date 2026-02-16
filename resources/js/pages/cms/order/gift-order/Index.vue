@@ -111,7 +111,6 @@ const handleGiftSendFiltersUpdate = (filters: string[]) => {
                     :href="create().url"
                     slideover
                     v-if="hasPermission('create' + resource)"
-                    class="hidden"
                 >
                     <Button>
                         <Plus class="h-4 w-4" />
