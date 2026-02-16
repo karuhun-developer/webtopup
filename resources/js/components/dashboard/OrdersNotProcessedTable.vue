@@ -1,5 +1,6 @@
 <script setup lang="ts">
-import { show } from '@/actions/App/Http/Controllers/Cms/Order/GiftOrderController';
+import { show as showGift } from '@/actions/App/Http/Controllers/Cms/Order/GiftOrderController';
+import { show as showTopupManual } from '@/actions/App/Http/Controllers/Cms/Order/ManualTopupOrderController';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import {
@@ -72,7 +73,15 @@ defineProps<{
                             </Badge>
                         </TableCell>
                         <TableCell class="text-right">
-                            <Link :href="show({ order: order.reference }).url">
+                            <Link
+                                :href="
+                                    (order.product?.provider === 'gift'
+                                        ? showGift(order.reference)
+                                        : showTopupManual(order.reference)
+                                    ).url
+                                "
+                            >
+                                showTopupManual
                                 <Button variant="outline" size="sm">
                                     Process
                                 </Button>
