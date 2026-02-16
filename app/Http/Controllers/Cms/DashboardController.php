@@ -22,6 +22,7 @@ class DashboardController extends Controller
                 // Stats: Not Processed
                 $notProcessedCount = (clone $giftOrderQuery)
                     ->whereNull('submited->user_confirm_friend_timestamp')
+                    ->whereNull('submited->admin_add_friend_timestamp')
                     ->where(function ($q) {
                         $q->whereNull('submited->gift_send')
                             ->orWhere('submited->gift_send', false);
@@ -35,6 +36,7 @@ class DashboardController extends Controller
 
                 // Stats: Waiting vs Ready
                 $pendingGiftOrders = (clone $giftOrderQuery)
+                    ->whereNotNull('submited->admin_add_friend_timestamp')
                     ->whereNotNull('submited->user_confirm_friend_timestamp')
                     ->where(function ($q) {
                         $q->whereNull('submited->gift_send')
@@ -76,6 +78,7 @@ class DashboardController extends Controller
             'ordersWaiting' => inertia()->defer(function () use ($giftOrderQuery) {
                 $ordersWaiting = (clone $giftOrderQuery)
                     ->with('brand', 'product', 'payment', 'user')
+                    ->whereNotNull('submited->admin_add_friend_timestamp')
                     ->whereNotNull('submited->user_confirm_friend_timestamp')
                     ->where(function ($q) {
                         $q->whereNull('submited->gift_send')
@@ -98,6 +101,7 @@ class DashboardController extends Controller
             'ordersNotProcessed' => inertia()->defer(function () use ($giftOrderQuery) {
                 $ordersNotProcessed = (clone $giftOrderQuery)
                     ->with('brand', 'product', 'payment', 'user')
+                    ->whereNull('submited->admin_add_friend_timestamp')
                     ->whereNull('submited->user_confirm_friend_timestamp')
                     ->where(function ($q) {
                         $q->whereNull('submited->gift_send')
