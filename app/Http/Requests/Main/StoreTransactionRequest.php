@@ -4,8 +4,10 @@ namespace App\Http\Requests\Main;
 
 use App\Models\Account\Account;
 use App\Models\PPOB\PPOBProduct;
+use App\Services\GameProService;
 use App\Services\GameService;
 use Illuminate\Foundation\Http\FormRequest;
+use Illuminate\Support\Str;
 
 class StoreTransactionRequest extends FormRequest
 {
@@ -39,8 +41,8 @@ class StoreTransactionRequest extends FormRequest
         // Game service
         $gameService = new GameService;
 
-        // Check the brand if the brand is mobile legends, check the server and uid
-        // if (in_array(strtolower($product->brand->name), ['mobile legends', 'mobile legends gift'])) {
+        // // Check the brand if the brand is mobile legends, check the server and uid
+        // if (Str::contains(strtolower($product->brand->name), 'mobile legend')) {
         //     $isValid = $gameService->isIdValid(
         //         game: 'mobilelegends',
         //         server: $this->server_id,
@@ -66,6 +68,35 @@ class StoreTransactionRequest extends FormRequest
         //         ]
         //     );
         // }
+
+        // Pro Version
+        $gameProService = new GameProService;
+        // Check the brand if the brand is mobile legends, check the server and uid
+        if (Str::contains(strtolower($product->brand->name), 'mobile legend')) {
+            $isValid = $gameProService->isIdValid(
+                game: 'mobilelegend',
+                server: $this->server_id,
+                uid: $this->account_id,
+            );
+
+            if (! $isValid['status']) {
+                throw \Illuminate\Validation\ValidationException::withMessages([
+                    'account_id' => 'Game id or server is invalid',
+                ]);
+            }
+
+            Account::updateOrCreate(
+                [
+                    'game' => 'mobilelegends',
+                    'uid' => $this->account_id,
+                    'server' => $this->server_id,
+                ],
+                [
+                    'username' => $isValid['data']['username'] ?? 'Unknown',
+                    'meta' => $isValid['data'] ?? null,
+                ]
+            );
+        }
 
         // Merge additional data
         $this->merge([
