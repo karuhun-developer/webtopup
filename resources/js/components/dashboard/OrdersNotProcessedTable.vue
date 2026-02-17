@@ -81,7 +81,6 @@ defineProps<{
                                     ).url
                                 "
                             >
-                                showTopupManual
                                 <Button variant="outline" size="sm">
                                     Process
                                 </Button>
