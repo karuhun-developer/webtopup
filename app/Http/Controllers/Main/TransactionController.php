@@ -7,6 +7,7 @@ use App\Actions\Main\UpdateTransactionAction;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Main\StoreTransactionRequest;
 use App\Http\Requests\Main\UpdateTransactionRequest;
+use App\Models\Account\Account;
 use App\Models\Order\Order;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
@@ -63,7 +64,7 @@ class TransactionController extends Controller
      */
     public function show(Order $order)
     {
-        $order->load('payment.media', 'product.media', 'brand.media');
+        $order->load('payment.media', 'product.media', 'brand.media', 'product.brand.category', 'media');
 
         // Map product image
         if ($order->product) {
@@ -83,10 +84,39 @@ class TransactionController extends Controller
             $order->payment->makeHidden('media');
         }
 
+        // Load media specific for gift/manual topup orders
+        if ($order->product) {
+            $submittedData = $order->submited;
+
+            // Check if it's a gift order
+            if ($order->product->provider === 'gift') {
+                $submittedData['admin_add_friend_proof'] = $order->getFirstMediaUrl('admin_add_friend_proof');
+                $submittedData['user_confirm_friend_proof'] = $order->getFirstMediaUrl('user_confirm_friend_proof');
+                $submittedData['gift_send_proof'] = $order->getFirstMediaUrl('gift_send_proof');
+            }
+
+            // Check if it's a manual topup order
+            elseif ($order->product->provider === 'manual_topup') {
+                $submittedData['gift_send_proof'] = $order->getFirstMediaUrl('gift_send_proof');
+            }
+
+            $order->submited = $submittedData;
+        }
+
+        // Try to get Mobile Legends account nickname
+        $mlAccount = null;
+        if (isset($order->submited['account_id']) && isset($order->submited['server_id'])) {
+            $mlAccount = Account::where('game', 'mobilelegend')
+                ->where('uid', $order->submited['account_id'])
+                ->where('server', $order->submited['server_id'])
+                ->first();
+        }
+
         $order = $this->maskData($order);
 
         return inertia('main/TransactionShow', [
             'order' => $order,
+            'mlAccountNickname' => $mlAccount->username ?? null,
         ]);
     }
 

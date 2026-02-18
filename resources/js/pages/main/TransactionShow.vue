@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import MainFooter from '@/components/MainFooter.vue';
 import MainHeader from '@/components/MainHeader.vue';
+import DeliveryProgressCard from '@/components/transaction/DeliveryProgressCard.vue';
 import OrderDetails from '@/components/transaction/OrderDetails.vue';
 import PaymentInstructions from '@/components/transaction/PaymentInstructions.vue';
 import { OrderDataItem } from '@/types/cms/main';
@@ -8,6 +9,7 @@ import { Head } from '@inertiajs/vue3';
 
 defineProps<{
     order: OrderDataItem;
+    mlAccountNickname?: string;
 }>();
 </script>
 
@@ -35,7 +37,10 @@ defineProps<{
                 <div class="grid gap-6 lg:grid-cols-2">
                     <!-- Left Column - Order Details -->
                     <div>
-                        <OrderDetails :order="order" />
+                        <OrderDetails
+                            :order="order"
+                            :ml-account-nickname="mlAccountNickname"
+                        />
                     </div>
 
                     <!-- Right Column - Payment Instructions -->
@@ -47,6 +52,20 @@ defineProps<{
                             :total-amount="order.total_amount"
                         />
                     </div>
+                </div>
+
+                <!-- Delivery Progress Section -->
+                <div
+                    v-if="
+                        order.payment_status !== 0 &&
+                        order.payment_status !== -1 &&
+                        order.payment_status !== -2 &&
+                        (order.product?.provider === 'gift' ||
+                            order.product?.provider === 'manual_topup')
+                    "
+                    class="mt-6"
+                >
+                    <DeliveryProgressCard :order="order" />
                 </div>
 
                 <!-- Help Section -->

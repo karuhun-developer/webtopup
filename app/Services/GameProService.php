@@ -20,8 +20,7 @@ class GameProService
         public ?string $apiUrl = null,
         public ?string $secretKey = null,
         public ?string $merchantId = null,
-    )
-    {
+    ) {
         $this->apiUrl = $apiUrl ?? config('gamepro.api_url');
         $this->secretKey = $secretKey ?? config('gamepro.secret_key');
         $this->merchantId = $merchantId ?? config('gamepro.merchant_id');
@@ -64,16 +63,16 @@ class GameProService
             ];
         }
     }
+
     public function resolveAccount(
         string $game,
         string $uid,
         ?string $server = null,
-    ): array
-    {
+    ): array {
         // Check local database first
         $account = Account::where('game', $game)
             ->where('uid', $uid)
-            ->when($server, fn($q) => $q->where('server', $server))
+            ->when($server, fn ($q) => $q->where('server', $server))
             ->first();
 
         if ($account) {

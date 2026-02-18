@@ -2,6 +2,7 @@
 
 namespace App\Actions\Main;
 
+use App\Models\PPOB\PPOBBrand;
 use App\Models\PPOB\PPOBProduct;
 use App\Services\GameProService;
 use Illuminate\Support\Str;
@@ -23,12 +24,12 @@ class CheckGameAccountAction
             $product = PPOBProduct::find($data['product_id']);
             $brandName = $product->brand->name;
         } elseif (isset($data['slug'])) {
-            $brand = \App\Models\PPOB\PPOBBrand::where('slug', $data['slug'])->firstOrFail();
+            $brand = PPOBBrand::where('slug', $data['slug'])->firstOrFail();
             $brandName = $brand->name;
         }
 
         // Currently only Mobile Legends is supported for check
-        if (!Str::contains(strtolower($brandName), 'mobile legend')) {
+        if (! Str::contains(strtolower($brandName), 'mobile legend')) {
             return [
                 'status' => false,
                 'message' => 'Game validation not supported for this product',

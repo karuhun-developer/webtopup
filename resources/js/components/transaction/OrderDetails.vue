@@ -5,6 +5,7 @@ import { OrderDataItem } from '@/types/cms/main';
 
 defineProps<{
     order: OrderDataItem;
+    mlAccountNickname?: string;
 }>();
 </script>
 
@@ -54,6 +55,12 @@ defineProps<{
                     <p class="text-xs text-muted-foreground">Server</p>
                     <p class="font-medium text-foreground">
                         {{ order.submited.server_id }}
+                    </p>
+                </div>
+                <div v-if="mlAccountNickname">
+                    <p class="text-xs text-muted-foreground">Username</p>
+                    <p class="font-medium text-foreground">
+                        {{ mlAccountNickname }}
                     </p>
                 </div>
             </div>

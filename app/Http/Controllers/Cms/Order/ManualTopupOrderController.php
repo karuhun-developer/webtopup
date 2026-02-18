@@ -160,7 +160,7 @@ class ManualTopupOrderController extends Controller
         // Try to get Mobile Legends account nickname
         $mlAccount = null;
         if (isset($order->submited['account_id']) && isset($order->submited['server_id'])) {
-            $mlAccount = Account::where('game', 'mobilelegends')
+            $mlAccount = Account::where('game', 'mobilelegend')
                 ->where('uid', $order->submited['account_id'])
                 ->where('server', $order->submited['server_id'])
                 ->first();

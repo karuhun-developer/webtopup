@@ -15,14 +15,10 @@ class CheckGameAccountController extends Controller
     {
         $result = $action->handle($request->validated());
 
-        if (!$result['status']) {
+        if (! $result['status']) {
             return $this->responseWithError('Game ID invalid', 422);
         }
 
-        // return response()->json([
-        //     'status' => true,
-        //     'data' => $result['data'],
-        // ]);
         return $this->responseWithSuccess($result['data']);
     }
 }
