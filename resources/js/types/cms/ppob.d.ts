@@ -8,6 +8,7 @@ export interface PPOBCategoryDataItem {
     created_at: string;
     updated_at: string;
     brands_count?: number;
+    active_brands_count?: number;
 }
 
 export interface PPOBBrandDataItem {

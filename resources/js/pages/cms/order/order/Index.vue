@@ -205,12 +205,12 @@ const handleTopupFiltersUpdate = (filters: string[]) => {
                     </span>
                 </template>
                 <template #created_at="{ row }">
-                    {{ dayjs(row.created_at).format('DD MMMM YYYY H:m:s') }}
+                    {{ dayjs(row.created_at).format('DD MMMM YYYY HH:mm:ss') }}
                 </template>
                 <template #expired_at="{ row }">
                     {{
                         dayjs(row.payment?.expired_at).format(
-                            'DD MMMM YYYY H:m:s',
+                            'DD MMMM YYYY HH:mm:ss',
                         )
                     }}
                 </template>

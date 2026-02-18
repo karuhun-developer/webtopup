@@ -11,6 +11,7 @@ Route::post('/checkout', [App\Http\Controllers\Main\TransactionController::class
 Route::get('/transaction/{order}', [App\Http\Controllers\Main\TransactionController::class, 'show'])->name('transaction.show');
 Route::get('/transaction', [App\Http\Controllers\Main\TransactionController::class, 'check'])->name('transaction.check');
 Route::put('/transaction/{order}', [App\Http\Controllers\Main\TransactionController::class, 'update'])->name('transaction.update');
+Route::post('/check-game-account', [App\Http\Controllers\Main\CheckGameAccountController::class, 'check'])->name('check-game-account');
 
 Route::get('/profile', [App\Http\Controllers\Main\ProfileController::class, 'index'])->name('main.profile.index')->middleware('auth');
 Route::patch('/profile', [App\Http\Controllers\Main\ProfileController::class, 'update'])->name('main.profile.update')->middleware('auth');

@@ -59,7 +59,7 @@ class HomeController extends Controller
                     return $brand;
                 }),
             'categories' => PPOBCategory::query()
-                ->withCount('brands', 'media')
+                ->withCount('activeBrands', 'media')
                 ->where('status', true)
                 ->get()
                 ->map(function ($category) {

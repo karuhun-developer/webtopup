@@ -2,6 +2,7 @@
 
 namespace App\Services;
 
+use App\Models\Account\Account;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Http;
 
@@ -62,5 +63,50 @@ class GameProService
                 'data' => null,
             ];
         }
+    }
+    public function resolveAccount(
+        string $game,
+        string $uid,
+        ?string $server = null,
+    ): array
+    {
+        // Check local database first
+        $account = Account::where('game', $game)
+            ->where('uid', $uid)
+            ->when($server, fn($q) => $q->where('server', $server))
+            ->first();
+
+        if ($account) {
+            return [
+                'status' => true,
+                'source' => 'database',
+                'data' => [
+                    'username' => $account->username,
+                    'meta' => $account->meta,
+                ],
+            ];
+        }
+
+        // Check against API
+        $check = $this->isIdValid($game, $server, $uid);
+
+        if ($check['status']) {
+            // Save to database
+            Account::create([
+                'game' => $game,
+                'uid' => $uid,
+                'server' => $server,
+                'username' => $check['data']['username'] ?? 'Unknown',
+                'meta' => $check['data'] ?? null,
+            ]);
+
+            return [
+                'status' => true,
+                'source' => 'api',
+                'data' => $check['data'],
+            ];
+        }
+
+        return $check;
     }
 }

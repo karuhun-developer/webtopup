@@ -40,4 +40,9 @@ class PPOBCategory extends Model implements HasMedia
     {
         return $this->hasMany(PPOBBrand::class, 'p_p_o_b_category_id');
     }
+
+    public function activeBrands()
+    {
+        return $this->hasMany(PPOBBrand::class, 'p_p_o_b_category_id')->where('status', true);
+    }
 }

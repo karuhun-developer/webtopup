@@ -8,7 +8,7 @@ import {
     SelectTrigger,
     SelectValue,
 } from '@/components/ui/select';
-import { CircleAlert } from 'lucide-vue-next';
+import { CircleAlert, Loader2 } from 'lucide-vue-next';
 import { computed } from 'vue';
 import InputError from '../InputError.vue';
 
@@ -20,6 +20,9 @@ const props = defineProps<{
     accountId: string;
     serverId: string;
     formErrors: any;
+    resolvedUsername?: string | null;
+    checkError?: string | null;
+    isLoadingCheck?: boolean;
 }>();
 
 const emit = defineEmits<{
@@ -44,6 +47,13 @@ const hasServerDropdown = computed(
             Masukkan Data Akun
         </h2>
 
+        <p
+            class="mb-6 flex items-center gap-2 rounded-md bg-secondary p-3 text-sm text-muted-foreground"
+        >
+            <CircleAlert class="h-4 w-4 flex-shrink-0 text-destructive" />
+            Pastikan data akun yang kamu masukkan benar.
+        </p>
+
         <div
             class="grid gap-4"
             :class="inputType === 'id+server' ? 'sm:grid-cols-2' : ''"
@@ -56,7 +66,7 @@ const hasServerDropdown = computed(
                     :model-value="accountId"
                     :placeholder="`Masukkan ${labelId}`"
                     class="mt-1"
-                    @update:model-value="emit('update:accountId', $event)"
+                    @update:model-value="emit('update:accountId', String($event))"
                 />
                 <InputError :message="formErrors.account_id" class="mt-1" />
             </div>
@@ -69,7 +79,7 @@ const hasServerDropdown = computed(
                 <Select
                     v-if="hasServerDropdown"
                     :model-value="serverId"
-                    @update:model-value="emit('update:serverId', $event)"
+                    @update:model-value="emit('update:serverId', String($event))"
                 >
                     <SelectTrigger id="server-id" class="mt-1">
                         <SelectValue :placeholder="`Pilih ${labelServer}`" />
@@ -92,17 +102,29 @@ const hasServerDropdown = computed(
                     :model-value="serverId"
                     :placeholder="`Masukkan ${labelServer}`"
                     class="mt-1"
-                    @update:model-value="emit('update:serverId', $event)"
+                    @update:model-value="emit('update:serverId', String($event))"
                 />
                 <InputError :message="formErrors.server_id" class="mt-1" />
             </div>
         </div>
 
-        <p
-            class="mt-6 flex items-center gap-2 rounded-md bg-secondary p-3 text-sm text-muted-foreground"
+        <div
+            v-if="isLoadingCheck || resolvedUsername || checkError"
+            class="mt-4 flex items-center gap-2 rounded-lg border bg-muted/50 p-3 text-sm"
         >
-            <CircleAlert class="h-4 w-4 flex-shrink-0 text-destructive" />
-            Pastikan data akun yang kamu masukkan benar.
-        </p>
+            <Loader2
+                v-if="isLoadingCheck"
+                class="h-4 w-4 animate-spin text-muted-foreground"
+            />
+            <div v-if="resolvedUsername" class="font-medium text-green-600">
+                Username: {{ resolvedUsername }}
+            </div>
+            <div v-else-if="checkError" class="font-medium text-destructive">
+                {{ checkError }}
+            </div>
+            <div v-else-if="isLoadingCheck" class="text-muted-foreground">
+                Mengecek ID...
+            </div>
+        </div>
     </section>
 </template>

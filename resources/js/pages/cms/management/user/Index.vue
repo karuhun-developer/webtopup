@@ -117,7 +117,7 @@ const breadcrumbItems: BreadcrumbItem[] = [
                     </span>
                 </template>
                 <template #users.created_at="{ row }">
-                    {{ dayjs(row.created_at).format('DD MMMM YYYY H:m:s') }}
+                    {{ dayjs(row.created_at).format('DD MMMM YYYY HH:mm:ss') }}
                 </template>
                 <template #actions="{ row }">
                     <div class="flex items-center justify-center gap-2">

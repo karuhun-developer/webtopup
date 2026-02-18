@@ -18,8 +18,10 @@ import { useSwal } from '@/composables/useSwal';
 import { PPOBBrandDataItem, PPOBProductDataItem } from '@/types/cms/ppob';
 import { FaqDataItem } from '@/types/cms/web';
 import { Head, useForm, usePage } from '@inertiajs/vue3';
+import { useDebounceFn } from '@vueuse/core';
+import axios from 'axios';
 import { ChevronDown } from 'lucide-vue-next';
-import { computed } from 'vue';
+import { computed, ref, watch } from 'vue';
 
 const props = defineProps<{
     brand: PPOBBrandDataItem;
@@ -39,10 +41,57 @@ const form = useForm({
     email: user?.email || '',
     name: user?.name || '',
     phone: user?.phone || '',
-    // payment_type: 'automatic' as 'manual' | 'automatic',
     payment_type: 'manual' as 'manual' | 'automatic',
     payment_method: null as string | null,
 });
+
+const resolvedUsername = ref<string | null>(null);
+const checkError = ref<string | null>(null);
+const isLoadingCheck = ref(false);
+
+const checkGameAccount = useDebounceFn(async () => {
+    // Check if brand is mobile legends
+    if (!props.brand.name.toLowerCase().includes('mobile legend')) {
+        return;
+    }
+
+    if (!form.account_id) return;
+    if (inputType.value === 'id+server' && !form.server_id) return;
+
+    isLoadingCheck.value = true;
+    resolvedUsername.value = null;
+    checkError.value = null;
+
+    try {
+        const response = await axios.post('/check-game-account', {
+            account_id: form.account_id,
+            server_id: form.server_id,
+            slug: props.brand.slug,
+        });
+
+        if (response.data.status || response.data.code === 200) {
+            resolvedUsername.value =
+                response.data.data?.username ||
+                response.data.data?.data?.username;
+        } else {
+            checkError.value =
+                response.data.message || 'Game ID tidak ditemukan';
+        }
+    } catch (error: any) {
+        resolvedUsername.value = null;
+        checkError.value =
+            error.response?.data?.message || 'Gagal mengecek Game ID';
+    } finally {
+        isLoadingCheck.value = false;
+    }
+}, 800);
+
+watch(
+    () => [form.account_id, form.server_id],
+    () => {
+        checkGameAccount();
+    },
+);
 
 // Computed
 const inputType = computed(() => props.brand.settings?.type || 'id');
@@ -329,6 +378,9 @@ const handleCheckout = () => {
                             v-model:account-id="form.account_id"
                             v-model:server-id="form.server_id"
                             :form-errors="form.errors"
+                            :resolved-username="resolvedUsername"
+                            :check-error="checkError"
+                            :is-loading-check="isLoadingCheck"
                         />
 
                         <!-- Step 2: Select Product -->

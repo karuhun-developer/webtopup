@@ -139,7 +139,7 @@ const appUrl = page.props.app_url;
                                 {{ category.name }}
                             </span>
                             <span class="text-xs text-muted-foreground">
-                                {{ category.brands_count }} produk
+                                {{ category.active_brands_count }} produk
                             </span>
                         </button>
                     </Link>
