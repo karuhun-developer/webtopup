@@ -182,7 +182,12 @@ const handleSearch = () => {
                                     <th
                                         class="px-4 py-3 font-semibold text-foreground"
                                     >
-                                        Status
+                                        Status Pembayaran
+                                    </th>
+                                    <th
+                                        class="px-4 py-3 font-semibold text-foreground"
+                                    >
+                                        Status Topup / Gift
                                     </th>
                                 </tr>
                             </thead>
@@ -217,6 +222,38 @@ const handleSearch = () => {
                                             :status="order.payment_status"
                                             type="payment"
                                         />
+                                    </td>
+                                    <td class="px-4 py-3">
+                                        <div
+                                            v-if="
+                                                order.product?.provider ===
+                                                'digiflazz'
+                                            "
+                                        >
+                                            <StatusBadge
+                                                :status="order.topup_status"
+                                                type="topup"
+                                            />
+                                        </div>
+                                        <div v-else>
+                                            <span
+                                                class="inline-flex w-fit items-center rounded-md px-2.5 py-1 text-xs font-semibold"
+                                                :class="{
+                                                    'border-green-500/20 bg-green-500/10 text-green-500':
+                                                        order.submited
+                                                            .gift_send,
+                                                    'border-yellow-500/20 bg-yellow-500/10 text-yellow-500':
+                                                        !order.submited
+                                                            .gift_send,
+                                                }"
+                                            >
+                                                {{
+                                                    order.submited.gift_send
+                                                        ? 'Sukses'
+                                                        : 'Dalam Proses'
+                                                }}
+                                            </span>
+                                        </div>
                                     </td>
                                 </tr>
                             </tbody>

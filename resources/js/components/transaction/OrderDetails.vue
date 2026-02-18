@@ -111,12 +111,30 @@ defineProps<{
                 </div>
                 <div
                     class="flex items-center justify-between"
-                    v-if="order.brand?.provider === 'digiflazz'"
+                    v-if="order.product?.provider === 'digiflazz'"
                 >
                     <span class="text-sm text-muted-foreground">
                         Status Top Up
                     </span>
                     <StatusBadge :status="order.topup_status" type="topup" />
+                </div>
+                <div class="flex items-center justify-between" v-else>
+                    <span class="text-sm text-muted-foreground">
+                        Status Gift / Topup
+                    </span>
+                    <span
+                        class="inline-flex w-fit items-center rounded-md px-2.5 py-1 text-xs font-semibold"
+                        :class="{
+                            'border-green-500/20 bg-green-500/10 text-green-500':
+                                order.submited.gift_send,
+                            'border-yellow-500/20 bg-yellow-500/10 text-yellow-500':
+                                !order.submited.gift_send,
+                        }"
+                    >
+                        {{
+                            order.submited.gift_send ? 'Sukses' : 'Dalam Proses'
+                        }}
+                    </span>
                 </div>
             </div>
         </div>

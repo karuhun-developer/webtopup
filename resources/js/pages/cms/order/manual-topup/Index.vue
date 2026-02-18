@@ -199,56 +199,6 @@ const handleGiftSendFiltersUpdate = (filters: string[]) => {
                         >
                             {{ row.submited.gift_send ? 'Sent' : 'Not Sent' }}
                         </span>
-
-                        <!-- Countdown -->
-                        <div
-                            v-if="
-                                row.submited?.user_confirm_friend_timestamp &&
-                                !row.submited.gift_send
-                            "
-                        >
-                            <span
-                                v-if="
-                                    dayjs(
-                                        row.submited
-                                            ?.user_confirm_friend_timestamp,
-                                    )
-                                        .add(7, 'day')
-                                        .diff(dayjs()) <= 0
-                                "
-                                class="inline-flex animate-pulse items-center rounded-md bg-red-100 px-2.5 py-1 text-xs font-semibold text-red-800 dark:bg-red-900/30 dark:text-red-400"
-                            >
-                                READY TO SEND
-                            </span>
-                            <span
-                                v-else
-                                class="inline-flex items-center rounded-md bg-orange-100 px-2.5 py-1.5 font-mono text-xs font-semibold text-orange-800 dark:bg-orange-900/30 dark:text-orange-400"
-                            >
-                                {{
-                                    Math.floor(
-                                        dayjs(
-                                            row.submited
-                                                ?.user_confirm_friend_timestamp,
-                                        )
-                                            .add(7, 'day')
-                                            .diff(dayjs()) /
-                                            (1000 * 60 * 60 * 24),
-                                    )
-                                }}d
-                                {{
-                                    Math.floor(
-                                        (dayjs(
-                                            row.submited
-                                                ?.user_confirm_friend_timestamp,
-                                        )
-                                            .add(7, 'day')
-                                            .diff(dayjs()) %
-                                            (1000 * 60 * 60 * 24)) /
-                                            (1000 * 60 * 60),
-                                    )
-                                }}h
-                            </span>
-                        </div>
                     </div>
                 </template>
                 <template #created_at="{ row }">
