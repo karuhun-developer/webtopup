@@ -3,6 +3,7 @@
 namespace App\Actions\Main;
 
 use App\Models\Voucher\Voucher;
+
 class CheckVoucherAction
 {
     /**

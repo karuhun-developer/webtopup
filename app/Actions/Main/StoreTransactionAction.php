@@ -49,8 +49,8 @@ class StoreTransactionAction
                 // Basic validation (should match checkVoucher logic)
                 $now = now();
                 $isValid = $voucher->status
-                    && (!$voucher->start_date || $now->gte($voucher->start_date))
-                    && (!$voucher->end_date || $now->lte($voucher->end_date))
+                    && (! $voucher->start_date || $now->gte($voucher->start_date))
+                    && (! $voucher->end_date || $now->lte($voucher->end_date))
                     && ($voucher->usage_limit === 0 || $voucher->used_count < $voucher->usage_limit)
                     && ($voucher->min_purchase_amount === 0 || $data['amount'] >= $voucher->min_purchase_amount);
 
