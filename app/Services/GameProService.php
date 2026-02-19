@@ -69,6 +69,10 @@ class GameProService
         string $uid,
         ?string $server = null,
     ): array {
+        // Clear uid and server only allow number and letter and no space
+        $uid = preg_replace('/[^a-zA-Z0-9]/', '', $uid);
+        $server = $server ? preg_replace('/[^a-zA-Z0-9]/', '', $server) : null;
+
         // Check local database first
         $account = Account::where('game', $game)
             ->where('uid', $uid)
