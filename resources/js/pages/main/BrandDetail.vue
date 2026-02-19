@@ -38,6 +38,7 @@ const form = useForm({
     account_id: '', // 36688862
     server_id: '', // 2052
     product_id: null as number | null,
+    voucher_code: null as string | null,
     email: user?.email || '',
     name: user?.name || '',
     phone: user?.phone || '',
@@ -48,6 +49,9 @@ const form = useForm({
 const resolvedUsername = ref<string | null>(null);
 const checkError = ref<string | null>(null);
 const isLoadingCheck = ref(false);
+const discountAmount = ref(0);
+
+const abortController = ref<AbortController | null>(null);
 
 const checkGameAccount = useDebounceFn(async () => {
     // Check if brand is mobile legends
@@ -58,16 +62,28 @@ const checkGameAccount = useDebounceFn(async () => {
     if (!form.account_id) return;
     if (inputType.value === 'id+server' && !form.server_id) return;
 
+    // Cancel previous request
+    if (abortController.value) {
+        abortController.value.abort();
+    }
+    abortController.value = new AbortController();
+
     isLoadingCheck.value = true;
     resolvedUsername.value = null;
     checkError.value = null;
 
     try {
-        const response = await axios.post('/check-game-account', {
-            account_id: form.account_id,
-            server_id: form.server_id,
-            slug: props.brand.slug,
-        });
+        const response = await axios.post(
+            '/check-game-account',
+            {
+                account_id: form.account_id,
+                server_id: form.server_id,
+                slug: props.brand.slug,
+            },
+            {
+                signal: abortController.value.signal,
+            },
+        );
 
         if (response.data.status || response.data.code === 200) {
             resolvedUsername.value =
@@ -78,11 +94,23 @@ const checkGameAccount = useDebounceFn(async () => {
                 response.data.message || 'Game ID tidak ditemukan';
         }
     } catch (error: any) {
+        if (axios.isCancel(error)) {
+            return;
+        }
         resolvedUsername.value = null;
         checkError.value =
             error.response?.data?.message || 'Gagal mengecek Game ID';
     } finally {
-        isLoadingCheck.value = false;
+        if (abortController.value?.signal.aborted) {
+            // Do nothing if aborted, wait for the next request to finish or set loading false only if this was the last one?
+            // Actually if we abort, we don't want to set isLoadingCheck to false immediately if a NEW request started.
+            // But here we are in the flow of the *aborted* request.
+            // Ideally we should track if *this* request is the specific one.
+            // But simpler: if aborted, don't touch isLoadingCheck.
+            // The NEW request would have set isLoadingCheck = true.
+        } else {
+            isLoadingCheck.value = false;
+        }
     }
 }, 800);
 
@@ -166,29 +194,40 @@ const totalAmount = computed(() => {
     if (!selectedProductData.value) return 0;
 
     const basePrice = selectedProductData.value.sell_price;
+    const priceAfterDiscount = Math.max(0, basePrice - discountAmount.value);
 
     // Manual payment has no fee
     if (form.payment_type === 'manual') {
-        return basePrice;
+        return priceAfterDiscount;
     }
 
     // Automatic payment - calculate fee
-    if (!form.payment_method) return basePrice;
+    if (!form.payment_method) return priceAfterDiscount;
 
     const method = paymentMethods.find((m) => m.id === form.payment_method);
-    if (!method) return basePrice;
+    if (!method) return priceAfterDiscount;
 
     if (method.action === 'multiply') {
         // Multiply: price * fee, then add to base price
-        const feeAmount = basePrice * method.fee;
-        return basePrice + feeAmount;
+        const feeAmount = priceAfterDiscount * method.fee;
+        return priceAfterDiscount + feeAmount;
     } else {
         // Add: flat fee
-        return basePrice + method.fee;
+        return priceAfterDiscount + method.fee;
     }
 });
 
 const { toast } = useSwal();
+
+const handleVoucherApplied = (code: string, discount: number) => {
+    form.voucher_code = code;
+    discountAmount.value = discount;
+};
+
+const handleVoucherRemoved = () => {
+    form.voucher_code = null;
+    discountAmount.value = 0;
+};
 
 const handleCheckout = () => {
     // Validation
@@ -432,7 +471,10 @@ const handleCheckout = () => {
                             :total-amount="totalAmount"
                             :manual-bank="manualBank"
                             :payment-methods="paymentMethods"
+                            :is-loading="form.processing"
                             @checkout="handleCheckout"
+                            @voucher-applied="handleVoucherApplied"
+                            @voucher-removed="handleVoucherRemoved"
                         />
                     </div>
                 </div>

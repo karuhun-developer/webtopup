@@ -43,6 +43,7 @@ export interface OrderDataItem {
     phone: string;
     amount: number;
     fee: number;
+    discount_amount: number;
     total_amount: number;
     payment_status: number;
     topup_status: number;

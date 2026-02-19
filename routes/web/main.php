@@ -12,6 +12,7 @@ Route::get('/transaction/{order}', [App\Http\Controllers\Main\TransactionControl
 Route::get('/transaction', [App\Http\Controllers\Main\TransactionController::class, 'check'])->name('transaction.check');
 Route::put('/transaction/{order}', [App\Http\Controllers\Main\TransactionController::class, 'update'])->name('transaction.update');
 Route::post('/check-game-account', [App\Http\Controllers\Main\CheckGameAccountController::class, 'check'])->name('check-game-account');
+Route::post('/check-voucher', [App\Http\Controllers\Main\TransactionController::class, 'checkVoucher'])->name('check-voucher');
 
 Route::get('/profile', [App\Http\Controllers\Main\ProfileController::class, 'index'])->name('main.profile.index')->middleware('auth');
 Route::patch('/profile', [App\Http\Controllers\Main\ProfileController::class, 'update'])->name('main.profile.update')->middleware('auth');

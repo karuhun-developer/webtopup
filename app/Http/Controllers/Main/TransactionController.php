@@ -2,9 +2,11 @@
 
 namespace App\Http\Controllers\Main;
 
+use App\Actions\Main\CheckVoucherAction;
 use App\Actions\Main\StoreTransactionAction;
 use App\Actions\Main\UpdateTransactionAction;
 use App\Http\Controllers\Controller;
+use App\Http\Requests\Main\CheckVoucherRequest;
 use App\Http\Requests\Main\StoreTransactionRequest;
 use App\Http\Requests\Main\UpdateTransactionRequest;
 use App\Models\Account\Account;
@@ -14,6 +16,8 @@ use Illuminate\Support\Facades\DB;
 
 class TransactionController extends Controller
 {
+    use \App\Traits\WithReturnResponse;
+
     /**
      * Display a listing of the resource.
      */
@@ -139,6 +143,7 @@ class TransactionController extends Controller
                     'payment_method',
                     'p_p_o_b_brand_id',
                     'p_p_o_b_product_id',
+                    'voucher_code',
                     'submited',
                 ]));
             });
@@ -159,6 +164,20 @@ class TransactionController extends Controller
         $action->handle($order, $request->validated());
 
         return back();
+    }
+
+    /**
+     * Check voucher validity
+     */
+    public function checkVoucher(CheckVoucherRequest $request, CheckVoucherAction $action)
+    {
+        $result = $action->handle($request->validated());
+
+        if (! $result['valid']) {
+            return $this->responseWithError($result['message'], 422);
+        }
+
+        return $this->responseWithSuccess($result);
     }
 
     /**

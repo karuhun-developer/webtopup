@@ -26,6 +26,7 @@ class StoreTransactionRequest extends FormRequest
             'phone' => 'required|numeric',
             'payment_type' => 'required|in:automatic,manual',
             'payment_method' => 'required|string|max:255', // in:qris,bca,bni,bri,mandiri,permata
+            'voucher_code' => 'nullable|string|exists:vouchers,code',
         ];
     }
 

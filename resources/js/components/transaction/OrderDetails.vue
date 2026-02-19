@@ -96,6 +96,15 @@ defineProps<{
                     </span>
                 </div>
                 <div
+                    v-if="order.discount_amount > 0"
+                    class="flex justify-between text-sm"
+                >
+                    <span class="text-muted-foreground">Diskon/Voucher</span>
+                    <span class="text-foreground">
+                        {{ formatCurrency(order.discount_amount) }}
+                    </span>
+                </div>
+                <div
                     class="flex justify-between border-t border-border/50 pt-2"
                 >
                     <span class="font-medium text-foreground">Total</span>

@@ -5,6 +5,8 @@ namespace App\Actions\Main;
 use App\Models\Order\Order;
 use App\Models\Payment\Payment;
 use App\Models\PPOB\PPOBProduct;
+use App\Models\Voucher\Voucher;
+use App\Models\Voucher\VoucherUse;
 use App\Services\MidtransService;
 use App\Services\VodaService;
 use App\Traits\WithGenerateReference;
@@ -37,17 +39,47 @@ class StoreTransactionAction
         $data['amount'] = (int) $product->sell_price;
         $data['user_id'] = auth()->id() ?? null;
 
+        // Voucher Logic
+        $voucher = null;
+        $discountAmount = 0;
+        if (isset($data['voucher_code']) && $data['voucher_code']) {
+            $voucher = Voucher::where('code', $data['voucher_code'])->first();
+
+            if ($voucher) {
+                // Basic validation (should match checkVoucher logic)
+                $now = now();
+                $isValid = $voucher->status
+                    && (!$voucher->start_date || $now->gte($voucher->start_date))
+                    && (!$voucher->end_date || $now->lte($voucher->end_date))
+                    && ($voucher->usage_limit === 0 || $voucher->used_count < $voucher->usage_limit)
+                    && ($voucher->min_purchase_amount === 0 || $data['amount'] >= $voucher->min_purchase_amount);
+
+                if ($isValid) {
+                    if ($voucher->type === 'FIXED_AMOUNT') {
+                        $discountAmount = $voucher->fixed_amount;
+                    } elseif ($voucher->type === 'PERCENTAGE') {
+                        $discountAmount = ($data['amount'] * $voucher->percentage) / 100;
+                    }
+                    $discountAmount = min($discountAmount, $data['amount']);
+                }
+            }
+        }
+
+        // Apply discount
+        $data['discount_amount'] = $discountAmount;
+        $amountAfterDiscount = $data['amount'] - $discountAmount;
+
         // Get fee if payment type is automatic
         if ($data['payment_type'] === 'automatic') {
             $fee = $data['payment_method'] === 'qris'
-                ? $product->price * 0.007 // 0.7% fee for qris
+                ? $amountAfterDiscount * 0.007 // 0.7% fee for qris based on discounted amount
                 : 4000; // Flat 4000 fee for bank transfer
 
             $data['fee'] = (int) round($fee);
-            $data['total_amount'] = $data['amount'] + $data['fee'];
+            $data['total_amount'] = $amountAfterDiscount + $data['fee'];
         } else {
             $data['fee'] = 0;
-            $data['total_amount'] = $data['amount'];
+            $data['total_amount'] = $amountAfterDiscount;
         }
 
         // If product provider is gift then add step to submited data
@@ -76,6 +108,20 @@ class StoreTransactionAction
         }
 
         $order = Order::create($data);
+
+        // Record Voucher Usage
+        if ($voucher && $discountAmount > 0) {
+            VoucherUse::create([
+                'voucher_id' => $voucher->id,
+                'usable_type' => Order::class,
+                'usable_id' => $order->id,
+                'before_amount' => $data['amount'],
+                'discount_amount' => $discountAmount,
+                'after_amount' => $amountAfterDiscount,
+            ]);
+
+            $voucher->increment('used_count');
+        }
 
         // Create payment record
         $orderId = uniqid().time();

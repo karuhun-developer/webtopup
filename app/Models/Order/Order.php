@@ -23,6 +23,7 @@ class Order extends Model implements HasMedia
         'submited',
         'amount',
         'fee',
+        'discount_amount',
         'total_amount',
         'payment_status',
         'topup_status',
