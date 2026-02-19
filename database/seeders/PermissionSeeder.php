@@ -4,6 +4,7 @@ namespace Database\Seeders;
 
 use App\Models\Order\Order;
 use App\Models\User;
+use App\Models\Voucher\Voucher;
 use App\Models\Web\Faq;
 use App\Models\Web\Slider;
 use Illuminate\Database\Console\Seeds\WithoutModelEvents;
@@ -58,7 +59,14 @@ class PermissionSeeder extends Seeder
         'show'.Faq::class,
         'create'.Faq::class,
         'update'.Faq::class,
+        'create'.Faq::class,
+        'update'.Faq::class,
         'delete'.Faq::class,
+        'view'.Voucher::class,
+        'show'.Voucher::class,
+        'create'.Voucher::class,
+        'update'.Voucher::class,
+        'delete'.Voucher::class,
     ];
 
     // List user permissions

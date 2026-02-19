@@ -90,5 +90,13 @@ class AdminMenuSeeder extends Seeder
             'active_pattern' => '/cms/web/faqs',
             'status' => 1,
         ]);
+        $web->subMenu()->create([
+            'role_id' => $this->role->id,
+            'name' => 'Vouchers',
+            'url' => '/cms/web/vouchers',
+            'order' => 3,
+            'active_pattern' => '/cms/web/vouchers',
+            'status' => 1,
+        ]);
     }
 }
