@@ -118,6 +118,20 @@ const rejectPayment = async (close: () => void) => {
                             <p class="mt-1 text-xl font-bold text-primary">
                                 {{ formatCurrency(order.total_amount) }}
                             </p>
+                            <div v-if="order.discount_amount > 0" class="mt-1">
+                                <p class="text-sm font-medium text-green-600">
+                                    Discount: -{{
+                                        formatCurrency(order.discount_amount)
+                                    }}
+                                </p>
+                                <p
+                                    v-if="order.voucher_use?.voucher?.code"
+                                    class="text-xs text-muted-foreground"
+                                >
+                                    Voucher:
+                                    {{ order.voucher_use.voucher.code }}
+                                </p>
+                            </div>
                         </div>
                     </div>
 

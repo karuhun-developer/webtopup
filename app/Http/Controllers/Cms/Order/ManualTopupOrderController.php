@@ -155,7 +155,7 @@ class ManualTopupOrderController extends Controller
     {
         Gate::authorize('view'.$this->resource);
 
-        $order->load('brand', 'product', 'notifications', 'media');
+        $order->load('brand', 'product', 'notifications', 'media', 'voucherUse.voucher');
 
         // Try to get Mobile Legends account nickname
         $mlAccount = null;

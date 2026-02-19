@@ -72,10 +72,10 @@ class OrderController extends Controller
 
         // Load media
         $model->map(function ($item) {
-            if ($item->payment->driver === 'manual') {
+            if ($item->payment?->driver === 'manual') {
                 $item->payment->image = $item->payment?->getFirstMediaUrl('image');
             }
-            $item->payment->makeHidden('media');
+            $item->payment?->makeHidden('media');
 
             return $item;
         });
@@ -122,7 +122,7 @@ class OrderController extends Controller
     {
         Gate::authorize('view'.$this->resource);
 
-        $order->load('brand', 'product', 'payment.media');
+        $order->load('brand', 'product', 'payment.media', 'voucherUse.voucher');
 
         // Load payment image if manual
         if ($order->payment && $order->payment->driver === 'manual') {

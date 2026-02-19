@@ -157,7 +157,7 @@ class GiftOrderController extends Controller
     {
         Gate::authorize('view'.$this->resource);
 
-        $order->load('brand', 'product', 'notifications', 'media');
+        $order->load('brand', 'product', 'notifications', 'media', 'voucherUse');
 
         // Try to get Mobile Legends account nickname
         $mlAccount = null;
@@ -212,7 +212,7 @@ class GiftOrderController extends Controller
     {
         Gate::authorize('update'.$this->resource);
 
-        $order->load('brand', 'product', 'payment.media');
+        $order->load('brand', 'product', 'payment.media', 'voucherUse.voucher');
 
         // Load payment image if manual
         if ($order->payment && $order->payment->driver === 'manual') {

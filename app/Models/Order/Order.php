@@ -65,4 +65,9 @@ class Order extends Model implements HasMedia
     {
         return $this->hasMany(OrderNotification::class);
     }
+
+    public function voucherUse()
+    {
+        return $this->morphOne(\App\Models\Voucher\VoucherUse::class, 'usable');
+    }
 }

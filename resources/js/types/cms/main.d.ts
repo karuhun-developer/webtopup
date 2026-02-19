@@ -55,4 +55,15 @@ export interface OrderDataItem {
     brand?: PPOBBrandDataItem;
     payment?: PaymentDataItem;
     notifications?: OrderNotificationDataItem[];
+    voucher_use?: {
+        id: number;
+        voucher_id: number;
+        discount_amount: number;
+        voucher?: {
+            id: number;
+            code: string;
+            type: string;
+            amount: number;
+        };
+    };
 }
