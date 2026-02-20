@@ -66,7 +66,10 @@ const hasServerDropdown = computed(
                     :model-value="accountId"
                     :placeholder="`Masukkan ${labelId}`"
                     class="mt-1"
-                    @update:model-value="emit('update:accountId', String($event))"
+                    :disabled="isLoadingCheck"
+                    @update:model-value="
+                        emit('update:accountId', String($event))
+                    "
                 />
                 <InputError :message="formErrors.account_id" class="mt-1" />
             </div>
@@ -79,9 +82,15 @@ const hasServerDropdown = computed(
                 <Select
                     v-if="hasServerDropdown"
                     :model-value="serverId"
-                    @update:model-value="emit('update:serverId', String($event))"
+                    @update:model-value="
+                        emit('update:serverId', String($event))
+                    "
                 >
-                    <SelectTrigger id="server-id" class="mt-1">
+                    <SelectTrigger
+                        id="server-id"
+                        class="mt-1"
+                        :disabled="isLoadingCheck"
+                    >
                         <SelectValue :placeholder="`Pilih ${labelServer}`" />
                     </SelectTrigger>
                     <SelectContent>
@@ -99,10 +108,13 @@ const hasServerDropdown = computed(
                 <Input
                     v-else
                     id="server-id"
+                    :disabled="isLoadingCheck"
                     :model-value="serverId"
                     :placeholder="`Masukkan ${labelServer}`"
                     class="mt-1"
-                    @update:model-value="emit('update:serverId', String($event))"
+                    @update:model-value="
+                        emit('update:serverId', String($event))
+                    "
                 />
                 <InputError :message="formErrors.server_id" class="mt-1" />
             </div>
