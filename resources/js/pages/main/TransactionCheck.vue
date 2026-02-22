@@ -104,7 +104,7 @@ const handleSearch = () => {
                     </p>
 
                     <div
-                        class="overflow-hidden rounded-lg border border-border/50 bg-card shadow-sm"
+                        class="overflow-scroll rounded-lg border border-border/50 bg-card shadow-sm"
                     >
                         <table class="w-full text-left text-sm">
                             <thead class="border-b border-border/50 bg-muted">
