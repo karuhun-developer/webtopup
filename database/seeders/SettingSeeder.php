@@ -77,6 +77,10 @@ Jika Anda memiliki pertanyaan lebih lanjut, silakan hubungi kami di {cs_link}. K
                     'manual_transfer_account_name' => 'PT TopupWok Indonesia',
                     'manual_transfer_account_number' => '1234567890',
                     'manual_transfer_type' => 'rekening', // rekening/qris
+                    'maintenance_status' => 'inactive',
+                    'maintenance_title' => 'Sistem Sedang Maintenance',
+                    'maintenance_description' => '<p>Mohon maaf, saat ini sistem sedang dalam perbaikan rutin. Silakan kembali lagi nanti.</p>',
+                    'maintenance_image' => '',
                     'providers' => [
                         'digiflazz' => true,
                         'gift' => true,

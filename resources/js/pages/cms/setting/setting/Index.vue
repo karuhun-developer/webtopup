@@ -6,6 +6,7 @@ import {
 import Heading from '@/components/Heading.vue';
 import ContentPagesTab from '@/components/settings/ContentPagesTab.vue';
 import GeneralInformationTab from '@/components/settings/GeneralInformationTab.vue';
+import MaintenanceTab from '@/components/settings/MaintenanceTab.vue';
 import ManualTransferTab from '@/components/settings/ManualTransferTab.vue';
 import WhatsAppTemplatesTab from '@/components/settings/WhatsAppTemplatesTab.vue';
 import { Button } from '@/components/ui/button';
@@ -16,7 +17,7 @@ import { Setting } from '@/types/cms/setting';
 import { Form, Head } from '@inertiajs/vue3';
 import { ref } from 'vue';
 
-type Tab = 'general' | 'content' | 'templates' | 'transfer';
+type Tab = 'general' | 'content' | 'templates' | 'transfer' | 'maintenance';
 
 const props = defineProps<{
     setting: Setting;
@@ -132,6 +133,24 @@ const activeTab = ref<Tab>('general');
                                 class="absolute right-0 bottom-0 left-0 h-0.5 bg-primary"
                             ></span>
                         </Button>
+
+                        <Button
+                            type="button"
+                            variant="ghost"
+                            class="relative rounded-none px-0 py-4 text-sm font-medium whitespace-nowrap hover:bg-transparent"
+                            :class="
+                                activeTab === 'maintenance'
+                                    ? 'text-foreground'
+                                    : 'text-muted-foreground hover:text-foreground'
+                            "
+                            @click="activeTab = 'maintenance'"
+                        >
+                            Maintenance
+                            <span
+                                v-if="activeTab === 'maintenance'"
+                                class="absolute right-0 bottom-0 left-0 h-0.5 bg-primary"
+                            ></span>
+                        </Button>
                     </div>
 
                     <div class="hidden px-6 py-2 md:block">
@@ -163,6 +182,12 @@ const activeTab = ref<Tab>('general');
 
                     <ManualTransferTab
                         v-if="activeTab === 'transfer'"
+                        :setting="setting?.value"
+                        :errors="errors"
+                    />
+
+                    <MaintenanceTab
+                        v-if="activeTab === 'maintenance'"
                         :setting="setting?.value"
                         :errors="errors"
                     />

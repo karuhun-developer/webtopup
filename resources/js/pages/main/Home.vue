@@ -4,6 +4,7 @@ import BrandCard from '@/components/BrandCard.vue';
 import HeroBanner from '@/components/HeroBanner.vue';
 import MainFooter from '@/components/MainFooter.vue';
 import MainHeader from '@/components/MainHeader.vue';
+import Maintenance from '@/pages/main/Maintenance.vue';
 import { PaginationItem } from '@/types';
 import { PPOBBrandDataItem, PPOBCategoryDataItem } from '@/types/cms/ppob';
 import { SliderDataItem } from '@/types/cms/web';
@@ -48,8 +49,11 @@ const appUrl = page.props.app_url;
         <!-- Header -->
         <MainHeader />
 
+        <template v-if="setting?.maintenance_status === 'active'">
+            <Maintenance />
+        </template>
         <!-- Main Content -->
-        <main class="mx-auto max-w-7xl px-4 py-8">
+        <main class="mx-auto max-w-7xl px-4 py-8" v-else>
             <!-- Hero Banner -->
             <HeroBanner
                 class="mb-8"

@@ -38,6 +38,10 @@ class SaveSettingRequest extends FormRequest
             'value.manual_transfer_account_name' => 'nullable|string',
             'value.manual_transfer_account_number' => 'nullable|string',
             'value.manual_transfer_type' => 'nullable|in:rekening,qris',
+            'value.maintenance_status' => 'nullable|in:active,inactive',
+            'value.maintenance_title' => 'nullable|string',
+            'value.maintenance_description' => 'nullable|string',
+            'value.maintenance_image' => 'nullable|image:allow_svg|max:2048',
         ];
     }
 }

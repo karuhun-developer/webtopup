@@ -22,6 +22,10 @@ export interface SettingValue {
     manual_transfer_account_name?: string;
     manual_transfer_account_number?: string;
     manual_transfer_type?: 'rekening' | 'qris';
+    maintenance_status?: 'active' | 'inactive';
+    maintenance_title?: string;
+    maintenance_description?: string;
+    maintenance_image?: string;
 }
 
 export interface Setting {

@@ -9,6 +9,7 @@ import PaymentMethodSelection from '@/components/brand-detail/PaymentMethodSelec
 import ProductSelection from '@/components/brand-detail/ProductSelection.vue';
 import MainFooter from '@/components/MainFooter.vue';
 import MainHeader from '@/components/MainHeader.vue';
+import Maintenance from '@/pages/main/Maintenance.vue';
 import {
     Collapsible,
     CollapsibleContent,
@@ -336,8 +337,11 @@ const handleCheckout = () => {
         <!-- Header -->
         <MainHeader :show-back-button="true" />
 
+        <template v-if="setting?.maintenance_status === 'active'">
+            <Maintenance />
+        </template>
         <!-- Main Content -->
-        <main class="flex-1">
+        <main class="flex-1" v-else>
             <!-- Banner Section -->
             <BrandBanner :brand="brand" />
 

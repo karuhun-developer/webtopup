@@ -53,6 +53,14 @@ class SaveSettingAction
             $data['value']['favicon'] = '/storage/'.$file;
         }
 
+        if ($data['value']['maintenance_image'] ?? null instanceof UploadedFile) {
+            $file = $this->saveFile(
+                file: $data['value']['maintenance_image'],
+                base_file_name: 'maintenance_image_'.time(),
+            );
+            $data['value']['maintenance_image'] = '/storage/'.$file;
+        }
+
         return $setting->update([
             'value' => [
                 ...$setting->value,
