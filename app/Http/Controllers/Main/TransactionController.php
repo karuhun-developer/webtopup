@@ -37,7 +37,10 @@ class TransactionController extends Controller
             ]);
         }
 
-        return inertia('main/TransactionCheck', [
+        $settingTitle = getSetting('title');
+        $settingFavicon = getSetting('favicon') ?: '/favicon.svg';
+
+        return inertia()->render('main/TransactionCheck', [
             'latestOrder' => Order::with('payment', 'product.media', 'brand.media')
                 ->latest()
                 ->limit(5)
@@ -60,6 +63,16 @@ class TransactionController extends Controller
 
                     return $this->maskData($order);
                 }),
+        ])->withViewData([
+            'meta' => [
+                'title' => 'Cek Transaksi - ' . $settingTitle,
+                'description' => 'Cek status transaksi top up game Anda di ' . $settingTitle . '. Masukkan nomor transaksi untuk melihat detail pesanan Anda.',
+                'keywords' => 'cek transaksi, status pesanan, lacak pesanan, ' . $settingTitle . ', topup game',
+                'author' => $settingTitle,
+                'application_name' => $settingTitle,
+                'url' => route('transaction.check'),
+                'image' => config('app.url') . $settingFavicon,
+            ]
         ]);
     }
 

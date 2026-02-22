@@ -42,56 +42,6 @@ const handleSearch = () => {
 <template>
     <Head>
         <title>Cek Transaksi</title>
-        <link
-            rel="icon"
-            type="image/svg+xml"
-            :href="setting?.favicon || '/favicon.svg'"
-        />
-        <meta
-            name="description"
-            :content="`Cek status transaksi top up game Anda di ${setting?.title}. Masukkan nomor transaksi untuk melihat detail pesanan Anda.`"
-        />
-        <meta
-            name="keywords"
-            :content="`cek transaksi, status pesanan, lacak pesanan, ${setting?.title}, topup game`"
-        />
-        <meta name="author" :content="setting?.title" />
-        <meta name="application-name" :content="setting?.title" />
-        <meta
-            property="og:title"
-            :content="`Cek Transaksi - ${setting?.title}`"
-        />
-        <meta
-            property="og:description"
-            :content="`Cek status transaksi top up game Anda di ${setting?.title}. Masukkan nomor transaksi untuk melihat detail pesanan Anda.`"
-        />
-        <meta property="og:url" :content="check().url" />
-        <meta
-            property="og:image"
-            :content="`${appUrl}${setting?.favicon || '/favicon.svg'}`"
-        />
-        <meta property="og:image:width" content="1200" />
-        <meta property="og:image:height" content="630" />
-        <meta
-            property="twitter:title"
-            :content="`Cek Transaksi - ${setting?.title}`"
-        />
-        <meta
-            property="twitter:description"
-            :content="`Cek status transaksi top up game Anda di ${setting?.title}. Masukkan nomor transaksi untuk melihat detail pesanan Anda.`"
-        />
-        <meta
-            property="twitter:image"
-            :content="`${appUrl}${setting?.favicon || '/favicon.svg'}`"
-        />
-        <meta property="twitter:card" content="summary_large_image" />
-        <meta property="twitter:site" :content="setting?.title" />
-        <meta
-            property="image"
-            :content="`${appUrl}${setting?.favicon || '/favicon.svg'}`"
-        />
-        <meta property="canonical" :content="check().url" />
-        <meta name="robots" content="index, follow" />
         <component :is="'script'" type="application/ld+json">
             {{
                 JSON.stringify({

@@ -21,7 +21,10 @@ class HomeController extends Controller
             $category = PPOBCategory::where('slug', $request->query('category'))->first();
         }
 
-        return inertia('main/Home', [
+        $settingTitle = getSetting('title');
+        $settingFavicon = getSetting('favicon') ?: '/favicon.svg';
+
+        return inertia()->render('main/Home', [
             'sliders' => Slider::query()
                 ->with('media')
                 ->where('status', true)
@@ -68,6 +71,16 @@ class HomeController extends Controller
 
                     return $category;
                 }),
+        ])->withViewData([
+            'meta' => [
+                'title' => $settingTitle,
+                'description' => "Selamat datang di {$settingTitle}, tempat topup game termurah dan terpercaya! Nikmati berbagai penawaran menarik untuk topup game favoritmu dengan harga terbaik. Bergabunglah sekarang dan rasakan pengalaman topup yang mudah, cepat, dan aman hanya di {$settingTitle}!",
+                'keywords' => "{$settingTitle}, topup game, topup murah, topup terpercaya, penawaran menarik, harga terbaik, pengalaman topup mudah, cepat, aman",
+                'author' => $settingTitle,
+                'application_name' => $settingTitle,
+                'url' => route('home'),
+                'image' => config('app.url') . $settingFavicon,
+            ]
         ]);
     }
 }

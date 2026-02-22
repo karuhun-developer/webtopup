@@ -24,61 +24,6 @@ const appUrl = page.props.app_url;
 <template>
     <Head>
         <title>{{ setting?.title }}</title>
-        <link
-            rel="icon"
-            type="image/svg+xml"
-            :href="setting?.favicon || '/favicon.svg'"
-        />
-        <meta
-            name="description"
-            :content="`Selamat datang di ${setting?.title}, tempat topup game termurah dan terpercaya! Nikmati berbagai penawaran menarik untuk topup game favoritmu dengan harga terbaik. Bergabunglah sekarang dan rasakan pengalaman topup yang mudah, cepat, dan aman hanya di ${setting?.title}!`"
-        />
-        <meta
-            name="keywords"
-            :content="`${setting?.title}, topup game, topup murah, topup terpercaya, penawaran menarik, harga terbaik, pengalaman topup mudah, cepat, aman`"
-        />
-        <meta name="author" :content="setting?.title" />
-        <meta name="type" content="website" />
-        <meta name="application-name" :content="setting?.title" />
-        <meta
-            property="og:title"
-            :content="setting?.title + ' - Topup Game Termurah dan Terpercaya'"
-        />
-        <meta
-            property="og:description"
-            :content="`Selamat datang di ${setting?.title}, tempat topup game termurah dan terpercaya! Nikmati berbagai penawaran menarik untuk topup game favoritmu dengan harga terbaik. Bergabunglah sekarang dan rasakan pengalaman topup yang mudah, cepat, dan aman hanya di ${setting?.title}!`"
-        />
-        <meta property="og:url" :content="index().url" />
-        <meta
-            property="og:image"
-            :content="`${appUrl}${setting?.favicon || '/favicon.svg'}`"
-        />
-        <meta property="og:image:width" content="1200" />
-        <meta property="og:image:height" content="630" />
-        <meta
-            property="twitter:title"
-            :content="setting?.title + ' - Topup Game Termurah dan Terpercaya'"
-        />
-        <meta
-            property="twitter:description"
-            :content="`Selamat datang di ${setting?.title}, tempat topup game termurah dan terpercaya! Nikmati berbagai penawaran menarik untuk topup game favoritmu dengan harga terbaik. Bergabunglah sekarang dan rasakan pengalaman topup yang mudah, cepat, dan aman hanya di ${setting?.title}!`"
-        />
-        <meta
-            property="twitter:image"
-            :content="`${appUrl}${setting?.favicon || '/favicon.svg'}`"
-        />
-        <meta property="twitter:card" content="summary_large_image" />
-        <meta property="twitter:site" :content="setting?.title" />
-        <meta
-            property="shortcut icon"
-            :href="setting?.favicon || '/favicon.svg'"
-        />
-        <meta
-            property="image"
-            :content="`${appUrl}${setting?.favicon || '/favicon.svg'}`"
-        />
-        <meta property="canonical" :content="index().url" />
-        <meta name="robots" content="index, follow" />
         <component :is="'script'" type="application/ld+json">
             {{
                 JSON.stringify({

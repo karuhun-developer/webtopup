@@ -30,7 +30,51 @@
             }
         </style>
 
-        <title inertia>{{ config('app.name', 'Laravel') }}</title>
+        <title inertia>{{ $meta['title'] ?? config('app.name', 'Laravel') }}</title>
+
+        @if(isset($meta['description']))
+            <meta name="description" content="{{ $meta['description'] }}" />
+        @endif
+        @if(isset($meta['keywords']))
+            <meta name="keywords" content="{{ $meta['keywords'] }}" />
+        @endif
+        @if(isset($meta['author']))
+            <meta name="author" content="{{ $meta['author'] }}" />
+        @endif
+        <meta name="type" content="website" />
+        <meta name="application-name" content="{{ $meta['application_name'] ?? config('app.name', 'Laravel') }}" />
+
+        <!-- Open Graph -->
+        <meta property="og:title" content="{{ $meta['title'] ?? config('app.name', 'Laravel') }}" />
+        @if(isset($meta['description']))
+            <meta property="og:description" content="{{ $meta['description'] }}" />
+        @endif
+        @if(isset($meta['url']))
+            <meta property="og:url" content="{{ $meta['url'] }}" />
+            <meta property="canonical" content="{{ $meta['url'] }}" />
+        @endif
+        @if(isset($meta['image']))
+            <meta property="og:image" content="{{ $meta['image'] }}" />
+            <meta property="og:image:width" content="1200" />
+            <meta property="og:image:height" content="630" />
+            <meta property="image" content="{{ $meta['image'] }}" />
+        @endif
+        <link rel="shortcut icon" href="{{ getSetting('favicon') ?: '/favicon.svg' }}" />
+        <link rel="icon" type="image/svg+xml" href="{{ getSetting('favicon') ?: '/favicon.svg' }}" />
+
+        <!-- Twitter -->
+        <meta property="twitter:title" content="{{ $meta['title'] ?? config('app.name', 'Laravel') }}" />
+        @if(isset($meta['description']))
+            <meta property="twitter:description" content="{{ $meta['description'] }}" />
+        @endif
+        @if(isset($meta['image']))
+            <meta property="twitter:image" content="{{ $meta['image'] }}" />
+        @endif
+        <meta property="twitter:card" content="summary_large_image" />
+        <meta property="twitter:site" content="{{ $meta['application_name'] ?? config('app.name', 'Laravel') }}" />
+
+        <meta name="robots" content="index, follow" />
+
         <link rel="preconnect" href="https://fonts.bunny.net">
         <link href="https://fonts.bunny.net/css?family=instrument-sans:400,500,600" rel="stylesheet" />
 

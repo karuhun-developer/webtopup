@@ -12,56 +12,6 @@ const appUrl = page.props.app_url;
 <template>
     <Head>
         <title>Kebijakan Privasi</title>
-        <link
-            rel="icon"
-            type="image/svg+xml"
-            :href="setting?.favicon || '/favicon.svg'"
-        />
-        <meta
-            name="description"
-            :content="`Kebijakan Privasi ${setting?.title}. Pelajari bagaimana kami mengumpulkan, menggunakan, dan melindungi informasi pribadi Anda saat menggunakan layanan kami.`"
-        />
-        <meta
-            name="keywords"
-            :content="`kebijakan privasi, privacy policy, ${setting?.title}, perlindungan data, keamanan informasi`"
-        />
-        <meta name="author" :content="setting?.title" />
-        <meta name="application-name" :content="setting?.title" />
-        <meta
-            property="og:title"
-            :content="`Kebijakan Privasi - ${setting?.title}`"
-        />
-        <meta
-            property="og:description"
-            :content="`Kebijakan Privasi ${setting?.title}. Pelajari bagaimana kami mengumpulkan, menggunakan, dan melindungi informasi pribadi Anda saat menggunakan layanan kami.`"
-        />
-        <meta property="og:url" :content="privacyPolicy().url" />
-        <meta
-            property="og:image"
-            :content="`${appUrl}${setting?.favicon || '/favicon.svg'}`"
-        />
-        <meta property="og:image:width" content="1200" />
-        <meta property="og:image:height" content="630" />
-        <meta
-            property="twitter:title"
-            :content="`Kebijakan Privasi - ${setting?.title}`"
-        />
-        <meta
-            property="twitter:description"
-            :content="`Kebijakan Privasi ${setting?.title}. Pelajari bagaimana kami mengumpulkan, menggunakan, dan melindungi informasi pribadi Anda saat menggunakan layanan kami.`"
-        />
-        <meta
-            property="twitter:image"
-            :content="`${appUrl}${setting?.favicon || '/favicon.svg'}`"
-        />
-        <meta property="twitter:card" content="summary_large_image" />
-        <meta property="twitter:site" :content="setting?.title" />
-        <meta
-            property="image"
-            :content="`${appUrl}${setting?.favicon || '/favicon.svg'}`"
-        />
-        <meta property="canonical" :content="privacyPolicy().url" />
-        <meta name="robots" content="index, follow" />
         <component :is="'script'" type="application/ld+json">
             {{
                 JSON.stringify({

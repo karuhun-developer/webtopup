@@ -24,9 +24,22 @@ class BrandController extends Controller
 
         $brand->makeHidden('media');
 
-        return inertia('main/BrandDetail', [
+        $settingTitle = getSetting('title');
+        $settingFavicon = getSetting('favicon') ?: '/favicon.svg';
+
+        return inertia()->render('main/BrandDetail', [
             'brand' => $brand,
             'faqs' => Faq::where('status', true)->orderBy('order', 'asc')->get(),
+        ])->withViewData([
+            'meta' => [
+                'title' => "{$brand->name} - Top Up Murah & Cepat | {$settingTitle}",
+                'description' => "Top up {$brand->name} termurah dan terpercaya di {$settingTitle}. Proses instan, tersedia berbagai metode pembayaran.",
+                'keywords' => "top up {$brand->name}, beli {$brand->name}, harga {$brand->name}, {$brand->name} murah, {$settingTitle}, topup game",
+                'author' => $settingTitle,
+                'application_name' => $settingTitle,
+                'url' => route('product.show', $brand->slug),
+                'image' => $brand->image ?: (config('app.url') . $settingFavicon),
+            ]
         ]);
     }
 }
