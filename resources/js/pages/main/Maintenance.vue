@@ -7,7 +7,7 @@ const setting = page.props.setting;
 
 <template>
     <main
-        class="mx-auto flex max-w-7xl flex-col items-center justify-center px-4 py-16 text-center"
+        class="mx-auto flex w-full flex-1 flex-col items-center justify-center px-4 py-16 text-center lg:max-w-7xl"
     >
         <div class="mb-8 w-full max-w-md">
             <img

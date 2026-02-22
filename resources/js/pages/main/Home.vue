@@ -45,7 +45,7 @@ const appUrl = page.props.app_url;
         </component>
     </Head>
 
-    <div class="min-h-screen bg-background">
+    <div class="flex min-h-screen flex-col bg-background">
         <!-- Header -->
         <MainHeader />
 
@@ -53,7 +53,7 @@ const appUrl = page.props.app_url;
             <Maintenance />
         </template>
         <!-- Main Content -->
-        <main class="mx-auto max-w-7xl px-4 py-8" v-else>
+        <main class="mx-auto w-full max-w-7xl flex-1 px-4 py-8" v-else>
             <!-- Hero Banner -->
             <HeroBanner
                 class="mb-8"

@@ -341,7 +341,7 @@ const handleCheckout = () => {
             <Maintenance />
         </template>
         <!-- Main Content -->
-        <main class="flex-1" v-else>
+        <main class="flex-1 w-full" v-else>
             <!-- Banner Section -->
             <BrandBanner :brand="brand" />
 
