@@ -2,11 +2,12 @@
 
 namespace App\Http\Controllers\Cms\Order;
 
+use App\Actions\Cms\Order\Order\ArchiveAllOrderAction;
 use App\Actions\Cms\Order\Order\ArchiveOrderAction;
 use App\Actions\Cms\Order\Order\StoreOrderAction;
-use App\Actions\Cms\Order\Order\UnarchiveOrderAction;
 use App\Actions\Cms\Order\Order\ValidatePaymentAction;
 use App\Http\Controllers\Controller;
+use App\Http\Requests\Cms\Order\Order\BulkOrderRequest;
 use App\Http\Requests\Cms\Order\Order\StoreOrderRequest;
 use App\Http\Requests\Cms\Order\Order\ValidatePaymentRequest;
 use App\Models\Order\Order;
@@ -35,7 +36,9 @@ class OrderController extends Controller
         $paymentStatusFilter = $request?->payment_status ?? [];
         $topupStatusFilter = $request?->topup_status ?? [];
 
-        $query = Order::with('brand', 'product', 'payment.media')->whereHas('brand', fn ($q) => $q->where('provider', 'digiflazz'))->withoutArchive();
+        $query = Order::with('brand', 'product', 'payment.media')
+            ->whereHas('product', fn ($q) => $q->where('provider', 'digiflazz'))
+            ->withoutArchive();
 
         // Apply payment status filter
         if (! empty($paymentStatusFilter)) {
@@ -151,57 +154,11 @@ class OrderController extends Controller
     }
 
     /**
-     * Display a listing of the archived orders.
-     */
-    public function archiveIndex(Request $request)
-    {
-        Gate::authorize('view'.$this->resource);
-
-        $order = $request?->order ?? 'desc';
-        $orderBy = $request?->orderBy ?? 'created_at';
-        $paginate = $request?->paginate ?? 10;
-        $searchBySpecific = $request?->searchBySpecific ?? '';
-        $search = $request?->search ?? '';
-
-        $query = Order::with('brand', 'product', 'payment')->onlyArchive();
-
-        $model = $this->getDataWithFilter(
-            model: $query,
-            searchBy: [
-                'reference',
-                'name',
-                'email',
-                'phone',
-            ],
-            order: $order,
-            orderBy: $orderBy,
-            paginate: $paginate,
-            searchBySpecific: $searchBySpecific,
-            s: $search,
-        );
-
-        return inertia('cms/order/archive/Index', [
-            'data' => $model,
-            'order' => $order,
-            'orderBy' => $orderBy,
-            'paginate' => $paginate,
-            'searchBySpecific' => $searchBySpecific,
-            'search' => $search,
-            'resource' => $this->resource,
-        ]);
-    }
-
-    /**
      * Archive selected orders.
      */
-    public function archive(Request $request, ArchiveOrderAction $action)
+    public function archive(BulkOrderRequest $request, ArchiveOrderAction $action)
     {
         Gate::authorize('update'.$this->resource);
-
-        $request->validate([
-            'ids' => 'required|array',
-            'ids.*' => 'integer',
-        ]);
 
         $action->handle($request->ids);
 
@@ -209,19 +166,14 @@ class OrderController extends Controller
     }
 
     /**
-     * Unarchive selected orders.
+     * Archive all orders for this provider.
      */
-    public function unarchive(Request $request, UnarchiveOrderAction $action)
+    public function archiveAll(ArchiveAllOrderAction $action)
     {
         Gate::authorize('update'.$this->resource);
 
-        $request->validate([
-            'ids' => 'required|array',
-            'ids.*' => 'integer',
-        ]);
+        $action->handle('digiflazz');
 
-        $action->handle($request->ids);
-
-        return back()->with('success', 'Orders unarchived successfully');
+        return back()->with('success', 'All orders archived successfully');
     }
 }

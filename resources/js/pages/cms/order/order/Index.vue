@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import {
     archive,
+    archiveAll,
     create,
     show,
 } from '@/actions/App/Http/Controllers/Cms/Order/OrderController';
@@ -10,6 +11,7 @@ import ResourceTable from '@/components/ResourceTable.vue';
 import { Button } from '@/components/ui/button';
 import { useFilter } from '@/composables/useFilter';
 import { usePermission } from '@/composables/usePermission';
+import { useSwal } from '@/composables/useSwal';
 import AppLayout from '@/layouts/AppLayout.vue';
 import { PaginationItem, type BreadcrumbItem } from '@/types';
 import { OrderDataItem } from '@/types/cms/main';
@@ -30,6 +32,7 @@ const props = defineProps<{
     topupStatusFilter?: string[];
 }>();
 
+const { confirm, toast } = useSwal();
 const { hasPermission } = usePermission();
 const { updateParams } = useFilter();
 
@@ -59,22 +62,6 @@ const breadcrumbItems: BreadcrumbItem[] = [
     },
 ];
 
-const selectedOrders = ref<(string | number)[]>([]);
-
-const bulkArchive = () => {
-    if (selectedOrders.value.length === 0) return;
-    router.post(
-        archive().url,
-        { ids: selectedOrders.value },
-        {
-            preserveScroll: true,
-            onSuccess: () => {
-                selectedOrders.value = [];
-            },
-        },
-    );
-};
-
 // Filter state
 const paymentFilters = ref<string[]>(props.paymentStatusFilter || []);
 const topupFilters = ref<string[]>((props.topupStatusFilter || []).map(String));
@@ -95,6 +82,67 @@ watch(
 );
 
 // Handle filter updates from component
+const selectedOrders = ref<(string | number)[]>([]);
+
+const bulkArchive = () => {
+    if (selectedOrders.value.length === 0) return;
+
+    confirm({
+        title: 'Archive Selected',
+        text: `Are you sure you want to archive ${selectedOrders.value.length} selected orders?`,
+        icon: 'warning',
+        confirmButtonText: 'Yes, archive them!',
+    }).then((result) => {
+        if (result.isConfirmed) {
+            router.post(
+                archive().url,
+                { ids: selectedOrders.value },
+                {
+                    preserveScroll: true,
+                    onSuccess: () => {
+                        selectedOrders.value = [];
+                        toast.fire({
+                            icon: 'success',
+                            title: 'Orders archived successfully.',
+                        });
+                    },
+                },
+            );
+        }
+    });
+};
+
+const isArchivingAll = ref(false);
+const handleArchiveAll = () => {
+    confirm({
+        title: 'Archive All',
+        text: 'Are you sure you want to archive all Topup Orders? This action cannot be undone.',
+        icon: 'warning',
+        confirmButtonText: 'Yes, archive all!',
+    }).then((result) => {
+        if (result.isConfirmed) {
+            isArchivingAll.value = true;
+            router.post(
+                archiveAll().url,
+                {},
+                {
+                    preserveScroll: true,
+                    onSuccess: () => {
+                        selectedOrders.value = [];
+                        toast.fire({
+                            icon: 'success',
+                            title: 'All orders archived successfully.',
+                        });
+                    },
+                    onFinish: () => {
+                        isArchivingAll.value = false;
+                    },
+                },
+            );
+        }
+    });
+};
+
 const handlePaymentFiltersUpdate = (filters: string[]) => {
     paymentFilters.value = filters;
     updateParams({
@@ -110,6 +158,17 @@ const handleTopupFiltersUpdate = (filters: string[]) => {
         page: 1,
     });
 };
+
+const handleUpdateStatus = (id: number, status: number) => {
+    // This function seems incomplete in the provided instruction.
+    // 'filters' is not defined in this scope.
+    // Assuming it's a placeholder or will be completed by the user.
+    // topupFilters.value = filters;
+    // updateParams({
+    //     topup_status: filters.length > 0 ? filters : undefined,
+    //     page: 1,
+    // });
+};
 </script>
 
 <template>
@@ -119,6 +178,14 @@ const handleTopupFiltersUpdate = (filters: string[]) => {
             <div class="flex items-center justify-between">
                 <Heading :title="title" :description="description" />
                 <div class="flex items-center gap-2">
+                    <Button
+                        v-if="hasPermission('update' + resource)"
+                        variant="secondary"
+                        @click="handleArchiveAll"
+                        :disabled="isArchivingAll"
+                    >
+                        Archive All
+                    </Button>
                     <Button
                         v-if="
                             selectedOrders.length > 0 &&

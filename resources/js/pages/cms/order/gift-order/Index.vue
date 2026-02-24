@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import {
+    archiveAll,
     create,
     show,
     validatePaymentView,
@@ -11,6 +12,7 @@ import ResourceTable from '@/components/ResourceTable.vue';
 import { Button } from '@/components/ui/button';
 import { useFilter } from '@/composables/useFilter';
 import { usePermission } from '@/composables/usePermission';
+import { useSwal } from '@/composables/useSwal';
 import AppLayout from '@/layouts/AppLayout.vue';
 import { PaginationItem, type BreadcrumbItem } from '@/types';
 import { OrderDataItem } from '@/types/cms/main';
@@ -31,6 +33,7 @@ const props = defineProps<{
     giftSendFilter?: string[];
 }>();
 
+const { confirm, toast } = useSwal();
 const { hasPermission } = usePermission();
 const { updateParams } = useFilter();
 
@@ -79,18 +82,63 @@ watch(
 
 const selectedOrders = ref<(string | number)[]>([]);
 
+const isArchivingAll = ref(false);
+const handleArchiveAll = () => {
+    confirm({
+        title: 'Archive All',
+        text: 'Are you sure you want to archive all Gift Orders? This action cannot be undone.',
+        icon: 'warning',
+        confirmButtonText: 'Yes, archive all!',
+    }).then((result) => {
+        if (result.isConfirmed) {
+            isArchivingAll.value = true;
+            router.post(
+                archiveAll().url,
+                {},
+                {
+                    preserveScroll: true,
+                    onSuccess: () => {
+                        selectedOrders.value = [];
+                        toast.fire({
+                            icon: 'success',
+                            title: 'All gift orders archived successfully.',
+                        });
+                    },
+                    onFinish: () => {
+                        isArchivingAll.value = false;
+                    },
+                },
+            );
+        }
+    });
+};
+
 const bulkArchive = () => {
     if (selectedOrders.value.length === 0) return;
-    router.post(
-        archive().url,
-        { ids: selectedOrders.value },
-        {
-            preserveScroll: true,
-            onSuccess: () => {
-                selectedOrders.value = [];
-            },
-        },
-    );
+
+    confirm({
+        title: 'Archive Selected',
+        text: `Are you sure you want to archive ${selectedOrders.value.length} selected orders?`,
+        icon: 'warning',
+        confirmButtonText: 'Yes, archive them!',
+    }).then((result) => {
+        if (result.isConfirmed) {
+            router.post(
+                archive().url,
+                { ids: selectedOrders.value },
+                {
+                    preserveScroll: true,
+                    onSuccess: () => {
+                        selectedOrders.value = [];
+                        toast.fire({
+                            icon: 'success',
+                            title: 'Selected orders archived successfully.',
+                        });
+                    },
+                },
+            );
+        }
+    });
 };
 
 watch(
@@ -125,6 +173,14 @@ const handleGiftSendFiltersUpdate = (filters: string[]) => {
             <div class="flex items-center justify-between">
                 <Heading :title="title" :description="description" />
                 <div class="flex items-center gap-2">
+                    <Button
+                        v-if="hasPermission('update' + resource)"
+                        variant="secondary"
+                        @click="handleArchiveAll"
+                        :disabled="isArchivingAll"
+                    >
+                        Archive All
+                    </Button>
                     <Button
                         v-if="
                             selectedOrders.length > 0 &&

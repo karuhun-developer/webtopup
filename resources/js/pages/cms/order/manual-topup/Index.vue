@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { validatePaymentView } from '@/actions/App/Http/Controllers/Cms/Order/GiftOrderController';
 import {
+    archiveAll,
     create,
     show,
 } from '@/actions/App/Http/Controllers/Cms/Order/ManualTopupOrderController';
@@ -11,6 +12,7 @@ import ResourceTable from '@/components/ResourceTable.vue';
 import { Button } from '@/components/ui/button';
 import { useFilter } from '@/composables/useFilter';
 import { usePermission } from '@/composables/usePermission';
+import { useSwal } from '@/composables/useSwal';
 import AppLayout from '@/layouts/AppLayout.vue';
 import { PaginationItem, type BreadcrumbItem } from '@/types';
 import { OrderDataItem } from '@/types/cms/main';
@@ -31,6 +33,7 @@ const props = defineProps<{
     giftSendFilter?: string[];
 }>();
 
+const { confirm, toast } = useSwal();
 const { hasPermission } = usePermission();
 const { updateParams } = useFilter();
 
@@ -116,6 +119,37 @@ const handleGiftSendFiltersUpdate = (filters: string[]) => {
         page: 1,
     });
 };
+
+const isArchivingAll = ref(false);
+const handleArchiveAll = () => {
+    confirm({
+        title: 'Archive All',
+        text: 'Are you sure you want to archive all Manual Topup Orders? This action cannot be undone.',
+        icon: 'warning',
+        confirmButtonText: 'Yes, archive all!',
+    }).then((result) => {
+        if (result.isConfirmed) {
+            isArchivingAll.value = true;
+            router.post(
+                archiveAll().url,
+                {},
+                {
+                    preserveScroll: true,
+                    onSuccess: () => {
+                        selectedOrders.value = [];
+                        toast.fire({
+                            icon: 'success',
+                            title: 'All orders archived successfully.',
+                        });
+                    },
+                    onFinish: () => {
+                        isArchivingAll.value = false;
+                    },
+                },
+            );
+        }
+    });
+};
 </script>
 
 <template>
@@ -125,6 +159,14 @@ const handleGiftSendFiltersUpdate = (filters: string[]) => {
             <div class="flex items-center justify-between">
                 <Heading :title="title" :description="description" />
                 <div class="flex items-center gap-2">
+                    <Button
+                        v-if="hasPermission('update' + resource)"
+                        variant="secondary"
+                        @click="handleArchiveAll"
+                        :disabled="isArchivingAll"
+                    >
+                        Archive All
+                    </Button>
                     <Button
                         v-if="selectedOrders.length > 0 && hasPermission('update' + resource)"
                         variant="secondary"

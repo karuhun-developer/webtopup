@@ -1,17 +1,20 @@
 <script setup lang="ts">
 import {
-    show,
     unarchive,
-} from '@/actions/App/Http/Controllers/Cms/Order/OrderController';
+    unarchiveAll,
+} from '@/actions/App/Http/Controllers/Cms/Order/ArchiveOrderController';
+import { show as showGiftOrder } from '@/actions/App/Http/Controllers/Cms/Order/GiftOrderController';
+import { show as showManualTopupOrder } from '@/actions/App/Http/Controllers/Cms/Order/ManualTopupOrderController';
+import { show as showOrder } from '@/actions/App/Http/Controllers/Cms/Order/OrderController';
 import Heading from '@/components/Heading.vue';
 import ResourceTable from '@/components/ResourceTable.vue';
 import { Button } from '@/components/ui/button';
-import { useFilter } from '@/composables/useFilter';
 import { usePermission } from '@/composables/usePermission';
+import { useSwal } from '@/composables/useSwal';
 import AppLayout from '@/layouts/AppLayout.vue';
 import { PaginationItem, type BreadcrumbItem } from '@/types';
 import { OrderDataItem } from '@/types/cms/main';
-import { Head, router } from '@inertiajs/vue3';
+import { Head, Link, router } from '@inertiajs/vue3';
 import { ModalLink } from '@inertiaui/modal-vue';
 import dayjs from 'dayjs';
 import { ArchiveRestore, Eye } from 'lucide-vue-next';
@@ -26,8 +29,8 @@ const props = defineProps<{
     resource: string;
 }>();
 
+const { confirm, toast } = useSwal();
 const { hasPermission } = usePermission();
-const { updateParams } = useFilter();
 
 const title = 'Archived Orders';
 const description = 'Manage and monitor all archived orders.';
@@ -35,8 +38,8 @@ const description = 'Manage and monitor all archived orders.';
 const columns = [
     { label: 'Reference', key: 'reference', sortable: true },
     { label: 'Customer', key: 'name', sortable: true },
+    { label: 'Provider', key: 'provider', sortable: false },
     { label: 'Payment', key: 'payment_status', sortable: true },
-    { label: 'Topup/Gift Status', key: 'topup_status', sortable: false },
     { label: 'Created At', key: 'created_at', sortable: true },
     { label: 'Archived At', key: 'archive_at', sortable: true },
     {
@@ -59,16 +62,60 @@ const selectedOrders = ref<(string | number)[]>([]);
 
 const bulkUnarchive = () => {
     if (selectedOrders.value.length === 0) return;
-    router.post(
-        unarchive().url,
-        { ids: selectedOrders.value },
-        {
-            preserveScroll: true,
-            onSuccess: () => {
-                selectedOrders.value = [];
-            },
-        },
-    );
+
+    confirm({
+        title: 'Unarchive Selected',
+        text: `Are you sure you want to unarchive ${selectedOrders.value.length} selected orders?`,
+        icon: 'warning',
+        confirmButtonText: 'Yes, unarchive them!',
+    }).then((result) => {
+        if (result.isConfirmed) {
+            router.post(
+                unarchive().url,
+                { ids: selectedOrders.value },
+                {
+                    preserveScroll: true,
+                    onSuccess: () => {
+                        selectedOrders.value = [];
+                        toast.fire({
+                            icon: 'success',
+                            title: 'Selected orders unarchived successfully.',
+                        });
+                    },
+                },
+            );
+        }
+    });
+};
+const isUnarchivingAll = ref(false);
+const handleUnarchiveAll = () => {
+    confirm({
+        title: 'Unarchive All',
+        text: 'Are you sure you want to unarchive ALL orders?',
+        icon: 'warning',
+        confirmButtonText: 'Yes, unarchive all!',
+    }).then((result) => {
+        if (result.isConfirmed) {
+            isUnarchivingAll.value = true;
+            router.post(
+                unarchiveAll().url,
+                {},
+                {
+                    preserveScroll: true,
+                    onSuccess: () => {
+                        selectedOrders.value = [];
+                        toast.fire({
+                            icon: 'success',
+                            title: 'All orders unarchived successfully.',
+                        });
+                    },
+                    onFinish: () => {
+                        isUnarchivingAll.value = false;
+                    },
+                },
+            );
+        }
+    });
 };
 </script>
 
@@ -79,6 +126,14 @@ const bulkUnarchive = () => {
             <div class="flex items-center justify-between">
                 <Heading :title="title" :description="description" />
                 <div class="flex items-center gap-2">
+                    <Button
+                        v-if="hasPermission('update' + resource)"
+                        variant="secondary"
+                        @click="handleUnarchiveAll"
+                        :disabled="isUnarchivingAll"
+                    >
+                        Unarchive All
+                    </Button>
                     <Button
                         v-if="
                             selectedOrders.length > 0 &&
@@ -112,6 +167,23 @@ const bulkUnarchive = () => {
                             {{ row.phone }} | {{ row.email || '-' }}
                         </span>
                     </div>
+                </template>
+                <template #provider="{ row }">
+                    <span
+                        class="inline-flex items-center rounded-md px-2.5 py-1 text-xs font-semibold"
+                        :class="{
+                            'bg-blue-100 text-blue-800 dark:bg-blue-900/30 dark:text-blue-400':
+                                row.product?.provider === 'digiflazz',
+                            'bg-purple-100 text-purple-800 dark:bg-purple-900/30 dark:text-purple-400':
+                                row.product?.provider === 'gift',
+                            'bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-400':
+                                row.product?.provider === 'manual_topup',
+                            'bg-gray-100 text-gray-800 dark:bg-gray-900/30 dark:text-gray-400':
+                                !row.product?.provider,
+                        }"
+                    >
+                        {{ row.product?.provider || 'N/A' }}
+                    </span>
                 </template>
                 <template #payment_status="{ row }">
                     <div class="flex flex-col gap-2">
@@ -200,11 +272,14 @@ const bulkUnarchive = () => {
                 </template>
                 <template #actions="{ row }">
                     <div class="flex items-center justify-center gap-2">
-                        <!-- View Order Details -->
+                        <!-- View Order Details (Digiflazz) -->
                         <ModalLink
-                            :href="show({ order: row.reference }).url"
+                            :href="showOrder({ order: row.reference }).url"
                             slideover
-                            v-if="hasPermission('view' + resource)"
+                            v-if="
+                                row.product?.provider === 'digiflazz' &&
+                                hasPermission('view' + resource)
+                            "
                         >
                             <Button
                                 variant="ghost"
@@ -214,6 +289,43 @@ const bulkUnarchive = () => {
                                 <Eye class="h-4 w-4" />
                             </Button>
                         </ModalLink>
+
+                        <!-- View Order Details (Gift) -->
+                        <Link
+                            :href="showGiftOrder({ order: row.reference }).url"
+                            v-else-if="
+                                row.product?.provider === 'gift' &&
+                                hasPermission('view' + resource)
+                            "
+                        >
+                            <Button
+                                variant="ghost"
+                                size="icon"
+                                title="View Details"
+                            >
+                                <Eye class="h-4 w-4" />
+                            </Button>
+                        </Link>
+
+                        <!-- View Order Details (Manual Topup) -->
+                        <Link
+                            :href="
+                                showManualTopupOrder({ order: row.reference })
+                                    .url
+                            "
+                            v-else-if="
+                                row.product?.provider === 'manual_topup' &&
+                                hasPermission('view' + resource)
+                            "
+                        >
+                            <Button
+                                variant="ghost"
+                                size="icon"
+                                title="View Details"
+                            >
+                                <Eye class="h-4 w-4" />
+                            </Button>
+                        </Link>
                     </div>
                 </template>
             </ResourceTable>

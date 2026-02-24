@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Cms\Order;
 
 use App\Actions\Cms\Order\ManualTopup\SendNotificationAction;
 use App\Actions\Cms\Order\ManualTopup\UpdateProgressAction;
+use App\Actions\Cms\Order\Order\ArchiveAllOrderAction;
 use App\Actions\Main\StoreTransactionAction;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Cms\Order\ManualTopup\SendNotificationRequest;
@@ -38,7 +39,9 @@ class ManualTopupOrderController extends Controller
         $paymentStatusFilter = $request?->payment_status ?? [];
         $giftSendFilter = $request?->gift_send ?? [];
 
-        $query = Order::with('brand', 'product', 'payment.media')->whereHas('product', fn ($q) => $q->where('provider', 'manual_topup'))->withoutArchive();
+        $query = Order::with('brand', 'product', 'payment.media')
+            ->whereHas('product', fn ($q) => $q->where('provider', 'manual_topup'))
+            ->withoutArchive();
 
         // Apply payment status filter
         if (! empty($paymentStatusFilter)) {
@@ -100,6 +103,18 @@ class ManualTopupOrderController extends Controller
             'paymentStatusFilter' => $paymentStatusFilter,
             'giftSendFilter' => $giftSendFilter,
         ]);
+    }
+
+    /**
+     * Archive all orders for this provider.
+     */
+    public function archiveAll(ArchiveAllOrderAction $action)
+    {
+        Gate::authorize('update'.$this->resource);
+
+        $action->handle('manual_topup');
+
+        return back()->with('success', 'All orders archived successfully');
     }
 
     /**
