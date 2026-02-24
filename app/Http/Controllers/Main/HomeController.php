@@ -79,8 +79,8 @@ class HomeController extends Controller
                 'author' => $settingTitle,
                 'application_name' => $settingTitle,
                 'url' => route('home'),
-                'image' => config('app.url') . $settingFavicon,
-            ]
+                'image' => config('app.url').$settingFavicon,
+            ],
         ]);
     }
 }

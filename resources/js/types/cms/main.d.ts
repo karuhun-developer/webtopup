@@ -47,6 +47,7 @@ export interface OrderDataItem {
     total_amount: number;
     payment_status: number;
     topup_status: number;
+    archive_at: string | null;
     submited: any;
     created_at: string;
     updated_at: string;

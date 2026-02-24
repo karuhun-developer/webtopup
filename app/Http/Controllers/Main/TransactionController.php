@@ -65,14 +65,14 @@ class TransactionController extends Controller
                 }),
         ])->withViewData([
             'meta' => [
-                'title' => 'Cek Transaksi - ' . $settingTitle,
-                'description' => 'Cek status transaksi top up game Anda di ' . $settingTitle . '. Masukkan nomor transaksi untuk melihat detail pesanan Anda.',
-                'keywords' => 'cek transaksi, status pesanan, lacak pesanan, ' . $settingTitle . ', topup game',
+                'title' => 'Cek Transaksi - '.$settingTitle,
+                'description' => 'Cek status transaksi top up game Anda di '.$settingTitle.'. Masukkan nomor transaksi untuk melihat detail pesanan Anda.',
+                'keywords' => 'cek transaksi, status pesanan, lacak pesanan, '.$settingTitle.', topup game',
                 'author' => $settingTitle,
                 'application_name' => $settingTitle,
                 'url' => route('transaction.check'),
-                'image' => config('app.url') . $settingFavicon,
-            ]
+                'image' => config('app.url').$settingFavicon,
+            ],
         ]);
     }
 

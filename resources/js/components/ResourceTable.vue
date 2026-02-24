@@ -1,5 +1,6 @@
 <script setup lang="ts" generic="T">
 import { Button } from '@/components/ui/button';
+import { Checkbox } from '@/components/ui/checkbox';
 import { Input } from '@/components/ui/input';
 import {
     Select,
@@ -25,7 +26,7 @@ import {
     ChevronsUpDown,
     Search,
 } from 'lucide-vue-next';
-import { ref, watch } from 'vue';
+import { computed, ref, watch } from 'vue';
 
 interface Column {
     label: string;
@@ -42,12 +43,18 @@ const props = withDefaults(
         order?: 'asc' | 'desc';
         search?: string;
         paginate?: number;
+        selectable?: boolean;
+        selected?: (string | number)[];
+        keyField?: string;
     }>(),
     {
         orderBy: 'id',
         order: 'desc',
         search: '',
         paginate: 10,
+        selectable: false,
+        selected: () => [],
+        keyField: 'reference',
     },
 );
 
@@ -58,6 +65,7 @@ const emit = defineEmits<{
     'update:order': [value: 'asc' | 'desc'];
     'update:orderBy': [value: string];
     'update:paginate': [value: number];
+    'update:selected': [value: (string | number)[]];
 }>();
 
 const localSearch = ref(props.search);
@@ -102,6 +110,56 @@ const onPageClick = (url: string | null) => {
         updateParams(newParams);
     }
 };
+
+const isAllSelected = computed(() => {
+    if (!props.data.data.length) return false;
+    return props.data.data.every((row: any) =>
+        props.selected.includes(row[props.keyField]),
+    );
+});
+
+const isSomeSelected = computed(() => {
+    if (!props.data.data.length || isAllSelected.value) return false;
+    return props.data.data.some((row: any) =>
+        props.selected.includes(row[props.keyField]),
+    );
+});
+
+const toggleAll = (checked: boolean | 'indeterminate') => {
+    const isChecked = checked === 'indeterminate' ? true : checked;
+    const pageKeys = props.data.data.map((row: any) => row[props.keyField]);
+    let newSelected = [...props.selected];
+
+    if (isChecked) {
+        // Add all keys from current page
+        pageKeys.forEach((k) => {
+            if (!newSelected.includes(k)) {
+                newSelected.push(k);
+            }
+        });
+    } else {
+        // Remove all keys from current page
+        newSelected = newSelected.filter((k) => !pageKeys.includes(k));
+    }
+
+    emit('update:selected', newSelected);
+};
+
+const toggleRow = (
+    checked: boolean | 'indeterminate',
+    key: string | number,
+) => {
+    const isChecked = checked === 'indeterminate' ? true : checked;
+    let newSelected = [...props.selected];
+    if (isChecked) {
+        if (!newSelected.includes(key)) {
+            newSelected.push(key);
+        }
+    } else {
+        newSelected = newSelected.filter((k) => k !== key);
+    }
+    emit('update:selected', newSelected);
+};
 </script>
 
 <template>
@@ -145,6 +203,19 @@ const onPageClick = (url: string | null) => {
             <Table>
                 <TableHeader>
                     <TableRow>
+                        <TableHead v-if="selectable" class="w-12">
+                            <Checkbox
+                                :model-value="
+                                    isAllSelected
+                                        ? true
+                                        : isSomeSelected
+                                          ? 'indeterminate'
+                                          : false
+                                "
+                                @update:model-value="toggleAll"
+                                aria-label="Select all"
+                            />
+                        </TableHead>
                         <TableHead
                             v-for="col in columns"
                             :key="col.key"
@@ -180,6 +251,23 @@ const onPageClick = (url: string | null) => {
                             v-for="row in data.data"
                             :key="(row as any).id"
                         >
+                            <TableCell v-if="selectable">
+                                <Checkbox
+                                    :model-value="
+                                        selected.includes(
+                                            (row as any)[keyField],
+                                        )
+                                    "
+                                    @update:model-value="
+                                        (checked: boolean | 'indeterminate') =>
+                                            toggleRow(
+                                                checked,
+                                                (row as any)[keyField],
+                                            )
+                                    "
+                                    aria-label="Select row"
+                                />
+                            </TableCell>
                             <TableCell
                                 v-for="col in columns"
                                 :key="col.key"
@@ -193,7 +281,9 @@ const onPageClick = (url: string | null) => {
                     </template>
                     <TableRow v-else>
                         <TableCell
-                            :colspan="columns.length"
+                            :colspan="
+                                selectable ? columns.length + 1 : columns.length
+                            "
                             class="h-24 text-center"
                         >
                             No results found.

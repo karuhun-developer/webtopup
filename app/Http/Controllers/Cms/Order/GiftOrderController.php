@@ -40,7 +40,7 @@ class GiftOrderController extends Controller
         $paymentStatusFilter = $request?->payment_status ?? [];
         $giftSendFilter = $request?->gift_send ?? [];
 
-        $query = Order::with('brand', 'product', 'payment.media')->whereHas('product', fn ($q) => $q->where('provider', 'gift'));
+        $query = Order::with('brand', 'product', 'payment.media')->whereHas('product', fn ($q) => $q->where('provider', 'gift'))->withoutArchive();
 
         // Apply payment status filter
         if (! empty($paymentStatusFilter)) {

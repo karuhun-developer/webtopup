@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import {
+    archive,
     create,
     show,
 } from '@/actions/App/Http/Controllers/Cms/Order/OrderController';
@@ -12,10 +13,10 @@ import { usePermission } from '@/composables/usePermission';
 import AppLayout from '@/layouts/AppLayout.vue';
 import { PaginationItem, type BreadcrumbItem } from '@/types';
 import { OrderDataItem } from '@/types/cms/main';
-import { Head } from '@inertiajs/vue3';
+import { Head, router } from '@inertiajs/vue3';
 import { ModalLink } from '@inertiaui/modal-vue';
 import dayjs from 'dayjs';
-import { CheckCircle, Eye, Plus } from 'lucide-vue-next';
+import { Archive, CheckCircle, Eye, Plus } from 'lucide-vue-next';
 import { ref, watch } from 'vue';
 
 const props = defineProps<{
@@ -57,6 +58,22 @@ const breadcrumbItems: BreadcrumbItem[] = [
         href: '#',
     },
 ];
+
+const selectedOrders = ref<(string | number)[]>([]);
+
+const bulkArchive = () => {
+    if (selectedOrders.value.length === 0) return;
+    router.post(
+        archive().url,
+        { ids: selectedOrders.value },
+        {
+            preserveScroll: true,
+            onSuccess: () => {
+                selectedOrders.value = [];
+            },
+        },
+    );
+};
 
 // Filter state
 const paymentFilters = ref<string[]>(props.paymentStatusFilter || []);
@@ -101,17 +118,30 @@ const handleTopupFiltersUpdate = (filters: string[]) => {
         <div class="flex h-full flex-1 flex-col gap-4 rounded-xl p-4">
             <div class="flex items-center justify-between">
                 <Heading :title="title" :description="description" />
-                <ModalLink
-                    :href="create().url"
-                    slideover
-                    v-if="hasPermission('create' + resource)"
-                    class="hidden"
-                >
-                    <Button>
-                        <Plus class="h-4 w-4" />
-                        Create
+                <div class="flex items-center gap-2">
+                    <Button
+                        v-if="
+                            selectedOrders.length > 0 &&
+                            hasPermission('update' + resource)
+                        "
+                        variant="secondary"
+                        @click="bulkArchive"
+                    >
+                        <Archive class="h-4 w-4" />
+                        Archive Selected ({{ selectedOrders.length }})
                     </Button>
-                </ModalLink>
+                    <ModalLink
+                        :href="create().url"
+                        slideover
+                        v-if="hasPermission('create' + resource)"
+                        class="hidden"
+                    >
+                        <Button>
+                            <Plus class="h-4 w-4" />
+                            Create
+                        </Button>
+                    </ModalLink>
+                </div>
             </div>
 
             <!-- Filter Tabs -->
@@ -129,6 +159,10 @@ const handleTopupFiltersUpdate = (filters: string[]) => {
                 :order="order"
                 :search="search"
                 :paginate="paginate"
+                selectable
+                key-field="id"
+                :selected="selectedOrders"
+                @update:selected="selectedOrders = $event"
             >
                 <template #name="{ row }">
                     <div class="flex flex-col">

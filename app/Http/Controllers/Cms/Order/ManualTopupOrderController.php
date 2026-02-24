@@ -38,7 +38,7 @@ class ManualTopupOrderController extends Controller
         $paymentStatusFilter = $request?->payment_status ?? [];
         $giftSendFilter = $request?->gift_send ?? [];
 
-        $query = Order::with('brand', 'product', 'payment.media')->whereHas('product', fn ($q) => $q->where('provider', 'manual_topup'));
+        $query = Order::with('brand', 'product', 'payment.media')->whereHas('product', fn ($q) => $q->where('provider', 'manual_topup'))->withoutArchive();
 
         // Apply payment status filter
         if (! empty($paymentStatusFilter)) {

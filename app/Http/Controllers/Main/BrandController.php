@@ -38,8 +38,8 @@ class BrandController extends Controller
                 'author' => $settingTitle,
                 'application_name' => $settingTitle,
                 'url' => route('product.show', $brand->slug),
-                'image' => $brand->image ?: (config('app.url') . $settingFavicon),
-            ]
+                'image' => $brand->image ?: (config('app.url').$settingFavicon),
+            ],
         ]);
     }
 }

@@ -1,12 +1,9 @@
 <script setup lang="ts">
-import { validatePaymentView } from '@/actions/App/Http/Controllers/Cms/Order/GiftOrderController';
 import {
-    create,
     show,
-} from '@/actions/App/Http/Controllers/Cms/Order/ManualTopupOrderController';
-import { archive } from '@/actions/App/Http/Controllers/Cms/Order/OrderController';
+    unarchive,
+} from '@/actions/App/Http/Controllers/Cms/Order/OrderController';
 import Heading from '@/components/Heading.vue';
-import OrderStatusFilter from '@/components/order/OrderStatusFilter.vue';
 import ResourceTable from '@/components/ResourceTable.vue';
 import { Button } from '@/components/ui/button';
 import { useFilter } from '@/composables/useFilter';
@@ -14,11 +11,11 @@ import { usePermission } from '@/composables/usePermission';
 import AppLayout from '@/layouts/AppLayout.vue';
 import { PaginationItem, type BreadcrumbItem } from '@/types';
 import { OrderDataItem } from '@/types/cms/main';
-import { Head, Link, router } from '@inertiajs/vue3';
+import { Head, router } from '@inertiajs/vue3';
 import { ModalLink } from '@inertiaui/modal-vue';
 import dayjs from 'dayjs';
-import { Archive, CheckCircle, Eye, Plus } from 'lucide-vue-next';
-import { ref, watch } from 'vue';
+import { ArchiveRestore, Eye } from 'lucide-vue-next';
+import { ref } from 'vue';
 
 const props = defineProps<{
     data: PaginationItem<OrderDataItem>;
@@ -27,28 +24,21 @@ const props = defineProps<{
     search?: string;
     paginate?: number;
     resource: string;
-    paymentStatusFilter?: string[];
-    giftSendFilter?: string[];
 }>();
 
 const { hasPermission } = usePermission();
 const { updateParams } = useFilter();
 
-const title = 'Gift Orders';
-const description = 'Manage and monitor all gift orders placed by customers.';
+const title = 'Archived Orders';
+const description = 'Manage and monitor all archived orders.';
 
 const columns = [
     { label: 'Reference', key: 'reference', sortable: true },
     { label: 'Customer', key: 'name', sortable: true },
-    {
-        label: 'Payment',
-        key: 'payment_status',
-        actualKey: 'gift_status',
-        sortable: true,
-    },
-    { label: 'Gift Status', key: 'gift_status', sortable: false },
+    { label: 'Payment', key: 'payment_status', sortable: true },
+    { label: 'Topup/Gift Status', key: 'topup_status', sortable: false },
     { label: 'Created At', key: 'created_at', sortable: true },
-    { label: 'Expired At', key: 'expired_at', sortable: false },
+    { label: 'Archived At', key: 'archive_at', sortable: true },
     {
         label: 'Actions',
         key: 'actions',
@@ -67,10 +57,10 @@ const breadcrumbItems: BreadcrumbItem[] = [
 
 const selectedOrders = ref<(string | number)[]>([]);
 
-const bulkArchive = () => {
+const bulkUnarchive = () => {
     if (selectedOrders.value.length === 0) return;
     router.post(
-        archive().url,
+        unarchive().url,
         { ids: selectedOrders.value },
         {
             preserveScroll: true,
@@ -79,42 +69,6 @@ const bulkArchive = () => {
             },
         },
     );
-};
-
-// Filter state
-const paymentFilters = ref<string[]>(props.paymentStatusFilter || []);
-const giftSendFilters = ref<string[]>(props.giftSendFilter || []);
-
-// Watch for prop changes to update local state
-watch(
-    () => props.paymentStatusFilter,
-    (newVal) => {
-        paymentFilters.value = newVal || [];
-    },
-);
-
-watch(
-    () => props.giftSendFilter,
-    (newVal) => {
-        giftSendFilters.value = newVal || [];
-    },
-);
-
-// Handle filter updates from component
-const handlePaymentFiltersUpdate = (filters: string[]) => {
-    paymentFilters.value = filters;
-    updateParams({
-        payment_status: filters.length > 0 ? filters : undefined,
-        page: 1,
-    });
-};
-
-const handleGiftSendFiltersUpdate = (filters: string[]) => {
-    giftSendFilters.value = filters;
-    updateParams({
-        gift_send: filters.length > 0 ? filters : undefined,
-        page: 1,
-    });
 };
 </script>
 
@@ -126,35 +80,18 @@ const handleGiftSendFiltersUpdate = (filters: string[]) => {
                 <Heading :title="title" :description="description" />
                 <div class="flex items-center gap-2">
                     <Button
-                        v-if="selectedOrders.length > 0 && hasPermission('update' + resource)"
+                        v-if="
+                            selectedOrders.length > 0 &&
+                            hasPermission('update' + resource)
+                        "
                         variant="secondary"
-                        @click="bulkArchive"
+                        @click="bulkUnarchive"
                     >
-                        <Archive class="h-4 w-4" />
-                        Archive Selected ({{ selectedOrders.length }})
+                        <ArchiveRestore class="h-4 w-4" />
+                        Unarchive Selected ({{ selectedOrders.length }})
                     </Button>
-                    <ModalLink
-                        :href="create().url"
-                        slideover
-                        v-if="hasPermission('create' + resource)"
-                    >
-                        <Button>
-                            <Plus class="h-4 w-4" />
-                            Create
-                        </Button>
-                    </ModalLink>
                 </div>
             </div>
-
-            <!-- Filter Tabs -->
-            <OrderStatusFilter
-                :payment-filters="paymentFilters"
-                :gift-send-filters="giftSendFilters"
-                :show-topup-filter="false"
-                :show-gift-send-filter="true"
-                @update:payment-filters="handlePaymentFiltersUpdate"
-                @update:gift-send-filters="handleGiftSendFiltersUpdate"
-            />
 
             <ResourceTable
                 :data="data"
@@ -217,57 +154,56 @@ const handleGiftSendFiltersUpdate = (filters: string[]) => {
                         </span>
                     </div>
                 </template>
-                <template #gift_status="{ row }">
-                    <div class="flex flex-col gap-2">
-                        <span
-                            class="inline-flex w-fit items-center rounded-md px-2.5 py-1 text-xs font-semibold"
-                            :class="{
-                                'bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-400':
-                                    row.submited.gift_send,
-                                'bg-yellow-100 text-yellow-800 dark:bg-yellow-900/30 dark:text-yellow-400':
-                                    !row.submited.gift_send,
-                            }"
-                        >
-                            {{ row.submited.gift_send ? 'Sent' : 'Not Sent' }}
-                        </span>
-                    </div>
+                <template #topup_status="{ row }">
+                    <span
+                        v-if="row.brand?.provider !== 'gift'"
+                        class="inline-flex items-center rounded-md px-2.5 py-1 text-xs font-semibold"
+                        :class="{
+                            'bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-400':
+                                row.topup_status === 2,
+                            'bg-yellow-100 text-yellow-800 dark:bg-yellow-900/30 dark:text-yellow-400':
+                                row.topup_status === 0,
+                            'bg-blue-100 text-blue-800 dark:bg-blue-900/30 dark:text-blue-400':
+                                row.topup_status === 1,
+                            'bg-red-100 text-red-800 dark:bg-red-900/30 dark:text-red-400':
+                                row.topup_status === 3,
+                        }"
+                    >
+                        {{
+                            row.topup_status === 2
+                                ? 'Success'
+                                : row.topup_status === 0
+                                  ? 'Pending'
+                                  : row.topup_status === 1
+                                    ? 'On Progress'
+                                    : 'Failed'
+                        }}
+                    </span>
+                    <span
+                        v-else
+                        class="inline-flex w-fit items-center rounded-md px-2.5 py-1 text-xs font-semibold"
+                        :class="{
+                            'bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-400':
+                                row.submited?.gift_send,
+                            'bg-yellow-100 text-yellow-800 dark:bg-yellow-900/30 dark:text-yellow-400':
+                                !row.submited?.gift_send,
+                        }"
+                    >
+                        {{ row.submited?.gift_send ? 'Sent' : 'Not Sent' }}
+                    </span>
                 </template>
                 <template #created_at="{ row }">
                     {{ dayjs(row.created_at).format('DD MMMM YYYY HH:mm:ss') }}
                 </template>
-                <template #expired_at="{ row }">
-                    {{
-                        dayjs(row.payment?.expired_at).format(
-                            'DD MMMM YYYY HH:mm:ss',
-                        )
-                    }}
+                <template #archive_at="{ row }">
+                    {{ dayjs(row.archive_at).format('DD MMMM YYYY HH:mm:ss') }}
                 </template>
                 <template #actions="{ row }">
                     <div class="flex items-center justify-center gap-2">
-                        <!-- Validate Payment Button (Manual Transfer + Pending + Has Image) -->
-                        <ModalLink
-                            v-if="
-                                row.payment_status === 0 &&
-                                hasPermission('update' + resource)
-                            "
-                            :href="
-                                validatePaymentView({ order: row.reference })
-                                    .url
-                            "
-                            slideover
-                        >
-                            <Button
-                                variant="default"
-                                size="icon"
-                                title="Validate Payment"
-                            >
-                                <CheckCircle class="h-4 w-4" />
-                            </Button>
-                        </ModalLink>
-
                         <!-- View Order Details -->
-                        <Link
+                        <ModalLink
                             :href="show({ order: row.reference }).url"
+                            slideover
                             v-if="hasPermission('view' + resource)"
                         >
                             <Button
@@ -277,7 +213,7 @@ const handleGiftSendFiltersUpdate = (filters: string[]) => {
                             >
                                 <Eye class="h-4 w-4" />
                             </Button>
-                        </Link>
+                        </ModalLink>
                     </div>
                 </template>
             </ResourceTable>

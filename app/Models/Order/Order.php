@@ -2,6 +2,8 @@
 
 namespace App\Models\Order;
 
+use Illuminate\Database\Eloquent\Attributes\Scope;
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
 use Spatie\MediaLibrary\HasMedia;
 use Spatie\MediaLibrary\InteractsWithMedia;
@@ -27,11 +29,13 @@ class Order extends Model implements HasMedia
         'total_amount',
         'payment_status',
         'topup_status',
+        'archive_at',
         'sn',
     ];
 
     protected $casts = [
         'submited' => 'array',
+        'archive_at' => 'datetime',
         'payment_status' => \App\Enums\PaymentStatusEnum::class,
         'topup_status' => \App\Enums\DigiflazzStatusEnum::class,
     ];
@@ -69,5 +73,17 @@ class Order extends Model implements HasMedia
     public function voucherUse()
     {
         return $this->morphOne(\App\Models\Voucher\VoucherUse::class, 'usable');
+    }
+
+    #[Scope]
+    public function onlyArchive(Builder $query)
+    {
+        return $query->whereNotNull('archive_at');
+    }
+
+    #[Scope]
+    public function withoutArchive(Builder $query)
+    {
+        return $query->whereNull('archive_at');
     }
 }

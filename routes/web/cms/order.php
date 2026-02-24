@@ -30,4 +30,9 @@ Route::group([
     Route::get('manual-topup-orders/{order}', [\App\Http\Controllers\Cms\Order\ManualTopupOrderController::class, 'show'])->name('manual-topup-orders.show');
     Route::put('manual-topup-orders/{order}', [\App\Http\Controllers\Cms\Order\ManualTopupOrderController::class, 'save'])->name('manual-topup-orders.save');
     Route::put('manual-topup-orders/{order}/notify', [\App\Http\Controllers\Cms\Order\ManualTopupOrderController::class, 'notify'])->name('manual-topup-orders.notify');
+
+    // Archive
+    Route::get('archives', [\App\Http\Controllers\Cms\Order\OrderController::class, 'archiveIndex'])->name('archives.index');
+    Route::post('archives', [\App\Http\Controllers\Cms\Order\OrderController::class, 'archive'])->name('archives.archive');
+    Route::post('archives/unarchive', [\App\Http\Controllers\Cms\Order\OrderController::class, 'unarchive'])->name('archives.unarchive');
 });
