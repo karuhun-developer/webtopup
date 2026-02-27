@@ -142,7 +142,7 @@ class GiftOrderController extends Controller
     public function store(StoreTransactionRequest $request, StoreTransactionAction $action)
     {
         try {
-            $order = DB::transaction(function () use ($request, $action) {
+            DB::transaction(function () use ($request, $action) {
                 return $action->handle($request->only([
                     'type',
                     'account_id',

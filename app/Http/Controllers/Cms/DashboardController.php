@@ -72,7 +72,7 @@ class DashboardController extends Controller
                     $timestamp = $order->submited['user_confirm_friend_timestamp'];
                     $readyDate = Carbon::parse($timestamp)->addDays(7);
 
-                    if (floor(now()->diffInDays($readyDate)) == 0) {
+                    if (floor(now()->diffInDays($readyDate)) < 1) {
                         $readyCount++;
                     } else {
                         $waitingCount++;
