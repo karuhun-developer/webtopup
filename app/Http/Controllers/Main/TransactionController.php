@@ -11,12 +11,13 @@ use App\Http\Requests\Main\StoreTransactionRequest;
 use App\Http\Requests\Main\UpdateTransactionRequest;
 use App\Models\Account\Account;
 use App\Models\Order\Order;
+use App\Traits\WithReturnResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 
 class TransactionController extends Controller
 {
-    use \App\Traits\WithReturnResponse;
+    use WithReturnResponse;
 
     /**
      * Display a listing of the resource.
