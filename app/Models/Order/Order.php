@@ -2,6 +2,13 @@
 
 namespace App\Models\Order;
 
+use App\Enums\DigiflazzStatusEnum;
+use App\Enums\PaymentStatusEnum;
+use App\Models\Payment\Payment;
+use App\Models\PPOB\PPOBBrand;
+use App\Models\PPOB\PPOBProduct;
+use App\Models\User;
+use App\Models\Voucher\VoucherUse;
 use Illuminate\Database\Eloquent\Attributes\Scope;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
@@ -36,8 +43,8 @@ class Order extends Model implements HasMedia
     protected $casts = [
         'submited' => 'array',
         'archive_at' => 'datetime',
-        'payment_status' => \App\Enums\PaymentStatusEnum::class,
-        'topup_status' => \App\Enums\DigiflazzStatusEnum::class,
+        'payment_status' => PaymentStatusEnum::class,
+        'topup_status' => DigiflazzStatusEnum::class,
     ];
 
     public function getRouteKeyName()
@@ -47,22 +54,22 @@ class Order extends Model implements HasMedia
 
     public function user()
     {
-        return $this->belongsTo(\App\Models\User::class);
+        return $this->belongsTo(User::class);
     }
 
     public function product()
     {
-        return $this->belongsTo(\App\Models\PPOB\PPOBProduct::class, 'p_p_o_b_product_id');
+        return $this->belongsTo(PPOBProduct::class, 'p_p_o_b_product_id');
     }
 
     public function brand()
     {
-        return $this->belongsTo(\App\Models\PPOB\PPOBBrand::class, 'p_p_o_b_brand_id');
+        return $this->belongsTo(PPOBBrand::class, 'p_p_o_b_brand_id');
     }
 
     public function payment()
     {
-        return $this->morphOne(\App\Models\Payment\Payment::class, 'payable');
+        return $this->morphOne(Payment::class, 'payable');
     }
 
     public function notifications()
@@ -72,7 +79,7 @@ class Order extends Model implements HasMedia
 
     public function voucherUse()
     {
-        return $this->morphOne(\App\Models\Voucher\VoucherUse::class, 'usable');
+        return $this->morphOne(VoucherUse::class, 'usable');
     }
 
     #[Scope]

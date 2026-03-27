@@ -4,15 +4,17 @@ namespace App\Http\Requests\Main;
 
 use App\Models\PPOB\PPOBProduct;
 use App\Services\GameProService;
+use Illuminate\Contracts\Validation\ValidationRule;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Support\Str;
+use Illuminate\Validation\ValidationException;
 
 class StoreTransactionRequest extends FormRequest
 {
     /**
      * Get the validation rules that apply to the request.
      *
-     * @return array<string, \Illuminate\Contracts\Validation\ValidationRule|array<mixed>|string>
+     * @return array<string, ValidationRule|array<mixed>|string>
      */
     public function rules(): array
     {
@@ -21,7 +23,7 @@ class StoreTransactionRequest extends FormRequest
             'account_id' => 'required_if:type,id',
             'server_id' => 'required_if:type,id+server',
             'product_id' => 'required|exists:p_p_o_b_products,id',
-            'email' => 'nullable|email|max:255',
+            'email' => 'required|email|max:255',
             'name' => 'required|string|max:255',
             'phone' => 'required|numeric',
             'payment_type' => 'required|in:automatic,manual',
@@ -48,7 +50,7 @@ class StoreTransactionRequest extends FormRequest
             );
 
             if (! $resolve['status']) {
-                throw \Illuminate\Validation\ValidationException::withMessages([
+                throw ValidationException::withMessages([
                     'account_id' => 'Game id or server is invalid',
                 ]);
             }

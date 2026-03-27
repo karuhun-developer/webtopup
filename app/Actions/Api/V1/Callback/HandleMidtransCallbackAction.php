@@ -3,6 +3,8 @@
 namespace App\Actions\Api\V1\Callback;
 
 use App\Enums\PaymentStatusEnum;
+use App\Mail\PaymentFailed;
+use App\Mail\PaymentSuccess;
 use App\Models\Order\Order;
 use App\Models\Payment\Payment;
 use App\Services\MidtransService;
@@ -156,26 +158,38 @@ class HandleMidtransCallbackAction
             $message = str_replace('{cs_link}', getSetting('cs'), $message);
         }
 
-        // Send message via Voda
-        $isNotificationError = false;
-        try {
-            // Send message via Voda
-            $this->vodaService->sendMessage(
-                phone: $order->phone,
-                message: $message,
-                linkPreview: true,
-            );
-        } catch (\Exception $e) {
-            Log::error('Failed to send Voda message: '.$e->getMessage());
-            $isNotificationError = true;
-        }
+        // // Send message via Voda
+        // $isNotificationError = false;
+        // try {
+        //     // Send message via Voda
+        //     $this->vodaService->sendMessage(
+        //         phone: $order->phone,
+        //         message: $message,
+        //         linkPreview: true,
+        //     );
+        // } catch (\Exception $e) {
+        //     Log::error('Failed to send Voda message: '.$e->getMessage());
+        //     $isNotificationError = true;
+        // }
 
-        // Create notification record
-        $order->notifications()->create([
-            'provider' => 'voda',
+        // // Create notification record
+        // $order->notifications()->create([
+        //     'provider' => 'voda',
+        //     'title' => 'Payment '.($isSuccess ? 'Confirmed' : 'Rejected'),
+        //     'content' => $message,
+        //     'error' => $isNotificationError,
+        // ]);
+
+        // Send message via email
+        Mail::to($order->email)->send(
+            $isSuccess ? new PaymentSuccess($order) : new PaymentFailed($order)
+        );
+
+        $order->notification()->create([
+            'provider' => 'email',
             'title' => 'Payment '.($isSuccess ? 'Confirmed' : 'Rejected'),
             'content' => $message,
-            'error' => $isNotificationError,
+            'error' => false,
         ]);
     }
 }

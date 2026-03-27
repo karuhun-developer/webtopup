@@ -4,12 +4,13 @@ use App\Actions\Cms\Management\RolePermission\UpdateRolePermissionsAction;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Spatie\Permission\Models\Permission;
 use Spatie\Permission\Models\Role;
+use Spatie\Permission\PermissionRegistrar;
 use Tests\TestCase;
 
 uses(TestCase::class, RefreshDatabase::class);
 
 test('assign all permissions action assigns all permissions', function () {
-    app()[\Spatie\Permission\PermissionRegistrar::class]->forgetCachedPermissions();
+    app()[PermissionRegistrar::class]->forgetCachedPermissions();
     $role = Role::create(['name' => 'Test Role', 'guard_name' => 'api']);
     Permission::create(['name' => 'perm1', 'guard_name' => 'api']);
     Permission::create(['name' => 'perm2', 'guard_name' => 'api']);
@@ -23,7 +24,7 @@ test('assign all permissions action assigns all permissions', function () {
 });
 
 test('revoke all permissions action revokes all permissions', function () {
-    app()[\Spatie\Permission\PermissionRegistrar::class]->forgetCachedPermissions();
+    app()[PermissionRegistrar::class]->forgetCachedPermissions();
     $role = Role::create(['name' => 'Test Role', 'guard_name' => 'api']);
     $p1 = Permission::create(['name' => 'perm1', 'guard_name' => 'api']);
     $role->givePermissionTo($p1);
@@ -35,7 +36,7 @@ test('revoke all permissions action revokes all permissions', function () {
 });
 
 test('assign permission action assigns specific permission', function () {
-    app()[\Spatie\Permission\PermissionRegistrar::class]->forgetCachedPermissions();
+    app()[PermissionRegistrar::class]->forgetCachedPermissions();
     $role = Role::create(['name' => 'Test Role', 'guard_name' => 'api']);
     Permission::create(['name' => 'perm1', 'guard_name' => 'api']);
 
@@ -46,7 +47,7 @@ test('assign permission action assigns specific permission', function () {
 });
 
 test('revoke permission action revokes specific permission', function () {
-    app()[\Spatie\Permission\PermissionRegistrar::class]->forgetCachedPermissions();
+    app()[PermissionRegistrar::class]->forgetCachedPermissions();
     $role = Role::create(['name' => 'Test Role', 'guard_name' => 'api']);
     $p1 = Permission::create(['name' => 'perm1', 'guard_name' => 'api']);
     $role->givePermissionTo($p1);

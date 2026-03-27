@@ -2,6 +2,7 @@
 
 namespace App\Actions\Main;
 
+use App\Mail\OrderCreated;
 use App\Models\Order\Order;
 use App\Models\Payment\Payment;
 use App\Models\PPOB\PPOBProduct;
@@ -11,6 +12,7 @@ use App\Services\MidtransService;
 use App\Services\VodaService;
 use App\Traits\WithGenerateReference;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Mail;
 
 class StoreTransactionAction
 {
@@ -183,25 +185,37 @@ class StoreTransactionAction
         ]), $message);
         $message = str_replace('{cs_link}', getSetting('cs'), $message);
 
-        // Send message via Voda
-        $isNotificationError = false;
-        try {
-            $this->vodaService->sendMessage(
-                phone: $order->phone,
-                message: $message,
-                linkPreview: true,
-            );
-        } catch (\Exception $e) {
-            Log::error('Failed to send Voda message: '.$e->getMessage());
-            $isNotificationError = true;
-        }
+        // // Send message via Voda
+        // $isNotificationError = false;
+        // try {
+        //     $this->vodaService->sendMessage(
+        //         phone: $order->phone,
+        //         message: $message,
+        //         linkPreview: true,
+        //     );
+        // } catch (\Exception $e) {
+        //     Log::error('Failed to send Voda message: '.$e->getMessage());
+        //     $isNotificationError = true;
+        // }
 
-        // Create notification record
-        $order->notifications()->create([
-            'provider' => 'voda',
+        // // Create notification record
+        // $order->notifications()->create([
+        //     'provider' => 'voda',
+        //     'title' => 'Order Created',
+        //     'content' => $message,
+        //     'error' => $isNotificationError,
+        // ]);
+
+        // Send message via email
+        Mail::to($order->email)->send(
+            new OrderCreated($order)
+        );
+
+        $order->notification()->create([
+            'provider' => 'email',
             'title' => 'Order Created',
             'content' => $message,
-            'error' => $isNotificationError,
+            'error' => false,
         ]);
 
         return $order;

@@ -53,6 +53,9 @@ const emit = defineEmits<{
                     @update:model-value="emit('update:phone', $event)"
                 />
                 <InputError :message="formErrors.phone" class="mt-1" />
+                <InputDescription class="sm:col-span-2">
+                    * Jika ada kendala, kami akan menghubungi nomor WA kamu diatas.
+                </InputDescription>
             </div>
             <div class="sm:col-span-2">
                 <Label for="email">Email (Optional)</Label>
@@ -65,10 +68,10 @@ const emit = defineEmits<{
                     @update:model-value="emit('update:email', $event)"
                 />
                 <InputError :message="formErrors.email" class="mt-1" />
+                <InputDescription class="sm:col-span-2">
+                    * Kami akan mengirimkan notifikasi transaksi melalui email jika kamu mengisi kolom ini.
+                </InputDescription>
             </div>
-            <InputDescription class="sm:col-span-2">
-                * Jika ada kendala, kami akan menghubungi nomor WA kamu diatas.
-            </InputDescription>
         </div>
     </section>
 </template>

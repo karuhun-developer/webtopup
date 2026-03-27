@@ -1,5 +1,6 @@
 <?php
 
+use App\Models\PPOB\PPOBBrand;
 use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
@@ -13,7 +14,7 @@ return new class extends Migration
     {
         Schema::create('p_p_o_b_products', function (Blueprint $table) {
             $table->id();
-            $table->foreignIdFor(App\Models\PPOB\PPOBBrand::class)->constrained()->cascadeOnDelete();
+            $table->foreignIdFor(PPOBBrand::class)->constrained()->cascadeOnDelete();
             $table->string('name');
             $table->string('slug')->unique();
             $table->string('sku')->unique();

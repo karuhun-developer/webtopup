@@ -1,5 +1,8 @@
 <?php
 
+use App\Http\Controllers\Cms\Web\FaqController;
+use App\Http\Controllers\Cms\Web\SliderController;
+use App\Http\Controllers\Cms\Web\VoucherController;
 use Illuminate\Support\Facades\Route;
 
 Route::group([
@@ -7,8 +10,8 @@ Route::group([
     'as' => 'web.',
 ], function () {
     Route::resources([
-        'sliders' => \App\Http\Controllers\Cms\Web\SliderController::class,
-        'faqs' => \App\Http\Controllers\Cms\Web\FaqController::class,
-        'vouchers' => \App\Http\Controllers\Cms\Web\VoucherController::class,
+        'sliders' => SliderController::class,
+        'faqs' => FaqController::class,
+        'vouchers' => VoucherController::class,
     ]);
 });

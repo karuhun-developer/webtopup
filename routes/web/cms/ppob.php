@@ -1,5 +1,9 @@
 <?php
 
+use App\Http\Controllers\Cms\PPOB\ImportDigiflazzController;
+use App\Http\Controllers\Cms\PPOB\PPOBBrandController;
+use App\Http\Controllers\Cms\PPOB\PPOBCategoryController;
+use App\Http\Controllers\Cms\PPOB\PPOBProductController;
 use Illuminate\Support\Facades\Route;
 
 Route::group([
@@ -7,13 +11,13 @@ Route::group([
     'as' => 'ppob.',
 ], function () {
     Route::resources([
-        'categories' => \App\Http\Controllers\Cms\PPOB\PPOBCategoryController::class,
-        'brands' => \App\Http\Controllers\Cms\PPOB\PPOBBrandController::class,
-        'products' => \App\Http\Controllers\Cms\PPOB\PPOBProductController::class,
+        'categories' => PPOBCategoryController::class,
+        'brands' => PPOBBrandController::class,
+        'products' => PPOBProductController::class,
     ]);
 
     // Additional Routes
-    Route::post('brands/json-all', [\App\Http\Controllers\Cms\PPOB\PPOBBrandController::class, 'jsonAll'])->name('brands.json-all');
-    Route::get('import-digiflazz', [\App\Http\Controllers\Cms\PPOB\ImportDigiflazzController::class, 'index'])->name('import-digiflazz.index');
-    Route::post('import-digiflazz', [\App\Http\Controllers\Cms\PPOB\ImportDigiflazzController::class, 'sync'])->name('import-digiflazz.sync');
+    Route::post('brands/json-all', [PPOBBrandController::class, 'jsonAll'])->name('brands.json-all');
+    Route::get('import-digiflazz', [ImportDigiflazzController::class, 'index'])->name('import-digiflazz.index');
+    Route::post('import-digiflazz', [ImportDigiflazzController::class, 'sync'])->name('import-digiflazz.sync');
 });

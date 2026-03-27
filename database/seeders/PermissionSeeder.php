@@ -12,6 +12,7 @@ use Illuminate\Database\Seeder;
 use Illuminate\Support\Facades\File;
 use Spatie\Permission\Models\Permission;
 use Spatie\Permission\Models\Role;
+use Spatie\Permission\PermissionRegistrar;
 
 class PermissionSeeder extends Seeder
 {
@@ -81,7 +82,7 @@ class PermissionSeeder extends Seeder
     public function run(): void
     {
         // Clear cache
-        app()[\Spatie\Permission\PermissionRegistrar::class]->forgetCachedPermissions();
+        app()[PermissionRegistrar::class]->forgetCachedPermissions();
 
         // Read all models exists
         $models = $this->getModelLists();

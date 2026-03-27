@@ -1,5 +1,8 @@
 <?php
 
+use App\Models\PPOB\PPOBBrand;
+use App\Models\PPOB\PPOBProduct;
+use App\Models\User;
 use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
@@ -13,9 +16,9 @@ return new class extends Migration
     {
         Schema::create('orders', function (Blueprint $table) {
             $table->id();
-            $table->foreignIdFor(App\Models\User::class)->nullable()->constrained()->nullOnDelete();
-            $table->foreignIdFor(App\Models\PPOB\PPOBBrand::class)->constrained()->cascadeOnDelete();
-            $table->foreignIdFor(App\Models\PPOB\PPOBProduct::class)->nullable()->constrained()->cascadeOnDelete();
+            $table->foreignIdFor(User::class)->nullable()->constrained()->nullOnDelete();
+            $table->foreignIdFor(PPOBBrand::class)->constrained()->cascadeOnDelete();
+            $table->foreignIdFor(PPOBProduct::class)->nullable()->constrained()->cascadeOnDelete();
             $table->string('reference')->unique();
             $table->unsignedBigInteger('ref_number')->unique();
             $table->string('name');

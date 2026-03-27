@@ -3,17 +3,15 @@
 namespace App\Actions\Cms\Order\Order;
 
 use App\Enums\PaymentStatusEnum;
+use App\Mail\PaymentFailed;
+use App\Mail\PaymentSuccess;
 use App\Models\Order\Order;
-use App\Services\VodaService;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Mail;
 use Triyatna\Digiflazz\Digiflazz;
 
 class ValidatePaymentAction
 {
-    public function __construct(
-        public readonly VodaService $vodaService,
-    ) {}
-
     /**
      * Handle the action.
      */
@@ -44,8 +42,7 @@ class ValidatePaymentAction
 
             // If the provider is Digiflazz, create transaction to Digiflazz
             if ($order->product->provider === 'digiflazz') {
-                // Digiflazz::createPrepaidTransaction(
-                //     productCode: $order->product->sku,
+                // Digiflazz::createPrepaidTransaction(\n//     productCode: $order->product->sku,
                 //     customerNo: $customer,
                 //     refId: $order->reference,
                 // );
@@ -93,25 +90,37 @@ class ValidatePaymentAction
             $message = str_replace('{cs_link}', getSetting('cs'), $message);
         }
 
-        // Send message via Voda
-        $isNotificationError = false;
-        try {
-            $this->vodaService->sendMessage(
-                phone: $order->phone,
-                message: $message,
-                linkPreview: true,
-            );
-        } catch (\Exception $e) {
-            Log::error('Failed to send Voda message: '.$e->getMessage());
-            $isNotificationError = true;
-        }
+        // // Send message via Voda
+        // $isNotificationError = false;
+        // try {
+        //     $this->vodaService->sendMessage(
+        //         phone: $order->phone,
+        //         message: $message,
+        //         linkPreview: true,
+        //     );
+        // } catch (\Exception $e) {
+        //     Log::error('Failed to send Voda message: '.$e->getMessage());
+        //     $isNotificationError = true;
+        // }
 
-        // Create notification record
+        // // Create notification record
+        // $order->notifications()->create([
+        //     'provider' => 'voda',
+        //     'title' => 'Payment '.($isSuccess ? 'Confirmed' : 'Rejected'),
+        //     'content' => $message,
+        //     'error' => $isNotificationError,
+        // ]);
+
+        // Send message via email
+        Mail::to($order->email)->send(
+            $isSuccess ? new PaymentSuccess($order) : new PaymentFailed($order)
+        );
+
         $order->notifications()->create([
-            'provider' => 'voda',
+            'provider' => 'email',
             'title' => 'Payment '.($isSuccess ? 'Confirmed' : 'Rejected'),
             'content' => $message,
-            'error' => $isNotificationError,
+            'error' => false,
         ]);
     }
 }

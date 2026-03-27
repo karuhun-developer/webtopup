@@ -3,20 +3,16 @@
 namespace App\Actions\Api\V1\Callback;
 
 use App\Enums\DigiflazzStatusEnum;
+use App\Mail\TopupSuccess;
 use App\Models\Order\Order;
-use App\Services\VodaService;
-use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Mail;
 use Triyatna\Digiflazz\Helpers\Webhook;
 
 class HandleDigiflazzCallbackAction
 {
-    public function __construct(
-        public readonly VodaService $vodaService,
-    ) {}
-
     public function handle(string $signature, string $payload, string $data)
     {
-        Log::info('Digiflazz Callback Received', [
+        \Illuminate\Support\Facades\Log::info('Digiflazz Callback Received', [
             'request' => $payload,
         ]);
 
@@ -49,26 +45,36 @@ class HandleDigiflazzCallbackAction
             ]), $message);
             $message = str_replace('{cs_link}', getSetting('cs'), $message);
 
-            // Send message via Voda
-            $isNotificationError = false;
-            try {
-                // Send message via Voda
-                $this->vodaService->sendMessage(
-                    phone: $order->phone,
-                    message: $message,
-                    linkPreview: true,
-                );
-            } catch (\Exception $e) {
-                Log::error('Failed to send Voda message: '.$e->getMessage());
-                $isNotificationError = true;
-            }
+            // // Send message via Voda
+            // $isNotificationError = false;
+            // try {
+            //     // Send message via Voda
+            //     $this->vodaService->sendMessage(
+            //         phone: $order->phone,
+            //         message: $message,
+            //         linkPreview: true,
+            //     );
+            // } catch (\Exception $e) {
+            //     Log::error('Failed to send Voda message: '.$e->getMessage());
+            //     $isNotificationError = true;
+            // }
 
-            // Create notification record
+            // // Create notification record
+            // $order->notifications()->create([
+            //     'provider' => 'voda',
+            //     'title' => 'Order Completed',
+            //     'content' => $message,
+            //     'error' => $isNotificationError,
+            // ]);
+
+            // Send message via email
+            Mail::to($order->email)->send(new TopupSuccess($order));
+
             $order->notifications()->create([
-                'provider' => 'voda',
+                'provider' => 'email',
                 'title' => 'Order Completed',
                 'content' => $message,
-                'error' => $isNotificationError,
+                'error' => false,
             ]);
         }
     }

@@ -1,5 +1,6 @@
 <?php
 
+use App\Models\Voucher\Voucher;
 use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
@@ -13,7 +14,7 @@ return new class extends Migration
     {
         Schema::create('voucher_uses', function (Blueprint $table) {
             $table->id();
-            $table->foreignIdFor(\App\Models\Voucher\Voucher::class)->constrained()->cascadeOnDelete();
+            $table->foreignIdFor(Voucher::class)->constrained()->cascadeOnDelete();
             $table->morphs('usable');
             $table->unsignedBigInteger('before_amount');
             $table->unsignedBigInteger('discount_amount');

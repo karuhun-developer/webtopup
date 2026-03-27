@@ -1,6 +1,8 @@
 <?php
 
+use App\Http\Controllers\Cms\DashboardController;
 use Illuminate\Support\Facades\Route;
+use Rap2hpoutre\LaravelLogViewer\LogViewerController;
 
 Route::group([
     'prefix' => 'cms',
@@ -11,7 +13,7 @@ Route::group([
     Route::get('/', fn () => to_route('cms.dashboard'))->name('home');
 
     // Dashboard Route
-    Route::get('/dashboard', [\App\Http\Controllers\Cms\DashboardController::class, 'index'])->name('dashboard');
+    Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
 
     // Web Routes
     require 'cms/web.php';
@@ -29,5 +31,5 @@ Route::group([
     require 'cms/management.php';
 
     // Logs
-    Route::get('logs', [\Rap2hpoutre\LaravelLogViewer\LogViewerController::class, 'index'])->name('logs')->middleware('auth', 'role:superadmin');
+    Route::get('logs', [LogViewerController::class, 'index'])->name('logs')->middleware('auth', 'role:superadmin');
 });

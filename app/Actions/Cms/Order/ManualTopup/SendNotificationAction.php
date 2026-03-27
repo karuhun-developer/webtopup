@@ -2,16 +2,12 @@
 
 namespace App\Actions\Cms\Order\ManualTopup;
 
+use App\Mail\GiftSend;
 use App\Models\Order\Order;
-use App\Services\VodaService;
-use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Mail;
 
 class SendNotificationAction
 {
-    public function __construct(
-        public readonly VodaService $vodaService,
-    ) {}
-
     /**
      * Handle the action.
      */
@@ -32,25 +28,35 @@ class SendNotificationAction
         $message = str_replace('{order_id}', $order->reference, $message);
         $message = str_replace('{cs_link}', getSetting('cs'), $message);
 
-        // Send message via Voda
-        $isNotificationError = false;
-        try {
-            $this->vodaService->sendMessage(
-                phone: $order->phone,
-                message: $message,
-                linkPreview: true,
-            );
-        } catch (\Exception $e) {
-            Log::error('Failed to send Voda message: '.$e->getMessage());
-            $isNotificationError = true;
-        }
+        // // Send message via Voda
+        // $isNotificationError = false;
+        // try {
+        //     $this->vodaService->sendMessage(
+        //         phone: $order->phone,
+        //         message: $message,
+        //         linkPreview: true,
+        //     );
+        // } catch (\Exception $e) {
+        //     Log::error('Failed to send Voda message: '.$e->getMessage());
+        //     $isNotificationError = true;
+        // }
 
-        // Create notification record
+        // // Create notification record
+        // $order->notifications()->create([
+        //     'provider' => 'voda',
+        //     'title' => $title,
+        //     'content' => $message,
+        //     'error' => $isNotificationError,
+        // ]);
+
+        // Send message via email
+        Mail::to($order->email)->send(new GiftSend($order));
+
         $order->notifications()->create([
-            'provider' => 'voda',
+            'provider' => 'email',
             'title' => $title,
             'content' => $message,
-            'error' => $isNotificationError,
+            'error' => false,
         ]);
     }
 }

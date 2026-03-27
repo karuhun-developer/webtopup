@@ -1,5 +1,6 @@
 <?php
 
+use App\Models\Order\Order;
 use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
@@ -13,7 +14,7 @@ return new class extends Migration
     {
         Schema::create('order_notifications', function (Blueprint $table) {
             $table->id();
-            $table->foreignIdFor(App\Models\Order\Order::class)->constrained()->cascadeOnDelete();
+            $table->foreignIdFor(Order::class)->constrained()->cascadeOnDelete();
             $table->string('provider')->default('voda');
             $table->string('title');
             $table->text('content');

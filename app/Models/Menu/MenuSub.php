@@ -2,6 +2,8 @@
 
 namespace App\Models\Menu;
 
+use App\Enums\CommonStatusEnum;
+use App\Models\Spatie\Role;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\Cache;
 use Spatie\Activitylog\LogOptions;
@@ -23,7 +25,7 @@ class MenuSub extends Model
     ];
 
     protected $casts = [
-        'status' => \App\Enums\CommonStatusEnum::class,
+        'status' => CommonStatusEnum::class,
     ];
 
     public static function booted()
@@ -50,7 +52,7 @@ class MenuSub extends Model
 
     public function role()
     {
-        return $this->belongsTo(\App\Models\Spatie\Role::class);
+        return $this->belongsTo(Role::class);
     }
 
     public function menu()
