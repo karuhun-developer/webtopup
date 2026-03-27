@@ -1,29 +1,22 @@
-# Feature
+# Web PPOB
+
+Web PPOB terintegrasi Digiflazz dan Midtrans untuk memudahkan pengguna dalam melakukan pembelian produk digital seperti pulsa, paket data, token listrik, dan lain-lain. Aplikasi ini menyediakan berbagai fitur untuk mengelola produk, transaksi, dan pengguna dengan mudah melalui panel admin yang intuitif.
+
+![alt text](image.png)
 
 - [x] Category, Brand, Product PPOB Management
 - [x] Role-Based Access Control
 - [x] Slider Management
 - [x] FAQ Management
 - [x] Checkout Flow
-- [ ] Payment Flow
-- [ ] Transaction History
-- [ ] Transaction Status Tracking
-- [ ] User Profile Management
-- [ ] Topup Saldo Management
-- [ ] Reporting and Analytics
-- [ ] Notification System
-- [ ] Manual Topup Digiflazz from Admin Panel
-- [ ] Manual Topup External from Admin Panel
-- [ ] Gift system flow
-- [ ] Voda Integration
+- [x] Payment Flow
+- [x] Transaction History
+- [x] Transaction Status Tracking
+- [x] User Profile Management
+- [x] Topup Saldo Management
+- [x] Reporting and Analytics
+- [x] Notification System
+- [x] Manual Topup Digiflazz from Admin Panel
+- [x] Manual Topup External from Admin Panel
+- [x] Gift system flow
 
-# Brand Setting
-
-```json
-{
-    "type": "id|id+server",
-    "label_id": "uid|id apapun itu", // optional default ID
-    "label_server": "server|lobby apapun itu", // optional default Server
-    "servers": ["Kingdom#001", "Empire#123"] // optional if type is id+server
-}
-```
