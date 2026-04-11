@@ -9,17 +9,18 @@
     "mcp": true,
     "nightwatch_mcp": false,
     "packages": [
-        "laravel/fortify",
-        "spatie/laravel-medialibrary"
+        "spatie/laravel-medialibrary",
+        "fruitcake/laravel-debugbar"
     ],
     "sail": false,
     "skills": [
+        "fortify-development",
         "laravel-best-practices",
         "wayfinder-development",
         "pest-testing",
         "inertia-vue-development",
         "tailwindcss-development",
-        "fortify-development",
-        "medialibrary-development"
+        "medialibrary-development",
+        "debug-using-debugbar"
     ]
 }
