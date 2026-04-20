@@ -185,7 +185,7 @@ class HandleMidtransCallbackAction
             $isSuccess ? new PaymentSuccess($order) : new PaymentFailed($order)
         );
 
-        $order->notification()->create([
+        $order->notifications()->create([
             'provider' => 'email',
             'title' => 'Payment '.($isSuccess ? 'Confirmed' : 'Rejected'),
             'content' => $message,

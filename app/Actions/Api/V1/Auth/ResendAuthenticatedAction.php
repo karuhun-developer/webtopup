@@ -15,7 +15,7 @@ class ResendAuthenticatedAction
             return false;
         }
 
-        $user->sendEmailVerificationNotification();
+        $user->sendEmailVerificationnotifications();
 
         // Save activity
         activity()->performedOn($user)->causedBy($user)->log('Resend Verification Email');

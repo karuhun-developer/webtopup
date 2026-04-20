@@ -211,7 +211,7 @@ class StoreTransactionAction
             new OrderCreated($order)
         );
 
-        $order->notification()->create([
+        $order->notifications()->create([
             'provider' => 'email',
             'title' => 'Order Created',
             'content' => $message,
