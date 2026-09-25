@@ -14,8 +14,13 @@ case "$1" in
   # Environment setup
   # ---------------------
   setup)
-    echo "→ Copying .env.example to .env..."
-    cp -n .env.example .env || true
+    if [ -f .env.docker ]; then
+      echo "→ Copying .env.docker to .env..."
+      cp -n .env.docker .env || true
+    else
+      echo "→ Copying .env.example to .env..."
+      cp -n .env.example .env || true
+    fi
 
     echo "→ Building image..."
     $COMPOSE build --no-cache
@@ -37,6 +42,13 @@ case "$1" in
   # ---------------------
   up)
     $COMPOSE up -d
+    ;;
+
+  # ---------------------
+  # Start with Vite dev server
+  # ---------------------
+  dev)
+    $COMPOSE --profile dev up -d
     ;;
 
   # ---------------------
@@ -113,6 +125,7 @@ case "$1" in
     echo "Commands:"
     echo "  setup       First-time setup (copy .env, build, migrate)"
     echo "  up          Start container"
+    echo "  dev         Start container with Vite dev server (profile dev)"
     echo "  down        Stop container"
     echo "  build       Rebuild Docker image"
     echo "  artisan     Run php artisan commands"

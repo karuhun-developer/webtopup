@@ -5,7 +5,7 @@ ENV COMPOSER_ALLOW_SUPERUSER=1 \
     NPM_CONFIG_AUDIT=false \
     NPM_CONFIG_FUND=false
 
-# ─── Install PHP + Node ───────────────────────────────────────────────────────
+# ─── Runtime: PHP-FPM + Nginx + Supervisor + Node (build) ────────────────────
 RUN apk add --no-cache \
     php84 php84-fpm \
     php84-bcmath \
@@ -34,6 +34,7 @@ RUN apk add --no-cache \
     php84-xmlreader \
     php84-xmlwriter \
     php84-zip \
+    nginx supervisor \
     nodejs npm \
     bash curl git unzip
 
@@ -61,24 +62,34 @@ RUN cp .env.example .env \
     && php artisan wayfinder:generate --no-interaction \
     && npm run build \
     && php artisan package:discover --ansi \
-    && rm .env
+    && rm .env \
+    && rm -rf node_modules
 
-# ─── Permissions ─────────────────────────────────────────────────────────────
-RUN chown nobody:nobody /var/www/html \
-    && chown -R nobody:nobody /var/www/html/storage /var/www/html/bootstrap/cache \
-    && chmod -R 775 /var/www/html/storage \
-    && chmod -R 775 /var/www/html/bootstrap/cache
+# ─── Nginx / PHP / Supervisor configuration ──────────────────────────────────
+COPY docker/nginx/prod.conf               /etc/nginx/http.d/default.conf
+COPY docker/php/php.ini                   /etc/php84/conf.d/laravel.ini
+COPY docker/php/opcache.ini               /etc/php84/conf.d/opcache.ini
+COPY docker/php/fpm.conf                  /etc/php84/php-fpm.d/www.conf
+COPY docker/supervisor/supervisord.prod.conf /etc/supervisor/conf.d/supervisord.conf
 
-# ─── PHP-FPM config ──────────────────────────────────────────────────────────
-COPY docker/php/php.ini     /etc/php84/conf.d/laravel.ini
-COPY docker/php/opcache.ini /etc/php84/conf.d/opcache.ini
-COPY docker/php/fpm.conf    /etc/php84/php-fpm.d/www.conf
+# ─── Writable dirs ───────────────────────────────────────────────────────────
+RUN mkdir -p \
+        storage/app/public \
+        storage/framework/cache/data \
+        storage/framework/sessions \
+        storage/framework/views \
+        storage/logs \
+        bootstrap/cache \
+    && chown -R nobody:nobody storage bootstrap/cache
 
 # ─── Entrypoint ──────────────────────────────────────────────────────────────
-COPY docker/entrypoint.sh /entrypoint.sh
+COPY docker/entrypoint.prod.sh /entrypoint.sh
 RUN chmod +x /entrypoint.sh
 
-EXPOSE 9000
+EXPOSE 80
+
+HEALTHCHECK --interval=30s --timeout=5s --start-period=40s --retries=3 \
+    CMD wget -qO- http://127.0.0.1/up || exit 1
 
 ENTRYPOINT ["/entrypoint.sh"]
-CMD ["/usr/sbin/php-fpm84", "--nodaemonize", "--fpm-config", "/etc/php84/php-fpm.conf"]
+CMD ["/usr/bin/supervisord", "-c", "/etc/supervisor/conf.d/supervisord.conf"]

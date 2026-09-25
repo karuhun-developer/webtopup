@@ -55,8 +55,9 @@ Aplikasi berjalan di **http://localhost**
 #### Perintah Docker yang Tersedia
 
 ```bash
-./docker-run.sh setup       # Setup otomatis (build image, migrate, generate key)
+./docker-run.sh setup       # Setup otomatis (copy .env.docker, build, migrate)
 ./docker-run.sh up          # Mulai semua service
+./docker-run.sh dev         # Mulai + Vite dev server (profile dev)
 ./docker-run.sh down        # Hentikan semua service
 ./docker-run.sh shell       # Masuk ke bash container app
 ./docker-run.sh build       # Build ulang image Docker
@@ -68,15 +69,15 @@ Aplikasi berjalan di **http://localhost**
 
 #### Service Docker
 
-| Service     | Image             | Port              |
-| ----------- | ----------------- | ----------------- |
-| `app`       | PHP 8.4-FPM       | —                 |
-| `nginx`     | nginx:1.27-alpine | `80`              |
-| `mysql`     | mysql:8.4         | `3306`            |
-| `redis`     | redis:7.4-alpine  | `6379`            |
-| `queue`     | PHP 8.4-FPM       | —                 |
-| `scheduler` | PHP 8.4-FPM       | —                 |
-| `vite`      | node:22-alpine    | `5173` (dev only) |
+| Service     | Image             | Port                                   |
+| ----------- | ----------------- | -------------------------------------- |
+| `app`       | PHP 8.4-FPM       | —                                      |
+| `nginx`     | nginx:1.27-alpine | `80` (`APP_PORT`)                      |
+| `db`        | mysql:8.4         | internal only                          |
+| `redis`     | redis:7.4-alpine  | internal only                          |
+| `queue`     | PHP 8.4-FPM       | —                                      |
+| `scheduler` | PHP 8.4-FPM       | —                                      |
+| `vite`      | node:22-alpine    | `5173` (only with `--profile dev`)     |
 
 ---
 
@@ -143,6 +144,65 @@ APIAGAME_SECRET_KEY=
 - **Media:** Spatie Media Library
 - **Payment:** Midtrans
 - **Supplier:** Digiflazz, API Games
+
+---
+
+## ☁️ Deploy ke Coolify
+
+Image produksi tersedia di `Dockerfile.prod` (satu container: Nginx + PHP-FPM + queue worker + scheduler via Supervisor).
+
+1. **Buat resource** di Coolify: `+ New` → **Application** → hubungkan repo GitHub ini, branch `master`.
+2. **Build Pack** = `Dockerfile`, lalu set **Dockerfile Location** = `/Dockerfile.prod`.
+3. **Ports Exposes** = `80`. Arahkan domain/FQDN ke port tersebut (SSL otomatis via proxy Coolify).
+4. **Persistent Storage** — tambahkan volume untuk data upload & log agar tidak hilang saat redeploy:
+
+   | Mount Path di container         | Keterangan                    |
+   | ------------------------------- | ----------------------------- |
+   | `/var/www/html/storage/app/public` | media (Spatie Media Library) |
+   | `/var/www/html/storage/logs`       | log aplikasi                 |
+
+5. **Environment Variables** — set minimal berikut di Coolify (jangan commit `.env`):
+
+   ```env
+   APP_NAME=WebTopup
+   APP_ENV=production
+   APP_DEBUG=false
+   APP_URL=https://domain-kamu.com
+   APP_KEY=base64:...          # php artisan key:generate --show
+   APP_TIMEZONE=UTC
+   APP_DISPLAY_TIMEZONE=Asia/Jakarta
+
+   DB_CONNECTION=mysql
+   DB_HOST=<host-db-coolify>
+   DB_PORT=3306
+   DB_DATABASE=webtopup
+   DB_USERNAME=webtopup
+   DB_PASSWORD=<password>
+
+   REDIS_CLIENT=predis
+   REDIS_HOST=<host-redis-coolify>
+   REDIS_PORT=6379
+   CACHE_STORE=redis
+   QUEUE_CONNECTION=redis
+   SESSION_DRIVER=redis
+
+   PAYMENT_GATEWAY=midtrans
+   MIDTRANS_MERCHANT_ID=
+   MIDTRANS_SERVER_KEY=
+   MIDTRANS_CLIENT_KEY=
+   MIDTRANS_IS_PRODUCTION=true
+   DIGIFLAZZ_USERNAME=
+   DIGIFLAZZ_API_KEY=
+   DIGIFLAZZ_WEBHOOK_SECRET=
+   APIAGAME_MERCHANT_ID=
+   APIAGAME_SECRET_KEY=
+   GAME_PROXY_URL=
+   ```
+
+6. **Migrasi & seed** saat pertama kali: buka terminal container Coolify lalu `php artisan migrate --force --seed`, atau set env `RUN_MIGRATIONS=true` (entrypoint menjalankan migrate tiap boot) — sebaiknya gunakan Pre-deployment Command Coolify: `php artisan migrate --force && php artisan db:seed --class=PermissionSeeder --force`.
+7. **Webhook** Midtrans/Digiflazz diarahkan ke `https://domain-kamu.com/api/v1/midtrans/callback` dan `/api/v1/digiflazz/callback`.
+
+Catatan: queue worker & scheduler berjalan di dalam container yang sama. Untuk trafik tinggi, pisahkan menjadi service Coolify terpisah (`php artisan queue:work`, `php artisan schedule:work`).
 
 ---
 
