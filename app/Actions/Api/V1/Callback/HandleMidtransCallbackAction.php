@@ -3,15 +3,16 @@
 namespace App\Actions\Api\V1\Callback;
 
 use App\Enums\PaymentStatusEnum;
+use App\Jobs\SubmitOrderToProvider;
 use App\Mail\PaymentFailed;
 use App\Mail\PaymentSuccess;
 use App\Models\Order\Order;
 use App\Models\Payment\Payment;
 use App\Services\MidtransService;
 use App\Services\VodaService;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Mail;
-use Triyatna\Digiflazz\Digiflazz;
 
 class HandleMidtransCallbackAction
 {
@@ -22,9 +23,7 @@ class HandleMidtransCallbackAction
 
     public function handle(array $payload)
     {
-        Log::info('Midtrans Callback Received', [
-            'request' => $payload,
-        ]);
+        $this->assertPayload($payload);
 
         // Validate signature key
         if (! $this->midtransService->validateSignature(
@@ -36,150 +35,108 @@ class HandleMidtransCallbackAction
             throw new \Exception('Invalid signature key', 403);
         }
 
+        Log::info('Midtrans Callback Received', [
+            'order_id' => $payload['order_id'],
+            'transaction_status' => $payload['transaction_status'],
+        ]);
+
         // Get the order ID without the suffix
-        $orderId = $payload['order_id'];
-        $orderId = explode('-', $orderId)[0];
+        $orderId = explode('-', $payload['order_id'])[0];
 
-        $payment = Payment::where('order_id', $orderId)->first();
+        $outcome = null;
+        $order = null;
 
-        if (! $payment) {
-            throw new \Exception('Transaction not found', 404);
+        $payment = DB::transaction(function () use ($payload, $orderId, &$outcome, &$order) {
+            $payment = Payment::where('order_id', $orderId)->lockForUpdate()->first();
+
+            if (! $payment) {
+                throw new \Exception('Transaction not found', 404);
+            }
+
+            // Idempotent: a repeated settlement/capture callback is acknowledged
+            // without reprocessing, so Midtrans retries never cause double work.
+            if ($payment->paid_at) {
+                return $payment;
+            }
+
+            if ($payment->expired_at && $payment->expired_at->isPast()) {
+                throw new \Exception('Transaction already expired', 400);
+            }
+
+            $transactionStatus = $payload['transaction_status'];
+
+            if (in_array($transactionStatus, ['capture', 'settlement'], true)) {
+                $payment->update(['paid_at' => now()]);
+
+                $order = $this->resolveOrder($payment);
+                $order?->update(['payment_status' => PaymentStatusEnum::SETTLEMENT]);
+
+                $outcome = 'settled';
+            } elseif (in_array($transactionStatus, ['deny', 'expire', 'cancel'], true)) {
+                $payment->update(['expired_at' => now()]);
+
+                $order = $this->resolveOrder($payment);
+                $order?->update(['payment_status' => PaymentStatusEnum::DENY]);
+
+                $outcome = 'denied';
+            }
+
+            return $payment;
+        });
+
+        // Side effects run after the transaction has committed.
+        if ($order instanceof Order) {
+            if ($outcome === 'settled') {
+                $this->sendOrderNotification($order, true);
+
+                // Send to the supplier outside the HTTP request so a slow or
+                // failing upstream never blocks the callback.
+                SubmitOrderToProvider::dispatch($order->id);
+            } elseif ($outcome === 'denied') {
+                $this->sendOrderNotification($order, false);
+            }
         }
-
-        if ($payment->paid_at || ($payment->expires_at && $payment->expires_at?->isPast())) {
-            throw new \Exception('Transaction already paid or expired', 400);
-        }
-
-        $this->handlePaymentStatus($payload['transaction_status'], $payment);
 
         return $payment;
     }
 
-    protected function handlePaymentStatus($transactionStatus, Payment $payment)
+    protected function assertPayload(array $payload): void
     {
-        switch ($transactionStatus) {
-            case 'capture':
-                $payment->update([
-                    'paid_at' => now(),
-                ]);
-                $this->capture($payment);
-                break;
-            case 'settlement':
-                $payment->update([
-                    'paid_at' => now(),
-                ]);
-                $this->capture($payment);
-                break;
-            case 'pending':
-                break;
-            case 'deny':
-                $payment->update([
-                    'expires_at' => now(),
-                ]);
-                $this->deny($payment);
-                break;
-            case 'expire':
-                $payment->update([
-                    'expires_at' => now(),
-                ]);
-                $this->deny($payment);
-                break;
-            case 'cancel':
-                $payment->update([
-                    'expires_at' => now(),
-                ]);
-                $this->deny($payment);
-                break;
+        $required = ['order_id', 'status_code', 'gross_amount', 'signature_key', 'transaction_status'];
+
+        foreach ($required as $key) {
+            if (! array_key_exists($key, $payload)) {
+                throw new \Exception('Invalid callback payload', 400);
+            }
         }
     }
 
-    protected function capture(Payment $payment)
+    protected function resolveOrder(Payment $payment): ?Order
     {
-        if ($payment->payable_type === Order::class) {
-            $this->handleAfterOrderPaid($payment->payable);
+        if ($payment->payable_type !== Order::class) {
+            return null;
         }
+
+        return $payment->payable;
     }
 
-    protected function handleAfterOrderPaid(Order $order)
-    {
-        $order->update([
-            'payment_status' => PaymentStatusEnum::SETTLEMENT,
-        ]);
-
-        $this->sendOrderNotification($order, true);
-    }
-
-    protected function deny(Payment $payment)
-    {
-        if ($payment->payable_type === Order::class) {
-            $order = $payment->payable;
-            $order->update([
-                'payment_status' => PaymentStatusEnum::DENY,
-            ]);
-
-            $this->sendOrderNotification($order, false);
-        }
-    }
-
-    protected function sendOrderNotification(Order $order, bool $isSuccess)
+    protected function sendOrderNotification(Order $order, bool $isSuccess): void
     {
         if ($isSuccess) {
-            // Proccess Transaction
-            $accountId = $order->submited['account_id'] ?? '';
-            $serverId = $order->submited['server_id'] ?? '';
-            $customer = $accountId.$serverId;
-
-            // If the provider is Digiflazz, create transaction to Digiflazz
-            if ($order->brand->provider === 'digiflazz') {
-                Digiflazz::createPrepaidTransaction(
-                     productCode: $order->product->sku,
-                     customerNo: $customer,
-                     refId: $order->reference,
-                );
-            }
-
-            // Send notification to user
-            $message = getSetting('template_payment_confirmation');
+            $message = getSetting('template_payment_confirmation') ?? '';
             $message = str_replace('{customer_name}', $order->name, $message);
             $message = str_replace('{order_id}', $order->reference, $message);
             $message = str_replace('{app_name}', config('app.name'), $message);
-            $message = str_replace('{link}', route('transaction.show', [
-                'order' => $order,
-            ]), $message);
+            $message = str_replace('{link}', transactionUrl($order), $message);
             $message = str_replace('{cs_link}', getSetting('cs'), $message);
         } else {
-            // Send notification to user
-            $message = getSetting('template_payment_rejected');
+            $message = getSetting('template_payment_rejected') ?? '';
             $message = str_replace('{customer_name}', $order->name, $message);
             $message = str_replace('{order_id}', $order->reference, $message);
             $message = str_replace('{app_name}', config('app.name'), $message);
-            $message = str_replace('{link}', route('transaction.show', [
-                'order' => $order,
-            ]), $message);
+            $message = str_replace('{link}', transactionUrl($order), $message);
             $message = str_replace('{cs_link}', getSetting('cs'), $message);
         }
-
-        // // Send message via Voda
-        // $isNotificationError = false;
-        // try {
-        //     // Send message via Voda
-        //     $this->vodaService->sendMessage(
-        //         phone: $order->phone,
-        //         message: $message,
-        //         linkPreview: true,
-        //     );
-        // } catch (\Exception $e) {
-        //     Log::error('Failed to send Voda message: '.$e->getMessage());
-        //     $isNotificationError = true;
-        // }
-
-        // // Create notification record
-        // $order->notifications()->create([
-        //     'provider' => 'voda',
-        //     'title' => 'Payment '.($isSuccess ? 'Confirmed' : 'Rejected'),
-        //     'content' => $message,
-        //     'error' => $isNotificationError,
-        // ]);
 
         // Send message via email
         Mail::to($order->email)->send(

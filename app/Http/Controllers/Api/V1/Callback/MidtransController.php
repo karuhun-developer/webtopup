@@ -16,7 +16,7 @@ class MidtransController extends Controller
     {
         try {
             $action->handle($request->all());
-        } catch (\Exception $e) {
+        } catch (\Throwable $e) {
             Log::error('Midtrans Callback Error', [
                 'error' => $e->getMessage(),
             ]);

@@ -18,10 +18,10 @@ class DigiflazzController extends Controller
             // Get signature and payload
             $signature = $request->header('X-Hub-Signature');
             $payload = $request->getContent();
-            $data = $request->input('data');
+            $data = $request->input('data', []);
 
             $action->handle($signature, $payload, $data);
-        } catch (\Exception $e) {
+        } catch (\Throwable $e) {
             Log::error('Digiflazz Callback Error', [
                 'error' => $e->getMessage(),
             ]);

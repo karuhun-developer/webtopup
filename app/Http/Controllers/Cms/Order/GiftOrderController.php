@@ -141,6 +141,8 @@ class GiftOrderController extends Controller
      */
     public function store(StoreTransactionRequest $request, StoreTransactionAction $action)
     {
+        Gate::authorize('create'.$this->resource);
+
         try {
             DB::transaction(function () use ($request, $action) {
                 return $action->handle($request->only([

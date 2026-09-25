@@ -8,9 +8,7 @@ Halo **{{ $order->name }}**, kami telah menerima konfirmasi pertemanan Anda untu
 - 🛒 Produk: **{{ $order->product->name }}**
 - 🧾 Total: **{{ numberToCurrency($order->total_amount) }}**
 <br />
-<x-mail::button :url="route('transaction.show', [
-    'order' => $order->reference,
-])">
+<x-mail::button :url="transactionUrl($order->reference)">
 Detail Pesanan
 </x-mail::button>
 

@@ -33,9 +33,7 @@ class TransactionController extends Controller
                 return back()->withErrors(['reference' => 'Order not found with the provided reference.'])->withInput();
             }
 
-            return to_route('transaction.show', [
-                'order' => $order,
-            ]);
+            return redirect(transactionUrl($order));
         }
 
         $settingTitle = getSetting('title');
@@ -135,6 +133,7 @@ class TransactionController extends Controller
         return inertia('main/TransactionShow', [
             'order' => $order,
             'mlAccountNickname' => $mlAccount->username ?? null,
+            'signedUpdateUrl' => transactionUpdateUrl($order),
         ]);
     }
 
@@ -162,9 +161,7 @@ class TransactionController extends Controller
                 ]));
             });
 
-            return to_route('transaction.show', [
-                'order' => $order,
-            ]);
+            return redirect(transactionUrl($order));
         } catch (\Exception $e) {
             return back()->withErrors(['error' => $e->getMessage()])->withInput();
         }
@@ -175,6 +172,16 @@ class TransactionController extends Controller
      */
     public function update(UpdateTransactionRequest $request, Order $order, UpdateTransactionAction $action)
     {
+        $order->loadMissing('payment');
+
+        abort_unless(
+            $order->payment
+                && $order->payment->driver === 'manual'
+                && $order->payment->paid_at === null,
+            403,
+            'Payment proof can no longer be updated.'
+        );
+
         $action->handle($order, $request->validated());
 
         return back();

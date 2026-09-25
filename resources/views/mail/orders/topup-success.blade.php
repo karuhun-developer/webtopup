@@ -8,9 +8,7 @@ Halo **{{ $order->name }}**, pesanan Anda telah berhasil diproses di {{ config('
 - 🛒 Produk: **{{ $order->product->name }}**
 - 🧾 Total: **{{ numberToCurrency($order->total_amount) }}**
 <br />
-<x-mail::button :url="route('transaction.show', [
-    'order' => $order->reference,
-])">
+<x-mail::button :url="transactionUrl($order->reference)">
 Detail Pesanan
 </x-mail::button>
 
