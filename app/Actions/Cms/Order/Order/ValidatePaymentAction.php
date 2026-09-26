@@ -76,17 +76,13 @@ class ValidatePaymentAction
             $message = str_replace('{customer_name}', $order->name, $message);
             $message = str_replace('{order_id}', $order->reference, $message);
             $message = str_replace('{app_name}', config('app.name'), $message);
-            $message = str_replace('{link}', route('transaction.show', [
-                'order' => $order,
-            ]), $message);
+            $message = str_replace('{link}', transactionUrl($order), $message);
             $message = str_replace('{cs_link}', getSetting('cs'), $message);
         } else {
             $message = getSetting('template_payment_rejected');
             $message = str_replace('{customer_name}', $order->name, $message);
             $message = str_replace('{order_id}', $order->reference, $message);
-            $message = str_replace('{link}', route('transaction.show', [
-                'order' => $order,
-            ]), $message);
+            $message = str_replace('{link}', transactionUrl($order), $message);
             $message = str_replace('{cs_link}', getSetting('cs'), $message);
         }
 

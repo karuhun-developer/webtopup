@@ -1,6 +1,11 @@
 <?php
 
+use App\Models\Order\Order;
+use App\Models\PPOB\PPOBBrand;
+use App\Models\PPOB\PPOBCategory;
+use App\Models\PPOB\PPOBProduct;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Support\Str;
 use Tests\TestCase;
 
 /*
@@ -47,4 +52,69 @@ expect()->extend('toBeOne', function () {
 function something()
 {
     // ..
+}
+
+/**
+ * Build a persisted order (with its payment) for tests.
+ *
+ * @param  array<string, mixed>  $overrides  Order attributes; a `payment` key
+ *                                          overrides the payment attributes.
+ */
+function makeTestOrder(array $overrides = []): Order
+{
+    $paymentOverrides = $overrides['payment'] ?? [];
+    unset($overrides['payment']);
+
+    $category = PPOBCategory::create([
+        'name' => 'Games',
+        'description' => 'Game vouchers',
+        'status' => true,
+    ]);
+
+    $brand = PPOBBrand::create([
+        'p_p_o_b_category_id' => $category->id,
+        'name' => 'Mobile Legends',
+        'provider' => 'digiflazz',
+        'description' => 'MLBB diamonds',
+        'featured' => true,
+        'order' => 1,
+        'status' => true,
+    ]);
+
+    $product = PPOBProduct::create([
+        'p_p_o_b_brand_id' => $brand->id,
+        'name' => '86 Diamonds',
+        'sku' => 'ML86',
+        'provider' => 'digiflazz',
+        'buy_price' => 20000,
+        'sell_price' => 22000,
+        'status' => true,
+    ]);
+
+    $order = Order::create(array_merge([
+        'p_p_o_b_brand_id' => $brand->id,
+        'p_p_o_b_product_id' => $product->id,
+        'reference' => 'TRX-TEST-'.Str::upper(Str::random(8)),
+        'ref_number' => random_int(1, 1_000_000_000),
+        'name' => 'Budi',
+        'email' => 'budi@example.com',
+        'phone' => '08123456789',
+        'submited' => ['account_id' => '12345', 'server_id' => '1'],
+        'amount' => 22000,
+        'fee' => 0,
+        'total_amount' => 22000,
+        'payment_status' => 0,
+        'topup_status' => 0,
+    ], $overrides));
+
+    $order->payment()->create(array_merge([
+        'driver' => 'manual',
+        'order_id' => uniqid().time(),
+        'payment_type' => 'bank_transfer',
+        'channel' => 'bca',
+        'expired_at' => now()->addHours(24),
+        'amount' => $order->total_amount,
+    ], $paymentOverrides));
+
+    return $order;
 }

@@ -1,0 +1,87 @@
+services:
+
+  # ── Application (Nginx + PHP-FPM + queue + scheduler) ────────────────────────
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile.prod
+    restart: unless-stopped
+    environment:
+      APP_ENV: ${APP_ENV:-production}
+      APP_DEBUG: ${APP_DEBUG:-false}
+      DB_CONNECTION: mysql
+      DB_HOST: db
+      DB_PORT: "3306"
+      DB_DATABASE: ${DB_DATABASE:-webtopup}
+      DB_USERNAME: ${DB_USERNAME:-webtopup}
+      DB_PASSWORD: ${DB_PASSWORD:-secret}
+      REDIS_CLIENT: predis
+      REDIS_HOST: redis
+      REDIS_PORT: "6379"
+      CACHE_STORE: ${CACHE_STORE:-redis}
+      QUEUE_CONNECTION: ${QUEUE_CONNECTION:-redis}
+      SESSION_DRIVER: ${SESSION_DRIVER:-redis}
+      RUN_MIGRATIONS: ${RUN_MIGRATIONS:-true}
+      APP_NAME: ${APP_NAME:-WebTopup}
+      APP_KEY: ${APP_KEY}
+      APP_URL: ${APP_URL}
+      APP_TIMEZONE: ${APP_TIMEZONE:-UTC}
+      APP_DISPLAY_TIMEZONE: ${APP_DISPLAY_TIMEZONE:-Asia/Jakarta}
+      PAYMENT_GATEWAY: ${PAYMENT_GATEWAY:-midtrans}
+      MIDTRANS_MERCHANT_ID: ${MIDTRANS_MERCHANT_ID}
+      MIDTRANS_SERVER_KEY: ${MIDTRANS_SERVER_KEY}
+      MIDTRANS_CLIENT_KEY: ${MIDTRANS_CLIENT_KEY}
+      MIDTRANS_IS_PRODUCTION: ${MIDTRANS_IS_PRODUCTION:-true}
+      DIGIFLAZZ_USERNAME: ${DIGIFLAZZ_USERNAME}
+      DIGIFLAZZ_API_KEY: ${DIGIFLAZZ_API_KEY}
+      DIGIFLAZZ_WEBHOOK_SECRET: ${DIGIFLAZZ_WEBHOOK_SECRET}
+      APIAGAME_MERCHANT_ID: ${APIAGAME_MERCHANT_ID}
+      APIAGAME_SECRET_KEY: ${APIAGAME_SECRET_KEY}
+      GAME_PROXY_URL: ${GAME_PROXY_URL}
+      LOG_CHANNEL: ${LOG_CHANNEL:-stack}
+      LOG_LEVEL: ${LOG_LEVEL:-error}
+    volumes:
+      - storage_data:/var/www/html/storage
+    ports:
+      - "80"
+    depends_on:
+      db:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+
+  # ── MySQL ────────────────────────────────────────────────────────────────────
+  db:
+    image: mysql:8.4
+    restart: unless-stopped
+    environment:
+      MYSQL_ROOT_PASSWORD: ${DB_ROOT_PASSWORD:-rootsecret}
+      MYSQL_DATABASE: ${DB_DATABASE:-webtopup}
+      MYSQL_USER: ${DB_USERNAME:-webtopup}
+      MYSQL_PASSWORD: ${DB_PASSWORD:-secret}
+    volumes:
+      - db_data:/var/lib/mysql
+      - ./docker/mysql/my.cnf:/etc/mysql/conf.d/my.cnf:ro
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost", "-u", "root", "-p${DB_ROOT_PASSWORD:-rootsecret}"]
+      interval: 10s
+      timeout: 5s
+      retries: 10
+
+  # ── Redis ────────────────────────────────────────────────────────────────────
+  redis:
+    image: redis:7.4-alpine
+    restart: unless-stopped
+    command: redis-server --appendonly yes
+    volumes:
+      - redis_data:/data
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+volumes:
+  storage_data:
+  db_data:
+  redis_data:

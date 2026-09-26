@@ -5,9 +5,7 @@ Halo **{{ $order->name }}**, kami telah menerima konfirmasi pembayaran Anda untu
 <br />
 Detail pesanan anda bisa dilihat di link berikut:
 <br />
-<x-mail::button :url="route('transaction.show', [
-    'order' => $order->reference,
-])">
+<x-mail::button :url="transactionUrl($order->reference)">
 Detail Pesanan
 </x-mail::button>
 

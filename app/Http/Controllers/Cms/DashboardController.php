@@ -7,6 +7,7 @@ use App\Http\Controllers\Controller;
 use App\Models\Order\Order;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Gate;
 
 class DashboardController extends Controller
 {
@@ -15,6 +16,8 @@ class DashboardController extends Controller
      */
     public function index(Request $request)
     {
+        Gate::authorize('view'.Order::class);
+
         $giftOrderQuery = Order::query()
             ->whereHas('product', function ($q) {
                 $q->where('provider', 'gift')

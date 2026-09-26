@@ -180,9 +180,7 @@ class StoreTransactionAction
         $message = str_replace('{order_id}', $order->reference, $message);
         $message = str_replace('{product}', $product->name, $message);
         $message = str_replace('{total}', numberToCurrency($order->total_amount), $message);
-        $message = str_replace('{link}', route('transaction.show', [
-            'order' => $order,
-        ]), $message);
+        $message = str_replace('{link}', transactionUrl($order), $message);
         $message = str_replace('{cs_link}', getSetting('cs'), $message);
 
         // // Send message via Voda

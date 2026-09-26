@@ -7,6 +7,10 @@ services:
     restart: unless-stopped
     volumes:
       - .:/var/www/html
+      # Shield image-built deps from the host bind mount, otherwise a
+      # Windows host (win32 native npm deps) or an empty clone shadows them.
+      - vendor_data:/var/www/html/vendor
+      - node_modules_data:/var/www/html/node_modules
     env_file: .env
     depends_on:
       db:
@@ -43,6 +47,7 @@ services:
       MYSQL_PASSWORD: "${DB_PASSWORD:-secret}"
     volumes:
       - db_data:/var/lib/mysql
+      - ./docker/mysql/my.cnf:/etc/mysql/conf.d/my.cnf:ro
     healthcheck:
       test: ["CMD", "mysqladmin", "ping", "-h", "localhost", "-u", "root", "-p${DB_ROOT_PASSWORD:-rootsecret}"]
       interval: 10s
@@ -75,6 +80,8 @@ services:
     command: ["php", "artisan", "queue:work", "--tries=3", "--timeout=90"]
     volumes:
       - .:/var/www/html
+      - vendor_data:/var/www/html/vendor
+      - node_modules_data:/var/www/html/node_modules
     env_file: .env
     depends_on:
       db:
@@ -84,9 +91,47 @@ services:
     networks:
       - internal
 
+  # ── Scheduler (ExpirePayments, hourly) ───────────────────────────────────────
+  scheduler:
+    build: .
+    container_name: webtopup_scheduler
+    restart: unless-stopped
+    command: ["php", "artisan", "schedule:work", "--verbose"]
+    volumes:
+      - .:/var/www/html
+      - vendor_data:/var/www/html/vendor
+      - node_modules_data:/var/www/html/node_modules
+    env_file: .env
+    depends_on:
+      db:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    networks:
+      - internal
+
+  # ── Vite dev server (optional, only with `--profile dev`) ────────────────────
+  vite:
+    image: node:22-alpine
+    container_name: webtopup_vite
+    restart: unless-stopped
+    working_dir: /var/www/html
+    profiles:
+      - dev
+    command: sh -c "npm ci --no-audit --no-fund && npm run dev -- --host 0.0.0.0"
+    volumes:
+      - .:/var/www/html
+      - node_modules_data:/var/www/html/node_modules
+    ports:
+      - "5173:5173"
+    networks:
+      - internal
+
 volumes:
   db_data:
   redis_data:
+  vendor_data:
+  node_modules_data:
 
 networks:
   internal:

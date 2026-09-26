@@ -7,7 +7,7 @@ use Rap2hpoutre\LaravelLogViewer\LogViewerController;
 Route::group([
     'prefix' => 'cms',
     'as' => 'cms.',
-    'middleware' => ['auth', 'verified'],
+    'middleware' => ['auth', 'verified', 'role:superadmin|admin'],
 ], function () {
     // Auto redirect to dashboard
     Route::get('/', fn () => to_route('cms.dashboard'))->name('home');

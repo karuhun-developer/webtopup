@@ -10,6 +10,7 @@ import { Head } from '@inertiajs/vue3';
 defineProps<{
     order: OrderDataItem;
     mlAccountNickname?: string;
+    signedUpdateUrl: string;
 }>();
 </script>
 
@@ -50,6 +51,7 @@ defineProps<{
                             :payment="order.payment"
                             :order-reference="order.reference"
                             :total-amount="order.total_amount"
+                            :update-url="signedUpdateUrl"
                         />
                     </div>
                 </div>

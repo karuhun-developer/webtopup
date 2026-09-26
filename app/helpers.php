@@ -1,7 +1,9 @@
 <?php
 
+use App\Models\Order\Order;
 use App\Models\Setting\Setting;
 use Illuminate\Support\Facades\Cache;
+use Illuminate\Support\Facades\URL;
 
 function numberToCurrency($value)
 {
@@ -28,4 +30,18 @@ function getSetting(?string $key = null)
     }
 
     return $setting[$key] ?? null;
+}
+
+function transactionUrl(Order|string $order): string
+{
+    $reference = $order instanceof Order ? $order->reference : $order;
+
+    return URL::signedRoute('transaction.show', ['order' => $reference]);
+}
+
+function transactionUpdateUrl(Order|string $order): string
+{
+    $reference = $order instanceof Order ? $order->reference : $order;
+
+    return URL::signedRoute('transaction.update', ['order' => $reference]);
 }

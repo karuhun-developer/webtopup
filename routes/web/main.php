@@ -14,12 +14,12 @@ Route::get('/privacy-policy', [ContentController::class, 'privacyPolicy'])->name
 Route::get('/terms', [ContentController::class, 'terms'])->name('terms');
 Route::get('/brand/{brand}', [BrandController::class, 'show'])->name('product.show');
 
-Route::post('/checkout', [TransactionController::class, 'store'])->name('checkout.store');
-Route::get('/transaction/{order}', [TransactionController::class, 'show'])->name('transaction.show');
-Route::get('/transaction', [TransactionController::class, 'check'])->name('transaction.check');
-Route::put('/transaction/{order}', [TransactionController::class, 'update'])->name('transaction.update');
-Route::post('/check-game-account', [CheckGameAccountController::class, 'check'])->name('check-game-account');
-Route::post('/check-voucher', [TransactionController::class, 'checkVoucher'])->name('check-voucher');
+Route::post('/checkout', [TransactionController::class, 'store'])->name('checkout.store')->middleware('throttle:20,1');
+Route::get('/transaction/{order}', [TransactionController::class, 'show'])->name('transaction.show')->middleware(['signed', 'throttle:60,1']);
+Route::get('/transaction', [TransactionController::class, 'check'])->name('transaction.check')->middleware('throttle:30,1');
+Route::put('/transaction/{order}', [TransactionController::class, 'update'])->name('transaction.update')->middleware(['signed', 'throttle:30,1']);
+Route::post('/check-game-account', [CheckGameAccountController::class, 'check'])->name('check-game-account')->middleware('throttle:30,1');
+Route::post('/check-voucher', [TransactionController::class, 'checkVoucher'])->name('check-voucher')->middleware('throttle:30,1');
 
 Route::get('/profile', [ProfileController::class, 'index'])->name('main.profile.index')->middleware('auth');
 Route::patch('/profile', [ProfileController::class, 'update'])->name('main.profile.update')->middleware('auth');

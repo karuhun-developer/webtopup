@@ -1,5 +1,4 @@
 <script setup lang="ts">
-import { update } from '@/actions/App/Http/Controllers/Main/TransactionController';
 import { Button } from '@/components/ui/button';
 import { Label } from '@/components/ui/label';
 import { useSwal } from '@/composables/useSwal';
@@ -14,6 +13,7 @@ const props = defineProps<{
     payment: PaymentDataItem;
     orderReference: string;
     totalAmount: number;
+    updateUrl: string;
 }>();
 
 const page = usePage();
@@ -50,9 +50,7 @@ const uploadProof = () => {
     }
 
     uploadForm.submit(
-        update({
-            reference: props.orderReference,
-        }),
+        props.updateUrl,
         {
             method: 'put',
             preserveScroll: true,
