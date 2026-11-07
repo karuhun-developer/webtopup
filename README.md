@@ -147,7 +147,8 @@ Contoh environment tersedia di [.env.example](.env.example) dan [.env.docker](.e
 - **Auth:** Laravel Fortify + Sanctum
 - **Media:** Spatie Media Library
 - **Payment:** QRIS Karuhun (default), Midtrans, Paywuz
-- **Supplier:** H2H Karuhun, Digiflazz · **Username:** H2H Karuhun, API Games
+- **Supplier:** H2H Karuhun, Digiflazz
+- **Username:** H2H Karuhun, API Games
 
 ---
 
@@ -189,19 +190,9 @@ Image produksi tersedia di `Dockerfile.prod` (satu container: Nginx + PHP-FPM + 
    CACHE_STORE=redis
    QUEUE_CONNECTION=redis
    SESSION_DRIVER=redis
-
-   PAYMENT_GATEWAY=karuhun_qris
-   MIDTRANS_MERCHANT_ID=
-   MIDTRANS_SERVER_KEY=
-   MIDTRANS_CLIENT_KEY=
-   MIDTRANS_IS_PRODUCTION=true
-   DIGIFLAZZ_USERNAME=
-   DIGIFLAZZ_API_KEY=
-   DIGIFLAZZ_WEBHOOK_SECRET=
-   APIAGAME_MERCHANT_ID=
-   APIAGAME_SECRET_KEY=
-   GAME_PROXY_URL=
    ```
+
+   Pilihan supplier, provider cek username, payment gateway, credential, dan environment Midtrans diatur melalui **CMS → Settings → Integrasi** (`/cms/setting/settings`), sehingga tidak perlu menambahkan variabel integrasi ke `.env`. Contoh env integrasi di `.env.example` dan `.env.docker` dikomentari dan hanya dipakai sebagai fallback opsional; pengaturan CMS tetap diutamakan.
 
 6. **Migrasi & seed** saat pertama kali: buka terminal container Coolify lalu `php artisan migrate --force --seed`, atau set env `RUN_MIGRATIONS=true` (entrypoint menjalankan migrate tiap boot) — sebaiknya gunakan Pre-deployment Command Coolify: `php artisan migrate --force && php artisan db:seed --class=PermissionSeeder --force`.
 7. **Webhook** Midtrans/Digiflazz diarahkan ke `https://domain-kamu.com/api/v1/midtrans/callback` dan `/api/v1/digiflazz/callback`.
