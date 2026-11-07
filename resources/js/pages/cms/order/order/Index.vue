@@ -158,17 +158,6 @@ const handleTopupFiltersUpdate = (filters: string[]) => {
         page: 1,
     });
 };
-
-const handleUpdateStatus = (id: number, status: number) => {
-    // This function seems incomplete in the provided instruction.
-    // 'filters' is not defined in this scope.
-    // Assuming it's a placeholder or will be completed by the user.
-    // topupFilters.value = filters;
-    // updateParams({
-    //     topup_status: filters.length > 0 ? filters : undefined,
-    //     page: 1,
-    // });
-};
 </script>
 
 <template>
@@ -246,7 +235,8 @@ const handleUpdateStatus = (id: number, status: number) => {
                             class="inline-flex w-fit items-center rounded-md px-2.5 py-1 text-xs font-semibold tracking-wide uppercase"
                             :class="{
                                 'bg-blue-100 text-blue-800 dark:bg-blue-900/30 dark:text-blue-400':
-                                    row.payment?.driver === 'midtrans',
+                                    row.payment?.driver &&
+                                    row.payment.driver !== 'manual',
                                 'bg-purple-100 text-purple-800 dark:bg-purple-900/30 dark:text-purple-400':
                                     row.payment?.driver === 'manual',
                                 'bg-gray-100 text-gray-800 dark:bg-gray-900/30 dark:text-gray-400':

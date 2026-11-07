@@ -1,24 +1,27 @@
-<div align="center">
+<h1 align="center">WebTopup</h1>
 
-# 🛒 Web PPOB
+<p align="center">
+  <strong>Jual produk digital. Terima pembayaran. Proses top up.</strong><br>
+  Platform PPOB dengan storefront dan CMS dalam satu aplikasi.
+</p>
 
-**Platform PPOB terintegrasi Digiflazz & Midtrans untuk pembelian produk digital**
+<p align="center">
+  <img src="https://img.shields.io/badge/PHP-8.4%2B-777BB4?style=flat-square&logo=php&logoColor=white" alt="PHP 8.4+">
+  <img src="https://img.shields.io/badge/Laravel-12-FF2D20?style=flat-square&logo=laravel&logoColor=white" alt="Laravel 12">
+  <img src="https://img.shields.io/badge/Docker-recommended-2496ED?style=flat-square&logo=docker&logoColor=white" alt="Docker recommended">
+</p>
 
-[![Laravel](https://img.shields.io/badge/Laravel-12-FF2D20?logo=laravel&logoColor=white)](https://laravel.com)
-[![Vue.js](https://img.shields.io/badge/Vue.js-3-4FC08D?logo=vue.js&logoColor=white)](https://vuejs.org)
-[![Inertia.js](https://img.shields.io/badge/Inertia.js-2-9553E9?logo=inertia&logoColor=white)](https://inertiajs.com)
-[![TailwindCSS](https://img.shields.io/badge/Tailwind-4-06B6D4?logo=tailwindcss&logoColor=white)](https://tailwindcss.com)
-[![Docker](https://img.shields.io/badge/Docker-Ready-2496ED?logo=docker&logoColor=white)](https://docker.com)
+<p align="center">
+  <a href="#fitur">Fitur</a> · <a href="#quick-start">Quick start</a> · <a href="#integrasi">Integrasi</a> · <a href="https://saweria.co/warukunai">Dukung</a>
+</p>
 
-[**Live Demo →**](https://topup.karuhundeveloper.com)
+<p align="center"><a href="https://topup.karuhundeveloper.com"><strong>Live Demo →</strong></a></p>
 
 ![Preview](image.png)
 
-</div>
-
 ---
 
-## ✨ Fitur
+## Fitur
 
 | Kategori      | Fitur                                                  |
 | ------------- | ------------------------------------------------------ |
@@ -30,7 +33,7 @@
 
 ---
 
-## 🚀 Quick Start
+## Quick Start
 
 ### Opsi 1 — Docker (Direkomendasikan)
 
@@ -111,25 +114,26 @@ composer run dev
 
 ---
 
-## 🔑 Konfigurasi API
+## Integrasi
 
-Isi kredensial berikut di file `.env`:
+Atur supplier, cek username, payment gateway, dan credential di **CMS → Settings → Integrasi** (`cms/setting/settings`). Default supplier dan cek username memakai H2H Karuhun; default pembayaran memakai QRIS Karuhun. Credential disimpan terenkripsi; kolom kosong mempertahankan nilai lama. Environment tetap tersedia sebagai fallback.
 
-```env
-# Midtrans — https://midtrans.com
-MIDTRANS_MERCHANT_ID=
-MIDTRANS_SERVER_KEY=
-MIDTRANS_CLIENT_KEY=
+| Integrasi                     | Provider     | Dokumentasi                                                                                           | Callback (POST)                                   |
+| ----------------------------- | ------------ | ----------------------------------------------------------------------------------------------------- | ------------------------------------------------- |
+| Supplier & username (default) | H2H Karuhun  | [H2H](https://h2h.karuhundeveloper.com) · [API reference](https://h2h.karuhundeveloper.com/reference) | `/api/v1/h2h/callback`                            |
+| Supplier                      | Digiflazz    | [Digiflazz](https://developer.digiflazz.com)                                                          | `/api/v1/digiflazz/callback`                      |
+| Cek username                  | API Games    | [API Games](https://apigames.id)                                                                      | —                                                 |
+| Pembayaran                    | Midtrans     | [Midtrans](https://docs.midtrans.com)                                                                 | `/api/v1/midtrans/callback`                       |
+| Pembayaran QRIS               | QRIS Karuhun | [QRIS Karuhun](https://qris.karuhundeveloper.com/reference#description/introduction)                  | Polling halaman 5 detik + rekonsiliasi tiap menit |
+| Pembayaran                    | Paywuz       | [Paywuz](https://paywuz.id/docs)                                                                      | `/api/v1/paywuz/callback`                         |
 
-# Digiflazz — https://member.digiflazz.com/buyer-area
-DIGIFLAZZ_USERNAME=
-DIGIFLAZZ_API_KEY=
-DIGIFLAZZ_WEBHOOK_SECRET=
+Import katalog melalui `/cms/ppob/import-product`. Harga jual yang sudah diedit dipertahankan saat import ulang. Produk H2H yang diimpor saat ini adalah prabayar; pascabayar membutuhkan alur cek tagihan tersendiri.
 
-# API Games — https://member.apigames.id/pengaturan/secret-key
-APIAGAME_MERCHANT_ID=
-APIAGAME_SECRET_KEY=
-```
+Supplier mengikuti produk pada setiap pesanan. Perubahan payment gateway hanya memengaruhi checkout baru; transaksi lama tetap memakai gateway asal. Fee aplikasi QRIS Karuhun Rp0; kode unik mengikuti gateway dan ditampilkan terpisah pada total. Halaman transaksi mengecek pembayaran tiap 5 detik, sementara scheduler merekonsiliasi pesanan yang masih pending tiap menit. Gambar QRIS diambil melalui server agar API key tetap tersimpan di backend. Paywuz diproses setelah status **success** / event **transaction.paid**. Aktifkan queue worker dan scheduler untuk cek pembayaran serta pesanan pending otomatis.
+
+Saat memperbarui instalasi, jalankan `php artisan migrate --force`, `npm run build`, dan restart queue worker. Migrasi akun merapikan duplikasi lama dengan mempertahankan baris terbaru untuk identitas provider/game/ID/server yang sama.
+
+Contoh environment tersedia di [.env.example](.env.example) dan [.env.docker](.env.docker).
 
 ---
 
@@ -142,8 +146,8 @@ APIAGAME_SECRET_KEY=
 - **Web Server:** Nginx
 - **Auth:** Laravel Fortify + Sanctum
 - **Media:** Spatie Media Library
-- **Payment:** Midtrans
-- **Supplier:** Digiflazz, API Games
+- **Payment:** QRIS Karuhun (default), Midtrans, Paywuz
+- **Supplier:** H2H Karuhun, Digiflazz · **Username:** H2H Karuhun, API Games
 
 ---
 
@@ -186,7 +190,7 @@ Image produksi tersedia di `Dockerfile.prod` (satu container: Nginx + PHP-FPM + 
    QUEUE_CONNECTION=redis
    SESSION_DRIVER=redis
 
-   PAYMENT_GATEWAY=midtrans
+   PAYMENT_GATEWAY=karuhun_qris
    MIDTRANS_MERCHANT_ID=
    MIDTRANS_SERVER_KEY=
    MIDTRANS_CLIENT_KEY=
@@ -211,3 +215,5 @@ Catatan: queue worker & scheduler berjalan di dalam container yang sama. Untuk t
 Jika project ini bermanfaat, dukung pengembangan lebih lanjut:
 
 **Saweria:** https://saweria.co/warukunai
+
+Mau custom project? Hubungi [Telegram](https://t.me/bayurifkialgh).

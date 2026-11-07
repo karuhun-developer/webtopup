@@ -36,11 +36,7 @@ const selectedCategory = ref<number>();
 const selectedBrand = ref<number | null>();
 
 // Fetch brands
-const {
-    data: brandsData,
-    isError: isBrandsError,
-    isFetching: isBrandsFetching,
-} = fetchBrands(
+const { data: brandsData, isFetching: isBrandsFetching } = fetchBrands(
     computed(() =>
         selectedCategory.value ? Number(selectedCategory.value) : 0,
     ),
@@ -170,6 +166,7 @@ watch(selectedBrand, () => {
                             <SelectValue placeholder="Select a provider" />
                         </SelectTrigger>
                         <SelectContent>
+                            <SelectItem value="h2h">H2H Karuhun</SelectItem>
                             <SelectItem value="digiflazz">
                                 Digiflazz
                             </SelectItem>
@@ -195,6 +192,17 @@ watch(selectedBrand, () => {
                         required
                     />
                     <InputError :message="errors.sku" />
+                </div>
+
+                <div v-if="provider === 'h2h'" class="grid gap-2">
+                    <Label for="provider_product_id">ID produk H2H</Label>
+                    <Input
+                        id="provider_product_id"
+                        name="provider_product_id"
+                        required
+                        placeholder="ID produk dari katalog API H2H"
+                    />
+                    <InputError :message="errors.provider_product_id" />
                 </div>
 
                 <div class="grid gap-2">

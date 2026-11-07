@@ -20,7 +20,7 @@ import dayjs from 'dayjs';
 import { ArchiveRestore, Eye } from 'lucide-vue-next';
 import { ref } from 'vue';
 
-const props = defineProps<{
+defineProps<{
     data: PaginationItem<OrderDataItem>;
     orderBy?: string;
     order?: 'asc' | 'desc';
@@ -173,7 +173,9 @@ const handleUnarchiveAll = () => {
                         class="inline-flex items-center rounded-md px-2.5 py-1 text-xs font-semibold"
                         :class="{
                             'bg-blue-100 text-blue-800 dark:bg-blue-900/30 dark:text-blue-400':
-                                row.product?.provider === 'digiflazz',
+                                ['digiflazz', 'h2h'].includes(
+                                    row.provider ?? row.product?.provider ?? '',
+                                ),
                             'bg-purple-100 text-purple-800 dark:bg-purple-900/30 dark:text-purple-400':
                                 row.product?.provider === 'gift',
                             'bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-400':
@@ -182,7 +184,7 @@ const handleUnarchiveAll = () => {
                                 !row.product?.provider,
                         }"
                     >
-                        {{ row.product?.provider || 'N/A' }}
+                        {{ row.provider ?? row.product?.provider ?? 'N/A' }}
                     </span>
                 </template>
                 <template #payment_status="{ row }">
@@ -192,7 +194,8 @@ const handleUnarchiveAll = () => {
                             class="inline-flex w-fit items-center rounded-md px-2.5 py-1 text-xs font-semibold tracking-wide uppercase"
                             :class="{
                                 'bg-blue-100 text-blue-800 dark:bg-blue-900/30 dark:text-blue-400':
-                                    row.payment?.driver === 'midtrans',
+                                    row.payment?.driver &&
+                                    row.payment.driver !== 'manual',
                                 'bg-purple-100 text-purple-800 dark:bg-purple-900/30 dark:text-purple-400':
                                     row.payment?.driver === 'manual',
                                 'bg-gray-100 text-gray-800 dark:bg-gray-900/30 dark:text-gray-400':
@@ -277,8 +280,9 @@ const handleUnarchiveAll = () => {
                             :href="showOrder({ order: row.reference }).url"
                             slideover
                             v-if="
-                                row.product?.provider === 'digiflazz' &&
-                                hasPermission('view' + resource)
+                                ['digiflazz', 'h2h'].includes(
+                                    row.provider ?? row.product?.provider ?? '',
+                                ) && hasPermission('view' + resource)
                             "
                         >
                             <Button

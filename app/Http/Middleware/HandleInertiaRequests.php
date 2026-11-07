@@ -3,6 +3,7 @@
 namespace App\Http\Middleware;
 
 use App\Models\Menu\Menu;
+use App\Services\IntegrationSettings;
 use Illuminate\Foundation\Inspiring;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Cache;
@@ -63,7 +64,7 @@ class HandleInertiaRequests extends Middleware
                     return Menu::with('subMenu')->where('role_id', $role->id)->orderBy('order', 'asc')->get();
                 }) : [],
             ],
-            'setting' => getSetting(),
+            'setting' => app(IntegrationSettings::class)->publicSettings(),
             'app_url' => config('app.url'),
             'sidebarOpen' => ! $request->hasCookie('sidebar_state') || $request->cookie('sidebar_state') === 'true',
         ];

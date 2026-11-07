@@ -2,8 +2,9 @@
 
 namespace App\Services;
 
-use Illuminate\Http\Request;
+use Illuminate\Http\Client\Response;
 use Illuminate\Support\Facades\Http;
+use RuntimeException;
 
 class MidtransService
 {
@@ -14,9 +15,10 @@ class MidtransService
         public ?string $clientKey = null,
         public ?bool $isProduction = null,
     ) {
-        $this->serverKey = $this->serverKey ?? config('midtrans.server_key');
-        $this->clientKey = $this->clientKey ?? config('midtrans.client_key');
-        $this->isProduction = $this->isProduction ?? config('midtrans.is_production', false);
+        $settings = app(IntegrationSettings::class);
+        $this->serverKey = $this->serverKey ?? $settings->credential('midtrans_server_key');
+        $this->clientKey = $this->clientKey ?? $settings->credential('midtrans_client_key');
+        $this->isProduction = $this->isProduction ?? (bool) (getSetting('midtrans_is_production') ?? config('midtrans.is_production', false));
         $this->baseUrl = $this->isProduction ? 'https://api.midtrans.com' : 'https://api.sandbox.midtrans.com';
     }
 
@@ -43,7 +45,7 @@ class MidtransService
         string $orderId,
         int $amount,
         string $bank = 'bca',
-    ) {
+    ): array {
         // Validate bank
         $validBanks = [
             'bca',
@@ -68,11 +70,11 @@ class MidtransService
         ];
 
         // Response
-        $response = Http::withBasicAuth($this->serverKey.':', '')->post($this->baseUrl.'/v2/charge', $params);
+        $response = $this->charge($params);
         $responseJson = $response->json();
 
         return [
-            'successful' => $response->successful(),
+            'successful' => $response->successful() && filled($responseJson['transaction_id'] ?? null),
             'transaction_id' => $responseJson['transaction_id'] ?? null,
             'account' => $responseJson['va_numbers'][0]['va_number'] ?? null,
             'code' => $responseJson['biller_code'] ?? null,
@@ -99,7 +101,7 @@ class MidtransService
     public function createQris(
         string $orderId,
         int $amount,
-    ) {
+    ): array {
         // Param
         $params = [
             'payment_type' => 'qris',
@@ -110,13 +112,14 @@ class MidtransService
         ];
 
         // Response
-        $response = Http::withBasicAuth($this->serverKey.':', '')->post($this->baseUrl.'/v2/charge', $params);
+        $response = $this->charge($params);
         $responseJson = $response->json();
 
         return [
-            'successful' => $response->successful(),
+            'successful' => $response->successful() && filled($responseJson['transaction_id'] ?? null),
             'transaction_id' => $responseJson['transaction_id'] ?? null,
-            'account' => $responseJson['actions'][0]['url'] ?? null,
+            'account' => collect($responseJson['actions'] ?? [])->firstWhere('name', 'generate-qr-code')['url']
+                ?? (isset($responseJson['transaction_id']) ? $this->baseUrl.'/v2/qris/'.$responseJson['transaction_id'].'/qr-code' : null),
             'code' => null,
             'redirect_url' => $responseJson['redirect_url'] ?? null,
             'message' => $responseJson['message'] ?? 'Failed to create qris',
@@ -158,7 +161,7 @@ class MidtransService
         ];
 
         // Response
-        $response = Http::withBasicAuth($this->serverKey.':', '')->post($this->baseUrl.'/v2/charge', $params);
+        $response = Http::connectTimeout(5)->timeout(15)->withBasicAuth($this->serverKey, '')->post($this->baseUrl.'/v2/charge', $params);
         $responseJson = $response->json();
 
         return [
@@ -175,6 +178,24 @@ class MidtransService
     {
         $hashedKey = hash('sha512', $orderId.$statusCode.$grossAmount.$this->serverKey);
 
-        return $hashedKey === $signatureKey;
+        return $this->serverKey !== '' && hash_equals($hashedKey, $signatureKey);
+    }
+
+    private function charge(array $params): Response
+    {
+        if ($this->serverKey === '') {
+            throw new RuntimeException('Server key Midtrans belum diatur di CMS.');
+        }
+        $client = Http::connectTimeout(5)->timeout(15)->withBasicAuth($this->serverKey, '');
+        $response = $client->post($this->baseUrl.'/v2/charge', $params);
+        if ((string) $response->json('status_code') === '406') {
+            $response = $client->get($this->baseUrl.'/v2/'.rawurlencode($params['transaction_details']['order_id']).'/status');
+            if ($response->json('order_id') !== $params['transaction_details']['order_id']
+                || (int) $response->json('gross_amount') !== $params['transaction_details']['gross_amount']) {
+                throw new RuntimeException('Pembayaran Midtrans sebelumnya tidak sesuai.');
+            }
+        }
+
+        return $response;
     }
 }

@@ -160,10 +160,22 @@ const submit = (close: () => void) => {
                             <SelectContent>
                                 <SelectItem
                                     v-for="server in serverOptions"
-                                    :key="server.id"
-                                    :value="server.id"
+                                    :key="
+                                        typeof server === 'string'
+                                            ? server
+                                            : server.value
+                                    "
+                                    :value="
+                                        typeof server === 'string'
+                                            ? server
+                                            : server.value
+                                    "
                                 >
-                                    {{ server.name }}
+                                    {{
+                                        typeof server === 'string'
+                                            ? server
+                                            : server.label
+                                    }}
                                 </SelectItem>
                             </SelectContent>
                         </Select>

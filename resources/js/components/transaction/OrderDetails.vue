@@ -127,7 +127,11 @@ defineProps<{
                 </div>
                 <div
                     class="flex items-center justify-between"
-                    v-if="order.product?.provider === 'digiflazz'"
+                    v-if="
+                        ['digiflazz', 'h2h'].includes(
+                            order.provider ?? order.product?.provider ?? '',
+                        )
+                    "
                 >
                     <span class="text-sm text-muted-foreground">
                         Status Top Up

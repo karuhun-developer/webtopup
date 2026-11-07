@@ -2,9 +2,12 @@
 
 namespace App\Http\Controllers\Main;
 
+use App\Actions\Main\CheckPaymentStatusAction;
 use App\Actions\Main\CheckVoucherAction;
+use App\Actions\Main\GetQrisImageAction;
 use App\Actions\Main\StoreTransactionAction;
 use App\Actions\Main\UpdateTransactionAction;
+use App\Enums\PaymentStatusEnum;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Main\CheckVoucherRequest;
 use App\Http\Requests\Main\StoreTransactionRequest;
@@ -13,7 +16,8 @@ use App\Models\Account\Account;
 use App\Models\Order\Order;
 use App\Traits\WithReturnResponse;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\DB;
+use Illuminate\Http\Response;
+use Illuminate\Support\Facades\URL;
 
 class TransactionController extends Controller
 {
@@ -78,9 +82,17 @@ class TransactionController extends Controller
     /**
      * Display the specified transaction.
      */
-    public function show(Order $order)
+    public function show(Order $order, CheckPaymentStatusAction $checkPayment)
     {
+        $order->loadMissing('payment');
+        if ($order->payment?->driver === 'karuhun_qris' && $order->payment_status === PaymentStatusEnum::PENDING) {
+            $checkPayment->handle($order->payment);
+            $order->refresh();
+        }
         $order->load('payment.media', 'product.media', 'brand.media', 'product.brand.category', 'media');
+        if ($order->payment?->driver === 'karuhun_qris' && $order->payment->transaction_id) {
+            $order->payment->account_number = URL::signedRoute('transaction.qris-image', ['order' => $order->reference]);
+        }
 
         // Map product image
         if ($order->product) {
@@ -140,26 +152,29 @@ class TransactionController extends Controller
     /**
      * Store a newly created transaction in storage.
      */
+    public function qrisImage(Order $order, GetQrisImageAction $action): Response
+    {
+        return $action->handle($order);
+    }
+
     public function store(StoreTransactionRequest $request, StoreTransactionAction $action)
     {
         try {
-            $order = DB::transaction(function () use ($request, $action) {
-                return $action->handle($request->only([
-                    'type',
-                    'account_id',
-                    'server_id',
-                    'product_id',
-                    'email',
-                    'name',
-                    'phone',
-                    'payment_type',
-                    'payment_method',
-                    'p_p_o_b_brand_id',
-                    'p_p_o_b_product_id',
-                    'voucher_code',
-                    'submited',
-                ]));
-            });
+            $order = $action->handle($request->only([
+                'type',
+                'account_id',
+                'server_id',
+                'product_id',
+                'email',
+                'name',
+                'phone',
+                'payment_type',
+                'payment_method',
+                'p_p_o_b_brand_id',
+                'p_p_o_b_product_id',
+                'voucher_code',
+                'submited',
+            ]));
 
             return redirect(transactionUrl($order));
         } catch (\Exception $e) {

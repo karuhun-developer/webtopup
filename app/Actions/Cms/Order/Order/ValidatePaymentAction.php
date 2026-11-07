@@ -3,6 +3,7 @@
 namespace App\Actions\Cms\Order\Order;
 
 use App\Enums\PaymentStatusEnum;
+use App\Jobs\SubmitOrderToProvider;
 use App\Mail\PaymentFailed;
 use App\Mail\PaymentSuccess;
 use App\Models\Order\Order;
@@ -41,11 +42,8 @@ class ValidatePaymentAction
             $customer = $accountId.$serverId;
 
             // If the provider is Digiflazz, create transaction to Digiflazz
-            if ($order->product->provider === 'digiflazz') {
-                // Digiflazz::createPrepaidTransaction(\n//     productCode: $order->product->sku,
-                //     customerNo: $customer,
-                //     refId: $order->reference,
-                // );
+            if (in_array($order->provider ?? $order->product->provider, ['digiflazz', 'h2h'], true)) {
+                SubmitOrderToProvider::dispatch($order->id)->afterCommit();
             }
 
             // Send success notification

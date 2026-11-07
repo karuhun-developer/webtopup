@@ -4,42 +4,21 @@ namespace App\Actions\Main;
 
 use App\Models\PPOB\PPOBBrand;
 use App\Models\PPOB\PPOBProduct;
-use App\Services\GameProService;
-use Illuminate\Support\Str;
+use App\Services\UsernameService;
 
 class CheckGameAccountAction
 {
-    public function __construct(
-        protected GameProService $gameProService,
-    ) {}
+    public function __construct(protected UsernameService $username) {}
 
-    /**
-     * Handle the action.
-     */
     public function handle(array $data): array
     {
-        $brandName = '';
+        $brand = isset($data['product_id'])
+            ? PPOBProduct::with('brand')->findOrFail($data['product_id'])->brand
+            : PPOBBrand::where('slug', $data['slug'])->firstOrFail();
 
-        if (isset($data['product_id'])) {
-            $product = PPOBProduct::find($data['product_id']);
-            $brandName = $product->brand->name;
-        } elseif (isset($data['slug'])) {
-            $brand = PPOBBrand::where('slug', $data['slug'])->firstOrFail();
-            $brandName = $brand->name;
-        }
-
-        // Currently only Mobile Legends is supported for check
-        if (! Str::contains(strtolower($brandName), 'mobile legend')) {
-            return [
-                'status' => false,
-                'message' => 'Game validation not supported for this product',
-            ];
-        }
-
-        return $this->gameProService->resolveAccount(
-            game: 'mobilelegend',
-            uid: $data['account_id'],
-            server: $data['server_id'] ?? null,
+        return $this->username->resolveAccount(
+            UsernameService::gameForBrand($brand->name), $data['account_id'], $data['server_id'] ?? null,
+            serviceCode: $brand->settings['username_service'] ?? null,
         );
     }
 }

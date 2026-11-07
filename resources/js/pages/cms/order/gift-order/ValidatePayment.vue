@@ -198,9 +198,17 @@ const rejectPayment = async (close: () => void) => {
 
                     <div class="rounded-lg border bg-card p-3">
                         <!-- QRIS QR Code -->
+                        <a
+                            v-if="order.payment.payment_url"
+                            :href="order.payment.payment_url"
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            class="text-primary underline"
+                            >Buka halaman pembayaran</a
+                        >
                         <div
-                            v-if="
-                                order.payment.driver === 'midtrans' &&
+                            v-else-if="
+                                order.payment.driver !== 'manual' &&
                                 order.payment.payment_type === 'qris'
                             "
                             class="flex justify-center"

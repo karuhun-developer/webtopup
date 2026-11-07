@@ -1,5 +1,7 @@
 <?php
 
+use App\Jobs\CheckGatewayPayments;
+use App\Jobs\CheckProviderOrders;
 use App\Jobs\ExpirePayments;
 use Illuminate\Foundation\Inspiring;
 use Illuminate\Support\Facades\Artisan;
@@ -10,3 +12,5 @@ Artisan::command('inspire', function () {
 })->purpose('Display an inspiring quote');
 
 Schedule::job(new ExpirePayments)->hourly();
+Schedule::job(new CheckGatewayPayments)->everyMinute()->withoutOverlapping();
+Schedule::job(new CheckProviderOrders)->everyMinute()->withoutOverlapping();

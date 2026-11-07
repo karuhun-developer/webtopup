@@ -1,29 +1,42 @@
 <script setup lang="ts">
-import { sync } from '@/actions/App/Http/Controllers/Cms/PPOB/ImportDigiflazzController';
+import {
+    index,
+    sync,
+} from '@/actions/App/Http/Controllers/Cms/PPOB/ImportProductController';
 import Heading from '@/components/Heading.vue';
+import InputError from '@/components/InputError.vue';
 import { Button } from '@/components/ui/button';
 import {
     Collapsible,
     CollapsibleContent,
     CollapsibleTrigger,
 } from '@/components/ui/collapsible';
+import {
+    Select,
+    SelectContent,
+    SelectItem,
+    SelectTrigger,
+    SelectValue,
+} from '@/components/ui/select';
 import { useSwal } from '@/composables/useSwal';
 import AppLayout from '@/layouts/AppLayout.vue';
 import { formatCurrency } from '@/lib/utils';
 import { BreadcrumbItem } from '@/types';
-import { DigiflazzCategoryGroup } from '@/types/cms/ppob';
-import { Head, useForm } from '@inertiajs/vue3';
+import { ImportedCategoryGroup } from '@/types/cms/ppob';
+import { Head, router, useForm } from '@inertiajs/vue3';
 import { ChevronRight, Save } from 'lucide-vue-next';
 import { ref } from 'vue';
 
 const props = defineProps<{
-    products: DigiflazzCategoryGroup[];
+    products: ImportedCategoryGroup[];
+    provider: string;
+    error?: string | null;
 }>();
 
 const { toast } = useSwal();
 
-const title = 'Import Digiflazz';
-const description = 'Select products to import from Digiflazz.';
+const title = 'Import Products';
+const description = 'Import katalog dari provider yang dipilih.';
 
 const breadcrumbItems: BreadcrumbItem[] = [
     { title: 'PPOB', href: '#' },
@@ -52,7 +65,7 @@ const toggleBrandOpen = (name: string) => {
 };
 
 // Submit - Import all products
-const form = useForm({});
+const form = useForm({ provider: props.provider });
 
 const submit = () => {
     form.post(sync().url, {
@@ -72,12 +85,40 @@ const submit = () => {
         <div class="flex h-full flex-1 flex-col gap-4 rounded-xl p-4">
             <div class="flex items-center justify-between">
                 <Heading :title="title" :description="description" />
-                <Button :disabled="form.processing" @click="submit">
+                <Button
+                    :disabled="form.processing || !!error || !products.length"
+                    @click="submit"
+                >
                     <Save class="mr-2 h-4 w-4" />
                     Import All Products
                 </Button>
             </div>
 
+            <div class="grid gap-3 sm:max-w-sm">
+                <Select
+                    :model-value="provider"
+                    @update:model-value="
+                        router.get(index.url(), { provider: String($event) })
+                    "
+                >
+                    <SelectTrigger class="w-full"
+                        ><SelectValue
+                    /></SelectTrigger>
+                    <SelectContent
+                        ><SelectItem value="h2h">H2H Karuhun</SelectItem
+                        ><SelectItem value="digiflazz"
+                            >Digiflazz</SelectItem
+                        ></SelectContent
+                    >
+                </Select>
+                <InputError :message="error || form.errors.provider" />
+            </div>
+            <p
+                v-if="!products.length && !error"
+                class="text-sm text-muted-foreground"
+            >
+                Belum ada produk tersedia dari provider ini.
+            </p>
             <div class="space-y-2">
                 <Collapsible
                     v-for="category in products"
@@ -141,20 +182,20 @@ const submit = () => {
                                     >
                                         <div
                                             v-for="product in brand.products"
-                                            :key="product.buyer_sku_code"
+                                            :key="product.sku"
                                             class="flex items-start gap-2 rounded-md border p-3"
                                         >
                                             <div class="grid flex-1 gap-1">
                                                 <div
                                                     class="leading-none font-medium"
                                                 >
-                                                    {{ product.product_name }}
+                                                    {{ product.name }}
                                                 </div>
                                                 <div
                                                     class="text-xs text-muted-foreground"
                                                 >
                                                     SKU:
-                                                    {{ product.buyer_sku_code }}
+                                                    {{ product.sku }}
                                                 </div>
                                                 <div
                                                     class="text-sm font-semibold"

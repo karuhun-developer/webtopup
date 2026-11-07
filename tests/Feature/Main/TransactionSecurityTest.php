@@ -52,6 +52,17 @@ it('accepts a payment proof upload for a pending manual payment', function () {
     expect($order->payment->fresh()->getMedia('image'))->toHaveCount(1);
 });
 
+it('accepts the signed multipart POST used by the payment proof form', function () {
+    $order = makeTestOrder();
+
+    $this->post(transactionUpdateUrl($order), [
+        '_method' => 'put',
+        'image' => UploadedFile::fake()->image('proof.jpg'),
+    ])->assertRedirect();
+
+    expect($order->payment->fresh()->getMedia('image'))->toHaveCount(1);
+});
+
 it('rejects a payment proof upload once the payment is already paid', function () {
     $order = makeTestOrder(['payment' => ['paid_at' => now()]]);
 

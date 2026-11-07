@@ -242,7 +242,8 @@ const handleGiftSendFiltersUpdate = (filters: string[]) => {
                             class="inline-flex w-fit items-center rounded-md px-2.5 py-1 text-xs font-semibold tracking-wide uppercase"
                             :class="{
                                 'bg-blue-100 text-blue-800 dark:bg-blue-900/30 dark:text-blue-400':
-                                    row.payment?.driver === 'midtrans',
+                                    row.payment?.driver &&
+                                    row.payment.driver !== 'manual',
                                 'bg-purple-100 text-purple-800 dark:bg-purple-900/30 dark:text-purple-400':
                                     row.payment?.driver === 'manual',
                                 'bg-gray-100 text-gray-800 dark:bg-gray-900/30 dark:text-gray-400':

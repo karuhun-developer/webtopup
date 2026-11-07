@@ -16,6 +16,7 @@ Route::get('/brand/{brand}', [BrandController::class, 'show'])->name('product.sh
 
 Route::post('/checkout', [TransactionController::class, 'store'])->name('checkout.store')->middleware('throttle:20,1');
 Route::get('/transaction/{order}', [TransactionController::class, 'show'])->name('transaction.show')->middleware(['signed', 'throttle:60,1']);
+Route::get('/transaction/{order}/qris-image', [TransactionController::class, 'qrisImage'])->name('transaction.qris-image')->middleware(['signed', 'throttle:60,1']);
 Route::get('/transaction', [TransactionController::class, 'check'])->name('transaction.check')->middleware('throttle:30,1');
 Route::put('/transaction/{order}', [TransactionController::class, 'update'])->name('transaction.update')->middleware(['signed', 'throttle:30,1']);
 Route::post('/check-game-account', [CheckGameAccountController::class, 'check'])->name('check-game-account')->middleware('throttle:30,1');

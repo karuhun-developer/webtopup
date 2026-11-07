@@ -15,6 +15,9 @@ class SettingSeeder extends Seeder
         if (! Setting::first()) {
             Setting::create([
                 'value' => [
+                    'supplier_provider' => 'h2h',
+                    'username_provider' => 'h2h',
+                    'payment_gateway' => 'karuhun_qris',
                     'title' => 'TopupWok',
                     'email' => 'support@topupwok.id',
                     'phone' => '+62 812-3456-7890',

@@ -2,16 +2,16 @@
 
 namespace App\Actions\Main;
 
+use App\Jobs\CreateGatewayPayment;
 use App\Mail\OrderCreated;
 use App\Models\Order\Order;
 use App\Models\Payment\Payment;
 use App\Models\PPOB\PPOBProduct;
 use App\Models\Voucher\Voucher;
 use App\Models\Voucher\VoucherUse;
-use App\Services\MidtransService;
-use App\Services\VodaService;
+use App\Services\PaymentGatewayService;
 use App\Traits\WithGenerateReference;
-use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Mail;
 
 class StoreTransactionAction
@@ -19,8 +19,7 @@ class StoreTransactionAction
     use WithGenerateReference;
 
     public function __construct(
-        public readonly MidtransService $midtransService,
-        public readonly VodaService $vodaService,
+        public readonly PaymentGatewayService $paymentGateway,
     ) {}
 
     /**
@@ -73,11 +72,7 @@ class StoreTransactionAction
 
         // Get fee if payment type is automatic
         if ($data['payment_type'] === 'automatic') {
-            $fee = $data['payment_method'] === 'qris'
-                ? $amountAfterDiscount * 0.007 // 0.7% fee for qris based on discounted amount
-                : 4000; // Flat 4000 fee for bank transfer
-
-            $data['fee'] = (int) round($fee);
+            $data['fee'] = $this->paymentGateway->fee($data['payment_method'], (int) $amountAfterDiscount);
             $data['total_amount'] = $amountAfterDiscount + $data['fee'];
         } else {
             $data['fee'] = 0;
@@ -109,63 +104,59 @@ class StoreTransactionAction
             ];
         }
 
-        $order = Order::create($data);
+        $data['provider'] = $product->provider;
+        $data['provider_payload'] = $product->provider === 'h2h' ? [
+            'productId' => $product->provider_product_id,
+            'destination' => (string) $data['account_id'],
+            'serverId' => (string) ($data['server_id'] ?? ''),
+            'expectedPrice' => (int) $product->buy_price,
+            'payment' => 'wallet', 'reference' => $data['reference'],
+        ] : ['sku' => $product->sku];
+        [$order, $payment] = DB::transaction(function () use ($data, $voucher, $discountAmount, $amountAfterDiscount) {
+            $order = Order::create($data);
 
-        // Record Voucher Usage
-        if ($voucher && $discountAmount > 0) {
-            VoucherUse::create([
-                'voucher_id' => $voucher->id,
-                'usable_type' => Order::class,
-                'usable_id' => $order->id,
-                'before_amount' => $data['amount'],
-                'discount_amount' => $discountAmount,
-                'after_amount' => $amountAfterDiscount,
+            // Record Voucher Usage
+            if ($voucher && $discountAmount > 0) {
+                VoucherUse::create([
+                    'voucher_id' => $voucher->id,
+                    'usable_type' => Order::class,
+                    'usable_id' => $order->id,
+                    'before_amount' => $data['amount'],
+                    'discount_amount' => $discountAmount,
+                    'after_amount' => $amountAfterDiscount,
+                ]);
+
+                $voucher->increment('used_count');
+            }
+
+            // Create payment record
+            $orderId = uniqid().time();
+            $payment = Payment::create([
+                'driver' => $data['payment_type'] === 'automatic' ? $this->paymentGateway->driver() : 'manual',
+                'payable_type' => Order::class,
+                'payable_id' => $order->id,
+                'order_id' => $orderId,
+                'transaction_id' => null,
+                'payment_type' => strtolower($data['payment_method']) === 'qris' ? 'qris' : 'bank_transfer',
+                // AUTO_GENERATED
+                'account_number' => 'AUTO_GENERATED',
+                'channel' => $data['payment_method'],
+                'expired_at' => now()->addHours(24),
+                'amount' => $order->total_amount,
             ]);
 
-            $voucher->increment('used_count');
-        }
+            return [$order, $payment];
+        });
 
-        // Create payment record
-        $orderId = uniqid().time();
-        $payment = Payment::create([
-            'driver' => $data['payment_type'] === 'automatic' ? 'midtrans' : 'manual',
-            'payable_type' => Order::class,
-            'payable_id' => $order->id,
-            'order_id' => $orderId,
-            'transaction_id' => null,
-            'payment_type' => $data['payment_method'] === 'qris' ? 'qris' : 'bank_transfer',
-            // AUTO_GENERATED
-            'account_number' => 'AUTO_GENERATED',
-            'channel' => $data['payment_method'],
-            'expired_at' => now()->addHours(24),
-            'amount' => $order->total_amount,
-        ]);
-
-        // Create Midtrans transaction if payment type is automatic
+        // Create a transaction with the configured payment gateway.
         if ($data['payment_type'] === 'automatic') {
-            if ($data['payment_method'] === 'qris') {
-                $midtrans = $this->midtransService->createQris(
-                    orderId: $payment->order_id,
-                    amount: $payment->amount,
-                );
-            } else {
-                $midtrans = $this->midtransService->createBankTransfer(
-                    orderId: $payment->order_id,
-                    bank: $payment->channel,
-                    amount: $payment->amount,
-                );
+            try {
+                $this->paymentGateway->create($payment);
+            } catch (\Throwable $e) {
+                report($e);
+                CreateGatewayPayment::dispatch($payment->id);
             }
-
-            // Throw an exception if Midtrans transaction creation failed
-            if (! $midtrans['successful']) {
-                throw new \Exception('Failed to create Midtrans transaction: '.$midtrans['message']);
-            }
-
-            // Update payment with Midtrans details
-            $payment->transaction_id = $midtrans['transaction_id'];
-            $payment->account_number = $midtrans['account'];
-            $payment->account_code = $midtrans['code'] ?? null;
-            $payment->save();
+            $order->refresh();
         } else {
             // For manual payment, we can set the account number to the payment method for easier reconciliation
             $payment->channel = getSetting('manual_transfer_bank');
@@ -175,34 +166,13 @@ class StoreTransactionAction
         }
 
         // Send notification to user
-        $message = getSetting('template_checkout');
+        $message = getSetting('template_checkout') ?? '';
         $message = str_replace('{app_name}', config('app.name'), $message);
         $message = str_replace('{order_id}', $order->reference, $message);
         $message = str_replace('{product}', $product->name, $message);
         $message = str_replace('{total}', numberToCurrency($order->total_amount), $message);
         $message = str_replace('{link}', transactionUrl($order), $message);
-        $message = str_replace('{cs_link}', getSetting('cs'), $message);
-
-        // // Send message via Voda
-        // $isNotificationError = false;
-        // try {
-        //     $this->vodaService->sendMessage(
-        //         phone: $order->phone,
-        //         message: $message,
-        //         linkPreview: true,
-        //     );
-        // } catch (\Exception $e) {
-        //     Log::error('Failed to send Voda message: '.$e->getMessage());
-        //     $isNotificationError = true;
-        // }
-
-        // // Create notification record
-        // $order->notifications()->create([
-        //     'provider' => 'voda',
-        //     'title' => 'Order Created',
-        //     'content' => $message,
-        //     'error' => $isNotificationError,
-        // ]);
+        $message = str_replace('{cs_link}', getSetting('cs') ?? '', $message);
 
         // Send message via email
         Mail::to($order->email)->send(

@@ -24,7 +24,8 @@ export interface PPOBBrandDataItem {
         type?: 'id' | 'id+server';
         label_id?: string;
         label_server?: string;
-        servers?: string[];
+        servers?: (string | { label: string; value: string })[];
+        username_service?: string | null;
     };
     image?: string;
     banner?: string;
@@ -40,6 +41,7 @@ export interface PPOBProductDataItem {
     id: number;
     p_p_o_b_brand_id: number;
     provider?: string;
+    provider_product_id?: string | null;
     name: string;
     slug: string;
     sku: string;
@@ -94,4 +96,12 @@ export interface DigiflazzBrandGroup {
 export interface DigiflazzCategoryGroup {
     name: string;
     brands: DigiflazzBrandGroup[];
+}
+
+export interface ImportedCategoryGroup {
+    name: string;
+    brands: {
+        name: string;
+        products: { sku: string; name: string; price: number }[];
+    }[];
 }

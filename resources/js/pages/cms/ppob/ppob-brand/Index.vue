@@ -152,6 +152,7 @@ watch(filter_provider, (newValue) => {
                             <SelectItem :value="null">
                                 -- All Providers --
                             </SelectItem>
+                            <SelectItem value="h2h">H2H Karuhun</SelectItem>
                             <SelectItem value="digiflazz">
                                 Digiflazz
                             </SelectItem>

@@ -16,7 +16,7 @@ const props = defineProps<{
     inputType: 'id' | 'id+server';
     labelId: string;
     labelServer: string;
-    serverOptions: string[];
+    serverOptions: (string | { label: string; value: string })[];
     accountId: string;
     serverId: string;
     formErrors: any;
@@ -96,10 +96,22 @@ const hasServerDropdown = computed(
                     <SelectContent>
                         <SelectItem
                             v-for="server in serverOptions"
-                            :key="server"
-                            :value="server"
+                            :key="
+                                typeof server === 'string'
+                                    ? server
+                                    : server.value
+                            "
+                            :value="
+                                typeof server === 'string'
+                                    ? server
+                                    : server.value
+                            "
                         >
-                            {{ server }}
+                            {{
+                                typeof server === 'string'
+                                    ? server
+                                    : server.label
+                            }}
                         </SelectItem>
                     </SelectContent>
                 </Select>

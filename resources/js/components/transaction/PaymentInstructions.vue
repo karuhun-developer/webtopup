@@ -49,10 +49,9 @@ const uploadProof = () => {
         return;
     }
 
-    uploadForm.submit(
-        props.updateUrl,
-        {
-            method: 'put',
+    uploadForm
+        .transform((data) => ({ ...data, _method: 'put' }))
+        .post(props.updateUrl, {
             preserveScroll: true,
             onSuccess: () => {
                 toast.fire({
@@ -66,8 +65,7 @@ const uploadProof = () => {
                     title: 'Gagal mengupload bukti transfer',
                 });
             },
-        },
-    );
+        });
 };
 </script>
 
@@ -77,10 +75,40 @@ const uploadProof = () => {
             Instruksi Pembayaran
         </h3>
 
-        <!-- Midtrans Bank Transfer -->
+        <p
+            v-if="payment.driver !== 'manual' && !payment.transaction_id"
+            class="text-sm text-muted-foreground"
+        >
+            Pembayaran sedang disiapkan. Halaman akan diperbarui otomatis;
+            simpan nomor transaksi ini.
+        </p>
         <div
-            v-if="
-                payment.driver === 'midtrans' &&
+            v-else-if="payment.payment_url && payment.driver !== 'manual'"
+            class="space-y-4"
+        >
+            <p class="text-sm text-muted-foreground">
+                Lanjutkan pembayaran melalui {{ payment.driver }}.
+            </p>
+            <p class="text-2xl font-bold text-primary">
+                {{ formatCurrency(totalAmount) }}
+            </p>
+            <a
+                :href="payment.payment_url"
+                target="_blank"
+                rel="noopener noreferrer"
+                class="inline-flex rounded-md bg-primary px-4 py-2 text-primary-foreground"
+                >Buka halaman pembayaran</a
+            >
+            <p class="text-sm text-muted-foreground">
+                Batas waktu:
+                {{ dayjs(payment.expired_at).format('DD MMM YYYY, HH:mm') }}
+            </p>
+        </div>
+
+        <!-- Automatic Bank Transfer -->
+        <div
+            v-else-if="
+                payment.driver !== 'manual' &&
                 payment.payment_type === 'bank_transfer'
             "
             class="space-y-4"
@@ -145,7 +173,7 @@ const uploadProof = () => {
         <!-- Midtrans QRIS -->
         <div
             v-else-if="
-                payment.driver === 'midtrans' && payment.payment_type === 'qris'
+                payment.driver !== 'manual' && payment.payment_type === 'qris'
             "
             class="space-y-4"
         >
@@ -201,8 +229,17 @@ const uploadProof = () => {
             </div>
         </div>
 
+        <p
+            v-if="payment.unique_amount"
+            class="mt-4 text-sm text-muted-foreground"
+        >
+            Kode unik {{ formatCurrency(payment.unique_amount) }} sudah termasuk
+            dalam total. Bayar sesuai nominal agar pembayaran terverifikasi
+            otomatis.
+        </p>
+
         <!-- Manual Payment -->
-        <div v-else-if="payment.driver === 'manual'" class="space-y-4">
+        <div v-if="payment.driver === 'manual'" class="space-y-4">
             <div
                 class="rounded-lg bg-muted/50 p-4"
                 v-if="setting.manual_transfer_type === 'rekening'"

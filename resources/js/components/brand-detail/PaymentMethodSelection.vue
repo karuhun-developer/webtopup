@@ -13,6 +13,7 @@ interface PaymentMethod {
     id: string;
     name: string;
     fee: number;
+    percent?: number;
     action: 'add' | 'multiply';
     img: string;
 }
@@ -139,6 +140,9 @@ const handlePaymentTypeChange = (type: 'manual' | 'automatic') => {
                             ? `${(method.fee * 100).toFixed(1)}%`
                             : formatCurrency(method.fee)
                     }}
+                    <template v-if="method.percent">
+                        + {{ (method.percent * 100).toFixed(1) }}%</template
+                    >
                 </span>
             </button>
         </div>

@@ -34,7 +34,7 @@ const description = ref<string>(props.brand.description || '');
 // Settings type state
 const settingsType = ref<string>(props.brand.settings?.type || 'id');
 // Server list state
-const serverList = ref<string[]>(
+const serverList = ref<(string | { label: string; value: string })[]>(
     props.brand.settings?.servers ? props.brand.settings.servers : [],
 );
 
@@ -134,6 +134,7 @@ const deleteServer = (index: number) => {
                             <SelectValue placeholder="Select a provider" />
                         </SelectTrigger>
                         <SelectContent>
+                            <SelectItem value="h2h">H2H Karuhun</SelectItem>
                             <SelectItem value="digiflazz">
                                 Digiflazz
                             </SelectItem>
@@ -304,6 +305,24 @@ const deleteServer = (index: number) => {
                     <InputError :message="errors['settings.label_id']" />
                 </div>
 
+                <div class="grid gap-2">
+                    <Label for="settings.username_service"
+                        >Layanan username H2H</Label
+                    >
+                    <InputDescription
+                        >Kode layanan dari katalog H2H; kosongkan untuk deteksi
+                        berdasarkan nama game.</InputDescription
+                    >
+                    <Input
+                        id="settings.username_service"
+                        name="settings[username_service]"
+                        :default-value="brand.settings?.username_service ?? ''"
+                    />
+                    <InputError
+                        :message="errors['settings.username_service']"
+                    />
+                </div>
+
                 <div class="grid gap-2" v-if="settingsType === 'id+server'">
                     <Label for="settings.label_server">Label Server</Label>
                     <InputDescription>
@@ -330,13 +349,33 @@ const deleteServer = (index: number) => {
                     </InputDescription>
 
                     <!-- Hidden input to submit server list -->
-                    <Input
+                    <template
                         v-for="(server, index) in serverList"
                         :key="index"
-                        name="settings[servers][]"
-                        type="hidden"
-                        :default-value="server"
-                    />
+                    >
+                        <Input
+                            v-if="typeof server === 'string'"
+                            :name="'settings[servers][' + index + ']'"
+                            type="hidden"
+                            :default-value="server"
+                        />
+                        <template v-else>
+                            <Input
+                                :name="
+                                    'settings[servers][' + index + '][label]'
+                                "
+                                type="hidden"
+                                :default-value="server.label"
+                            />
+                            <Input
+                                :name="
+                                    'settings[servers][' + index + '][value]'
+                                "
+                                type="hidden"
+                                :default-value="server.value"
+                            />
+                        </template>
+                    </template>
 
                     <!-- Add Server Button -->
                     <div class="mb-2 flex justify-end">
@@ -395,7 +434,11 @@ const deleteServer = (index: number) => {
                                         {{ index + 1 }}
                                     </td>
                                     <td class="px-4 py-3 text-sm">
-                                        {{ server }}
+                                        {{
+                                            typeof server === 'string'
+                                                ? server
+                                                : server.label
+                                        }}
                                     </td>
                                     <td class="px-4 py-3 text-right">
                                         <Button

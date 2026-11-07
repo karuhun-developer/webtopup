@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { show } from '@/actions/App/Http/Controllers/Main/BrandController';
+import { check as checkAccount } from '@/actions/App/Http/Controllers/Main/CheckGameAccountController';
 import { store } from '@/actions/App/Http/Controllers/Main/TransactionController';
 import AccountDataForm from '@/components/brand-detail/AccountDataForm.vue';
 import BrandBanner from '@/components/brand-detail/BrandBanner.vue';
@@ -9,29 +9,36 @@ import PaymentMethodSelection from '@/components/brand-detail/PaymentMethodSelec
 import ProductSelection from '@/components/brand-detail/ProductSelection.vue';
 import MainFooter from '@/components/MainFooter.vue';
 import MainHeader from '@/components/MainHeader.vue';
-import Maintenance from '@/pages/main/Maintenance.vue';
 import {
     Collapsible,
     CollapsibleContent,
     CollapsibleTrigger,
 } from '@/components/ui/collapsible';
 import { useSwal } from '@/composables/useSwal';
+import Maintenance from '@/pages/main/Maintenance.vue';
 import { PPOBBrandDataItem, PPOBProductDataItem } from '@/types/cms/ppob';
 import { FaqDataItem } from '@/types/cms/web';
 import { Head, useForm, usePage } from '@inertiajs/vue3';
 import { useDebounceFn } from '@vueuse/core';
 import axios from 'axios';
 import { ChevronDown } from 'lucide-vue-next';
-import { computed, ref, watch } from 'vue';
+import { computed, onUnmounted, ref, watch } from 'vue';
 
 const props = defineProps<{
     brand: PPOBBrandDataItem;
     faqs: FaqDataItem[];
+    paymentMethods: {
+        id: string;
+        name: string;
+        fee: number;
+        percent: number;
+        action: 'add' | 'multiply';
+        img: string;
+    }[];
 }>();
 const page = usePage();
 const user = page.props.auth.user;
 const setting = page.props.setting;
-const appUrl = page.props.app_url;
 
 // Form data using Inertia's useForm
 const form = useForm({
@@ -53,10 +60,21 @@ const isLoadingCheck = ref(false);
 const discountAmount = ref(0);
 
 const abortController = ref<AbortController | null>(null);
+let isMounted = true;
+onUnmounted(() => {
+    isMounted = false;
+    abortController.value?.abort();
+});
 
 const checkGameAccount = useDebounceFn(async () => {
+    if (!isMounted) return;
     // Check if brand is mobile legends
-    if (!props.brand.name.toLowerCase().includes('mobile legend')) {
+    if (
+        !props.brand.settings?.username_service &&
+        !['mobile legend', 'free fire'].some((game) =>
+            props.brand.name.toLowerCase().includes(game),
+        )
+    ) {
         return;
     }
 
@@ -67,7 +85,8 @@ const checkGameAccount = useDebounceFn(async () => {
     if (abortController.value) {
         abortController.value.abort();
     }
-    abortController.value = new AbortController();
+    const controller = new AbortController();
+    abortController.value = controller;
 
     isLoadingCheck.value = true;
     resolvedUsername.value = null;
@@ -75,17 +94,18 @@ const checkGameAccount = useDebounceFn(async () => {
 
     try {
         const response = await axios.post(
-            '/check-game-account',
+            checkAccount.url(),
             {
                 account_id: form.account_id,
                 server_id: form.server_id,
                 slug: props.brand.slug,
             },
             {
-                signal: abortController.value.signal,
+                signal: controller.signal,
             },
         );
 
+        if (controller.signal.aborted) return;
         if (response.data.status || response.data.code === 200) {
             resolvedUsername.value =
                 response.data.data?.username ||
@@ -102,14 +122,7 @@ const checkGameAccount = useDebounceFn(async () => {
         checkError.value =
             error.response?.data?.message || 'Gagal mengecek Game ID';
     } finally {
-        if (abortController.value?.signal.aborted) {
-            // Do nothing if aborted, wait for the next request to finish or set loading false only if this was the last one?
-            // Actually if we abort, we don't want to set isLoadingCheck to false immediately if a NEW request started.
-            // But here we are in the flow of the *aborted* request.
-            // Ideally we should track if *this* request is the specific one.
-            // But simpler: if aborted, don't touch isLoadingCheck.
-            // The NEW request would have set isLoadingCheck = true.
-        } else {
+        if (abortController.value === controller) {
             isLoadingCheck.value = false;
         }
     }
@@ -118,6 +131,10 @@ const checkGameAccount = useDebounceFn(async () => {
 watch(
     () => [form.account_id, form.server_id],
     () => {
+        abortController.value?.abort();
+        resolvedUsername.value = null;
+        checkError.value = null;
+        isLoadingCheck.value = false;
         checkGameAccount();
     },
 );
@@ -144,51 +161,7 @@ const manualBank = {
     img: setting?.manual_transfer_bank_logo,
 };
 
-// Automatic payment methods
-const paymentMethods = [
-    {
-        id: 'qris',
-        name: 'QRIS',
-        fee: 0.007, // 0.7%
-        action: 'multiply' as const,
-        img: '/images/QRIS.svg',
-    },
-    {
-        id: 'bca',
-        name: 'Virtual Account BCA',
-        fee: 4000, // Flat 4000 IDR
-        action: 'add' as const,
-        img: '/images/BCA.svg',
-    },
-    {
-        id: 'mandiri',
-        name: 'Virtual Account Mandiri',
-        fee: 4000, // Flat 4000 IDR
-        action: 'add' as const,
-        img: '/images/MANDIRI.svg',
-    },
-    {
-        id: 'bni',
-        name: 'Virtual Account BNI',
-        fee: 4000, // Flat 4000 IDR
-        action: 'add' as const,
-        img: '/images/BNI.svg',
-    },
-    {
-        id: 'bri',
-        name: 'Virtual Account BRI',
-        fee: 4000, // Flat 4000 IDR
-        action: 'add' as const,
-        img: '/images/BRI.svg',
-    },
-    {
-        id: 'permata',
-        name: 'Virtual Account Permata',
-        fee: 4000, // Flat 4000 IDR
-        action: 'add' as const,
-        img: '/images/PERMATA.svg',
-    },
-];
+const paymentMethods = computed(() => props.paymentMethods);
 
 // Calculate total with fee
 const totalAmount = computed(() => {
@@ -205,17 +178,15 @@ const totalAmount = computed(() => {
     // Automatic payment - calculate fee
     if (!form.payment_method) return priceAfterDiscount;
 
-    const method = paymentMethods.find((m) => m.id === form.payment_method);
+    const method = paymentMethods.value.find(
+        (m) => m.id === form.payment_method,
+    );
     if (!method) return priceAfterDiscount;
 
-    if (method.action === 'multiply') {
-        // Multiply: price * fee, then add to base price
-        const feeAmount = priceAfterDiscount * method.fee;
-        return priceAfterDiscount + feeAmount;
-    } else {
-        // Add: flat fee
-        return priceAfterDiscount + method.fee;
-    }
+    return (
+        priceAfterDiscount +
+        Math.ceil(method.fee + priceAfterDiscount * method.percent)
+    );
 });
 
 const { toast } = useSwal();
@@ -341,7 +312,7 @@ const handleCheckout = () => {
             <Maintenance />
         </template>
         <!-- Main Content -->
-        <main class="flex-1 w-full" v-else>
+        <main class="w-full flex-1" v-else>
             <!-- Banner Section -->
             <BrandBanner :brand="brand" />
 

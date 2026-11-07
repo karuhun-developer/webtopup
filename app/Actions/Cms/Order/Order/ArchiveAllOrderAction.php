@@ -6,9 +6,9 @@ use App\Models\Order\Order;
 
 class ArchiveAllOrderAction
 {
-    public function handle(string $provider): void
+    public function handle(string|array $provider): void
     {
-        Order::whereHas('product', fn ($q) => $q->where('provider', $provider))
+        Order::fromProviders((array) $provider)
             ->withoutArchive()
             ->update([
                 'archive_at' => now(),

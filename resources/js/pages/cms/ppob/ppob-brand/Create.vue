@@ -119,11 +119,12 @@ const deleteServer = (index: number) => {
                     <InputDescription>
                         Select the provider for this PPOB brand.
                     </InputDescription>
-                    <Select name="provider" default-value="digiflazz">
+                    <Select name="provider" default-value="h2h">
                         <SelectTrigger id="provider" class="mt-1 w-full">
                             <SelectValue placeholder="Select a provider" />
                         </SelectTrigger>
                         <SelectContent>
+                            <SelectItem value="h2h">H2H Karuhun</SelectItem>
                             <SelectItem value="digiflazz">
                                 Digiflazz
                             </SelectItem>

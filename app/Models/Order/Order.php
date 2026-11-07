@@ -38,14 +38,20 @@ class Order extends Model implements HasMedia
         'topup_status',
         'archive_at',
         'sn',
+        'provider',
+        'provider_order_id',
+        'provider_payload',
     ];
 
     protected $casts = [
         'submited' => 'array',
+        'provider_payload' => 'array',
         'archive_at' => 'datetime',
         'payment_status' => PaymentStatusEnum::class,
         'topup_status' => DigiflazzStatusEnum::class,
     ];
+
+    protected $hidden = ['provider_payload'];
 
     public function getRouteKeyName()
     {
@@ -80,6 +86,17 @@ class Order extends Model implements HasMedia
     public function voucherUse()
     {
         return $this->morphOne(VoucherUse::class, 'usable');
+    }
+
+    #[Scope]
+    protected function fromProviders(Builder $query, array $providers): Builder
+    {
+        return $query->where(function (Builder $query) use ($providers) {
+            $query->whereIn('provider', $providers)
+                ->orWhere(function (Builder $query) use ($providers) {
+                    $query->whereNull('provider')->whereHas('product', fn (Builder $query) => $query->whereIn('provider', $providers));
+                });
+        });
     }
 
     #[Scope]

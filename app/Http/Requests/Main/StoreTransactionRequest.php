@@ -2,11 +2,13 @@
 
 namespace App\Http\Requests\Main;
 
+use App\Actions\Main\CheckGameAccountAction;
 use App\Models\PPOB\PPOBProduct;
-use App\Services\GameProService;
+use App\Services\PaymentGatewayService;
+use App\Services\UsernameService;
 use Illuminate\Contracts\Validation\ValidationRule;
 use Illuminate\Foundation\Http\FormRequest;
-use Illuminate\Support\Str;
+use Illuminate\Validation\Rule;
 use Illuminate\Validation\ValidationException;
 
 class StoreTransactionRequest extends FormRequest
@@ -20,14 +22,17 @@ class StoreTransactionRequest extends FormRequest
     {
         return [
             'type' => 'nullable|in:id,id+server',
-            'account_id' => 'required_if:type,id',
-            'server_id' => 'required_if:type,id+server',
+            'account_id' => 'required|string|max:100',
+            'server_id' => 'required_if:type,id+server|nullable|string|max:100',
             'product_id' => 'required|exists:p_p_o_b_products,id',
             'email' => 'required|email|max:255',
             'name' => 'required|string|max:255',
             'phone' => 'required|numeric',
             'payment_type' => 'required|in:automatic,manual',
-            'payment_method' => 'required|string|max:255', // in:qris,bca,bni,bri,mandiri,permata
+            'payment_method' => ['required', 'string', 'max:255', Rule::when(
+                $this->input('payment_type') === 'automatic',
+                fn () => Rule::in(array_column(app(PaymentGatewayService::class)->methods(), 'id')),
+            )],
             'voucher_code' => 'nullable|string|exists:vouchers,code',
         ];
     }
@@ -39,15 +44,9 @@ class StoreTransactionRequest extends FormRequest
     {
         $product = PPOBProduct::find($this->product_id);
 
-        // Pro Version
-        $gameProService = new GameProService;
-        // Check the brand if the brand is mobile legends, check the server and uid
-        if (Str::contains(strtolower($product->brand->name), 'mobile legend')) {
-            $resolve = $gameProService->resolveAccount(
-                game: 'mobilelegend',
-                uid: $this->account_id,
-                server: $this->server_id,
-            );
+        $game = UsernameService::gameForBrand($product->brand->name);
+        if (in_array($game, ['mobilelegend', 'freefire'], true) || filled($product->brand->settings['username_service'] ?? null)) {
+            $resolve = app(CheckGameAccountAction::class)->handle($this->validated());
 
             if (! $resolve['status']) {
                 throw ValidationException::withMessages([

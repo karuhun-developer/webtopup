@@ -1,4 +1,13 @@
 export interface SettingValue {
+    supplier_provider?: 'h2h' | 'digiflazz';
+    username_provider?: 'h2h' | 'apigames';
+    payment_gateway?: 'midtrans' | 'karuhun_qris' | 'paywuz';
+    h2h_base_url?: string;
+    qris_base_url?: string;
+    paywuz_base_url?: string;
+    apigames_base_url?: string;
+    qris_provider?: string;
+    midtrans_is_production?: boolean;
     title: string;
     email: string;
     phone: string;

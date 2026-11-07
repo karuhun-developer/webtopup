@@ -41,10 +41,6 @@ class UpdatePPOBBrandAction
             );
         }
 
-        $brand->products()->where('provider', $brand->provider)->update([
-            'provider' => $data['provider'] ?? $brand->provider,
-        ]);
-
         $result = $brand->update($data);
 
         $this->flushCacheGroup(CacheGroupEnum::BRANDS, CacheGroupEnum::CATEGORIES);

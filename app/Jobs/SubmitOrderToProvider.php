@@ -3,13 +3,15 @@
 namespace App\Jobs;
 
 use App\Enums\DigiflazzStatusEnum;
+use App\Enums\PaymentStatusEnum;
 use App\Mail\TopupFailed;
 use App\Models\Order\Order;
+use App\Services\ProductProviderService;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Queue\Queueable;
+use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Mail;
-use Triyatna\Digiflazz\Digiflazz;
 
 class SubmitOrderToProvider implements ShouldQueue
 {
@@ -25,27 +27,26 @@ class SubmitOrderToProvider implements ShouldQueue
     /**
      * Submit a paid order to the upstream supplier.
      */
-    public function handle(): void
+    public function handle(ProductProviderService $providers): void
     {
         $order = Order::with('product')->find($this->orderId);
 
-        if (! $order || $order->product?->provider !== 'digiflazz') {
+        if (! $order || $order->payment_status !== PaymentStatusEnum::SETTLEMENT
+            || ! in_array($order->provider ?? $order->product?->provider, ['digiflazz', 'h2h'], true)) {
             return;
         }
 
         // Already fulfilled - never call the supplier twice.
-        if ($order->topup_status === DigiflazzStatusEnum::SUCCESS) {
+        if (in_array($order->topup_status, [DigiflazzStatusEnum::SUCCESS, DigiflazzStatusEnum::FAILED], true)) {
             return;
         }
 
-        $accountId = $order->submited['account_id'] ?? '';
-        $serverId = $order->submited['server_id'] ?? '';
-
-        Digiflazz::createPrepaidTransaction(
-            productCode: $order->product->sku,
-            customerNo: $accountId.$serverId,
-            refId: $order->reference,
-        );
+        Cache::lock('submit-order:'.$order->id, 30)->block(5, function () use ($order, $providers) {
+            $order->refresh();
+            if (! in_array($order->topup_status, [DigiflazzStatusEnum::SUCCESS, DigiflazzStatusEnum::FAILED], true)) {
+                $providers->submit($order);
+            }
+        });
     }
 
     /**
@@ -59,11 +60,18 @@ class SubmitOrderToProvider implements ShouldQueue
             return;
         }
 
+        if (($order->provider ?? $order->product?->provider) === 'h2h') {
+            $order->update(['topup_status' => DigiflazzStatusEnum::ON_PROGRESS]);
+            Log::warning('H2H submission outcome requires reconciliation', ['reference' => $order->reference]);
+
+            return;
+        }
+
         $order->update([
             'topup_status' => DigiflazzStatusEnum::FAILED,
         ]);
 
-        Log::error('Failed to submit order to Digiflazz', [
+        Log::error('Failed to submit order to provider', [
             'reference' => $order->reference,
             'error' => $e?->getMessage(),
         ]);

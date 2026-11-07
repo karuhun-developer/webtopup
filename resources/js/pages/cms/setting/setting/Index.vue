@@ -6,6 +6,7 @@ import {
 import Heading from '@/components/Heading.vue';
 import ContentPagesTab from '@/components/settings/ContentPagesTab.vue';
 import GeneralInformationTab from '@/components/settings/GeneralInformationTab.vue';
+import IntegrationsTab from '@/components/settings/IntegrationsTab.vue';
 import MaintenanceTab from '@/components/settings/MaintenanceTab.vue';
 import ManualTransferTab from '@/components/settings/ManualTransferTab.vue';
 import WhatsAppTemplatesTab from '@/components/settings/WhatsAppTemplatesTab.vue';
@@ -17,10 +18,18 @@ import { Setting } from '@/types/cms/setting';
 import { Form, Head } from '@inertiajs/vue3';
 import { ref } from 'vue';
 
-type Tab = 'general' | 'content' | 'templates' | 'transfer' | 'maintenance';
+type Tab =
+    | 'general'
+    | 'content'
+    | 'templates'
+    | 'transfer'
+    | 'maintenance'
+    | 'integrations';
 
-const props = defineProps<{
+defineProps<{
     setting: Setting;
+    configuredCredentials: Record<string, boolean>;
+    callbackUrls: Record<string, string>;
 }>();
 
 const breadcrumbItems: BreadcrumbItem[] = [
@@ -37,6 +46,7 @@ const description = 'Manage your website configuration and settings';
 
 // Active tab
 const activeTab = ref<Tab>('general');
+const integrationRevision = ref(0);
 </script>
 
 <template>
@@ -47,6 +57,7 @@ const activeTab = ref<Tab>('general');
 
             <Form
                 v-bind="save.form()"
+                @success="integrationRevision++"
                 :onSuccess="
                     () =>
                         toast.fire({
@@ -62,6 +73,23 @@ const activeTab = ref<Tab>('general');
                     <div
                         class="flex w-full gap-6 overflow-x-auto px-6 md:w-auto"
                     >
+                        <Button
+                            type="button"
+                            variant="ghost"
+                            class="relative rounded-none px-0 py-4 text-sm font-medium whitespace-nowrap hover:bg-transparent"
+                            :class="
+                                activeTab === 'integrations'
+                                    ? 'text-foreground'
+                                    : 'text-muted-foreground hover:text-foreground'
+                            "
+                            @click="activeTab = 'integrations'"
+                        >
+                            Integrasi
+                            <span
+                                v-if="activeTab === 'integrations'"
+                                class="absolute right-0 bottom-0 left-0 h-0.5 bg-primary"
+                            ></span>
+                        </Button>
                         <Button
                             type="button"
                             variant="ghost"
@@ -162,6 +190,14 @@ const activeTab = ref<Tab>('general');
 
                 <!-- Tab Content -->
                 <div class="rounded-lg border bg-card p-6">
+                    <IntegrationsTab
+                        v-show="activeTab === 'integrations'"
+                        :key="integrationRevision"
+                        :setting="setting?.value"
+                        :errors="errors"
+                        :configured-credentials="configuredCredentials"
+                        :callback-urls="callbackUrls"
+                    />
                     <GeneralInformationTab
                         v-if="activeTab === 'general'"
                         :setting="setting?.value"

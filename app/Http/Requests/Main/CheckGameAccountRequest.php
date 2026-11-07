@@ -15,8 +15,8 @@ class CheckGameAccountRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'account_id' => 'required',
-            'server_id' => 'nullable',
+            'account_id' => 'required|string|max:100',
+            'server_id' => 'nullable|string|max:100',
             'product_id' => 'nullable|exists:p_p_o_b_products,id',
             'slug' => 'required_without:product_id|exists:p_p_o_b_brands,slug',
         ];

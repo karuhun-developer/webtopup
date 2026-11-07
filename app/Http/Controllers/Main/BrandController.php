@@ -6,6 +6,7 @@ use App\Enums\CacheGroupEnum;
 use App\Http\Controllers\Controller;
 use App\Models\PPOB\PPOBBrand;
 use App\Models\Web\Faq;
+use App\Services\PaymentGatewayService;
 use App\Traits\WithVersionedCache;
 use Inertia\Response;
 
@@ -13,7 +14,7 @@ class BrandController extends Controller
 {
     use WithVersionedCache;
 
-    public function show(PPOBBrand $brand): Response
+    public function show(PPOBBrand $brand, PaymentGatewayService $payments): Response
     {
         $brand = $this->flexibleVersioned(CacheGroupEnum::BRANDS, "detail:{$brand->slug}", [1800, 3600], function () use ($brand) {
             $brand->load(['products.media', 'category']);
@@ -42,6 +43,7 @@ class BrandController extends Controller
         return inertia()->render('main/BrandDetail', [
             'brand' => $brand,
             'faqs' => $faqs,
+            'paymentMethods' => $payments->methods(),
         ])->withViewData([
             'meta' => [
                 'title' => "{$brand->name} - Top Up Murah & Cepat | {$settingTitle}",

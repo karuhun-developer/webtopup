@@ -20,7 +20,6 @@ const form = useForm({
 
 const page = usePage();
 const setting = page.props.setting;
-const appUrl = page.props.app_url;
 const { toast } = useSwal();
 
 const handleSearch = () => {
@@ -29,7 +28,7 @@ const handleSearch = () => {
     }
 
     form.get(check().url, {
-        onError: (errors) => {
+        onError: () => {
             toast.fire({
                 icon: 'error',
                 title: 'Transaksi tidak ditemukan. Silakan periksa kembali nomor Invoice kamu.',
@@ -176,8 +175,12 @@ const handleSearch = () => {
                                     <td class="px-4 py-3">
                                         <div
                                             v-if="
-                                                order.product?.provider ===
-                                                'digiflazz'
+                                                ['digiflazz', 'h2h'].includes(
+                                                    order.provider ??
+                                                        order.product
+                                                            ?.provider ??
+                                                        '',
+                                                )
                                             "
                                         >
                                             <StatusBadge

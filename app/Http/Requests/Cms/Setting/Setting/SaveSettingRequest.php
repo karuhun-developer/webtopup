@@ -2,6 +2,7 @@
 
 namespace App\Http\Requests\Cms\Setting\Setting;
 
+use App\Services\IntegrationSettings;
 use Illuminate\Contracts\Validation\ValidationRule;
 use Illuminate\Foundation\Http\FormRequest;
 
@@ -14,7 +15,7 @@ class SaveSettingRequest extends FormRequest
      */
     public function rules(): array
     {
-        return [
+        $rules = [
             'value' => 'nullable|array',
             'value.title' => 'nullable|string',
             'value.email' => 'nullable|email',
@@ -43,6 +44,21 @@ class SaveSettingRequest extends FormRequest
             'value.maintenance_title' => 'nullable|string',
             'value.maintenance_description' => 'nullable|string',
             'value.maintenance_image' => 'nullable|image:allow_svg|max:2048',
+            'value.supplier_provider' => 'sometimes|required|in:h2h,digiflazz',
+            'value.username_provider' => 'sometimes|required|in:h2h,apigames',
+            'value.payment_gateway' => 'sometimes|required|in:midtrans,karuhun_qris,paywuz',
+            'value.h2h_base_url' => 'nullable|url:https|max:255',
+            'value.qris_base_url' => 'nullable|url:https|max:255',
+            'value.paywuz_base_url' => 'nullable|url:https|max:255',
+            'value.apigames_base_url' => 'nullable|url:https|max:255',
+            'value.qris_provider' => 'nullable|string|max:100',
+            'value.midtrans_is_production' => 'nullable|boolean',
+            'credentials' => 'nullable|array',
         ];
+        foreach (array_keys(IntegrationSettings::CREDENTIALS) as $key) {
+            $rules['credentials.'.$key] = 'nullable|string|max:2048';
+        }
+
+        return $rules;
     }
 }

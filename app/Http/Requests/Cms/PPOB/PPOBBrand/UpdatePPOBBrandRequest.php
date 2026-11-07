@@ -17,7 +17,7 @@ class UpdatePPOBBrandRequest extends FormRequest
         return [
             'p_p_o_b_category_id' => 'required|exists:p_p_o_b_categories,id',
             'name' => 'required|string|max:255',
-            'provider' => 'required|in:digiflazz,gift,manual_topup',
+            'provider' => 'required|in:h2h,digiflazz,gift,manual_topup',
             'description' => 'nullable|string|max:1000',
             'featured' => 'required|boolean',
             'order' => 'required|integer|min:1',
@@ -26,6 +26,7 @@ class UpdatePPOBBrandRequest extends FormRequest
             'settings.label_id' => 'required_with:settings|string|max:255',
             'settings.label_server' => 'required_if:settings.type,id+server|string|max:255',
             'settings.servers' => 'nullable|array',
+            'settings.username_service' => 'nullable|string|max:100',
             'image' => 'nullable|image|max:5120', // max 5MB
             'banner' => 'nullable|image|max:5120', // max 5MB
             'default_product_image' => 'nullable|image|max:2048', // max 2MB

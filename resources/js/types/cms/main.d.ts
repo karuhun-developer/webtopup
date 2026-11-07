@@ -15,6 +15,8 @@ export interface PaymentDataItem {
     expired_at: string;
     paid_at: string;
     amount: number;
+    payment_url?: string | null;
+    unique_amount?: number;
     image?: string;
     created_at: string;
     updated_at: string;
@@ -33,6 +35,7 @@ export interface OrderNotificationDataItem {
 
 export interface OrderDataItem {
     id: number;
+    provider?: string | null;
     user_id: number;
     p_p_o_b_brand_id: number;
     p_p_o_b_product_id: number;

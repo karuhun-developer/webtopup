@@ -19,7 +19,7 @@ class SaveSettingAction
         // Forget the cache for global settings to ensure that the updated settings are reflected immediately.
         Cache::forget('global:settings');
 
-        $setting = Setting::first();
+        $setting = Setting::firstOrNew();
 
         if ($data['value']['manual_transfer_bank_logo'] ?? null instanceof UploadedFile) {
             $file = $this->saveFile(
@@ -61,11 +61,21 @@ class SaveSettingAction
             $data['value']['maintenance_image'] = '/storage/'.$file;
         }
 
-        return $setting->update([
+        $credentials = array_filter($data['credentials'] ?? [], fn ($value) => filled($value));
+        if (array_key_exists('midtrans_is_production', $data['value'] ?? [])) {
+            $data['value']['midtrans_is_production'] = (bool) $data['value']['midtrans_is_production'];
+        }
+        $setting->fill([
+            'credentials' => [...($setting->credentials ?? []), ...$credentials],
             'value' => [
-                ...$setting->value,
-                ...$data['value'],
+                ...($setting->value ?? []),
+                ...($data['value'] ?? []),
             ],
         ]);
+        $saved = $setting->save();
+        Cache::forget('global:settings');
+        Cache::forget('integration:credentials');
+
+        return $saved;
     }
 }

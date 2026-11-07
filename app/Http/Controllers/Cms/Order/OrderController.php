@@ -14,6 +14,7 @@ use App\Models\Order\Order;
 use App\Traits\WithGetFilterData;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Gate;
+use Illuminate\Support\Facades\URL;
 
 class OrderController extends Controller
 {
@@ -37,7 +38,7 @@ class OrderController extends Controller
         $topupStatusFilter = $request?->topup_status ?? [];
 
         $query = Order::with('brand', 'product', 'payment.media')
-            ->whereHas('product', fn ($q) => $q->where('provider', 'digiflazz'))
+            ->fromProviders(['digiflazz', 'h2h'])
             ->withoutArchive();
 
         // Apply payment status filter
@@ -128,6 +129,9 @@ class OrderController extends Controller
         Gate::authorize('view'.$this->resource);
 
         $order->load('brand', 'product', 'payment.media', 'voucherUse.voucher');
+        if ($order->payment?->driver === 'karuhun_qris' && $order->payment->transaction_id) {
+            $order->payment->account_number = URL::signedRoute('transaction.qris-image', ['order' => $order->reference]);
+        }
 
         // Load payment image if manual
         if ($order->payment && $order->payment->driver === 'manual') {
@@ -172,7 +176,7 @@ class OrderController extends Controller
     {
         Gate::authorize('update'.$this->resource);
 
-        $action->handle('digiflazz');
+        $action->handle(['digiflazz', 'h2h']);
 
         return back()->with('success', 'All orders archived successfully');
     }

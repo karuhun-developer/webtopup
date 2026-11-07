@@ -5,19 +5,38 @@ import DeliveryProgressCard from '@/components/transaction/DeliveryProgressCard.
 import OrderDetails from '@/components/transaction/OrderDetails.vue';
 import PaymentInstructions from '@/components/transaction/PaymentInstructions.vue';
 import { OrderDataItem } from '@/types/cms/main';
-import { Head } from '@inertiajs/vue3';
+import { Head, usePoll } from '@inertiajs/vue3';
+import { watch } from 'vue';
 
-defineProps<{
+const props = defineProps<{
     order: OrderDataItem;
     mlAccountNickname?: string;
     signedUpdateUrl: string;
 }>();
+const { start, stop } = usePoll(
+    5000,
+    { only: ['order'] },
+    { autoStart: false, keepAlive: true },
+);
+watch(
+    () => props.order,
+    () => {
+        if (
+            props.order.payment?.driver !== 'manual' &&
+            props.order.payment_status === 0 &&
+            new Date(props.order.payment?.expired_at ?? '').getTime() >
+                Date.now()
+        )
+            start();
+        else stop();
+    },
+    { immediate: true },
+);
 </script>
 
 <template>
-    <Head :title="'Detail Transaksi ' + order.reference" />
-
     <div class="flex min-h-screen flex-col bg-background">
+        <Head :title="'Detail Transaksi ' + order.reference" />
         <!-- Header -->
         <MainHeader :show-back-button="true" />
 
