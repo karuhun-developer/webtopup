@@ -23,14 +23,19 @@ import AppLayout from '@/layouts/AppLayout.vue';
 import { formatCurrency } from '@/lib/utils';
 import { BreadcrumbItem } from '@/types';
 import { ImportedCategoryGroup } from '@/types/cms/ppob';
-import { Head, router, useForm } from '@inertiajs/vue3';
-import { ChevronRight, Save } from 'lucide-vue-next';
-import { ref } from 'vue';
+import { Head, router, useForm, usePoll } from '@inertiajs/vue3';
+import { ChevronRight, LoaderCircle, Save } from 'lucide-vue-next';
+import { computed, ref, watch } from 'vue';
 
 const props = defineProps<{
     products: ImportedCategoryGroup[];
     provider: string;
     error?: string | null;
+    catalog: {
+        complete: boolean;
+        count: number;
+        retry_after: number;
+    };
 }>();
 
 const { toast } = useSwal();
@@ -45,6 +50,18 @@ const breadcrumbItems: BreadcrumbItem[] = [
 
 const openCategories = ref<string[]>([]);
 const openBrands = ref<string[]>([]);
+
+const catalogLoading = computed(
+    () => props.provider === 'h2h' && !props.catalog.complete && !props.error,
+);
+const { start, stop } = usePoll(
+    5000,
+    { only: ['products', 'catalog', 'error'] },
+    { autoStart: false, keepAlive: true },
+);
+watch(catalogLoading, (loading) => (loading ? start() : stop()), {
+    immediate: true,
+});
 
 const isCategoryOpen = (name: string) => openCategories.value.includes(name);
 const toggleCategoryOpen = (name: string) => {
@@ -66,6 +83,12 @@ const toggleBrandOpen = (name: string) => {
 
 // Submit - Import all products
 const form = useForm({ provider: props.provider });
+watch(
+    () => props.provider,
+    (provider) => {
+        form.provider = provider;
+    },
+);
 
 const submit = () => {
     form.post(sync().url, {
@@ -86,7 +109,12 @@ const submit = () => {
             <div class="flex items-center justify-between">
                 <Heading :title="title" :description="description" />
                 <Button
-                    :disabled="form.processing || !!error || !products.length"
+                    :disabled="
+                        form.processing ||
+                        !!error ||
+                        !catalog.complete ||
+                        !products.length
+                    "
                     @click="submit"
                 >
                     <Save class="mr-2 h-4 w-4" />
@@ -113,8 +141,25 @@ const submit = () => {
                 </Select>
                 <InputError :message="error || form.errors.provider" />
             </div>
+            <div
+                v-if="catalogLoading"
+                role="status"
+                class="rounded-lg border bg-muted/40 p-4 text-sm"
+            >
+                <p class="flex items-center gap-2 font-medium">
+                    <LoaderCircle class="size-4 animate-spin" />
+                    Memuat katalog H2H… {{ catalog.count }} produk tersedia.
+                </p>
+                <p class="mt-2 text-muted-foreground">
+                    {{
+                        catalog.retry_after > 0
+                            ? 'H2H sedang membatasi request. Pengambilan akan dilanjutkan otomatis.'
+                            : 'Daftar diperbarui otomatis. Tunggu hingga katalog lengkap untuk mengimpor semua produk.'
+                    }}
+                </p>
+            </div>
             <p
-                v-if="!products.length && !error"
+                v-if="!products.length && !error && !catalogLoading"
                 class="text-sm text-muted-foreground"
             >
                 Belum ada produk tersedia dari provider ini.

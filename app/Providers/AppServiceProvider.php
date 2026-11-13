@@ -11,7 +11,11 @@ class AppServiceProvider extends ServiceProvider
      */
     public function register(): void
     {
-        //
+        // Exclude large catalog payloads before Debugbar registers its Inertia listeners.
+        config()->set('debugbar.except', array_values(array_unique([
+            ...config('debugbar.except', []),
+            'cms/ppob/import-product',
+        ])));
     }
 
     /**

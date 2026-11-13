@@ -18,7 +18,7 @@ class SyncPPOBProductAction
 
     public function handle(string $provider): void
     {
-        $products = $this->providers->products($provider, true);
+        $products = $this->providers->products($provider);
         DB::transaction(function () use ($products, $provider) {
             foreach ($products as $data) {
                 $category = PPOBCategory::firstOrCreate(['name' => $data['category']], ['status' => true]);

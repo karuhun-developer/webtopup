@@ -36,6 +36,19 @@ class ProductProviderService
         ], $response->data());
     }
 
+    /**
+     * @return array{products: array, complete: bool, count: int, retry_after: int}
+     */
+    public function catalog(string $provider): array
+    {
+        if ($provider === 'h2h') {
+            return $this->h2h->catalog();
+        }
+        $products = $this->products($provider);
+
+        return ['products' => $products, 'complete' => true, 'count' => count($products), 'retry_after' => 0];
+    }
+
     public function submit(Order $order): void
     {
         $provider = $order->provider ?? $order->product?->provider;

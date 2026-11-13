@@ -2,14 +2,20 @@
 
 namespace App\Services;
 
+use App\Exceptions\ProductCatalogPendingException;
 use Illuminate\Http\Client\PendingRequest;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Http;
+use Illuminate\Support\Facades\RateLimiter;
 use Illuminate\Support\Str;
 use RuntimeException;
 
 class H2hService
 {
+    private const CATALOG_BATCH_SIZE = 10;
+
+    private const CATALOG_REQUESTS_PER_MINUTE = 90;
+
     public function __construct(public readonly IntegrationSettings $settings) {}
 
     public function client(): PendingRequest
@@ -25,21 +31,69 @@ class H2hService
 
     public function products(bool $refresh = false): array
     {
-        $key = 'h2h:products:'.hash('sha256', $this->settings->credential('h2h_api_key'));
-        if ($refresh) {
-            Cache::forget($key);
+        $catalog = $this->catalog($refresh);
+        if (! $catalog['complete']) {
+            throw new ProductCatalogPendingException;
         }
 
-        return Cache::remember($key, 300, function () {
-            $products = [];
-            for ($page = 1; $page <= 10000; $page++) {
-                $data = $this->client()->get('/api/v1/products', ['page' => $page])->throw()->json('data');
-                if (! is_array($data)) {
+        return $catalog['products'];
+    }
+
+    /**
+     * @return array{products: array, complete: bool, count: int, retry_after: int}
+     */
+    public function catalog(bool $refresh = false): array
+    {
+        $fingerprint = hash('sha256', json_encode([
+            rtrim($this->settings->value('h2h_base_url'), '/'),
+            $this->settings->credential('h2h_api_key'),
+        ]));
+        $cacheKey = 'h2h:catalog:'.$fingerprint;
+        $rateKey = 'h2h:catalog-requests:'.$fingerprint;
+        $initial = ['products' => [], 'next_page' => 1, 'complete' => false, 'retry_at' => 0];
+        $state = Cache::get($cacheKey, $initial);
+        if ($state['complete'] && ! $refresh) {
+            return $this->presentCatalog($state);
+        }
+
+        $updated = Cache::lock($cacheKey.':lock', 60)->get(function () use ($cacheKey, $rateKey, $initial, $refresh) {
+            $state = Cache::get($cacheKey, $initial);
+            if ($refresh && $state['complete']) {
+                $state = $initial;
+            }
+            if ($state['complete'] || $state['retry_at'] > now()->timestamp) {
+                return $state;
+            }
+
+            $startedAt = microtime(true);
+            for ($batch = 0; $batch < self::CATALOG_BATCH_SIZE; $batch++) {
+                if ($batch > 0 && microtime(true) - $startedAt >= 5) {
+                    break;
+                }
+                if (RateLimiter::tooManyAttempts($rateKey, self::CATALOG_REQUESTS_PER_MINUTE)) {
+                    $state['retry_at'] = now()->addSeconds(max(1, RateLimiter::availableIn($rateKey)))->timestamp;
+                    Cache::put($cacheKey, $state, 3600);
+
+                    break;
+                }
+
+                $client = $this->client();
+                RateLimiter::hit($rateKey, 60);
+                $response = $client->get('/api/v1/products', ['page' => $state['next_page']]);
+                if ($response->status() === 429) {
+                    $retryAfter = filter_var($response->header('Retry-After'), FILTER_VALIDATE_INT);
+                    $state['retry_at'] = now()->addSeconds(max(1, $retryAfter === false ? 60 : $retryAfter))->timestamp;
+                    Cache::put($cacheKey, $state, 3600);
+
+                    break;
+                }
+                $data = $response->throw()->json('data');
+                if (! is_array($data) || ! array_is_list($data)) {
                     throw new RuntimeException('Respons katalog H2H tidak valid.');
                 }
                 foreach ($data as $product) {
                     if (($product['billingType'] ?? 'prepaid') === 'prepaid' && ($product['apiPrice'] ?? 0) > 0) {
-                        $products[] = [
+                        $state['products'][$product['id']] = [
                             'sku' => $product['sku'], 'name' => $product['name'],
                             'category' => $product['category'], 'brand' => $product['operator'],
                             'price' => $product['apiPrice'], 'provider_product_id' => $product['id'],
@@ -49,13 +103,36 @@ class H2hService
                         ];
                     }
                 }
-                if (count($data) < 50) {
+                $state['next_page']++;
+                $state['complete'] = count($data) < 50;
+                $state['retry_at'] = 0;
+                Cache::put($cacheKey, $state, $state['complete'] ? 300 : 3600);
+                if ($state['complete']) {
                     break;
+                }
+                if ($state['next_page'] > 10000) {
+                    throw new RuntimeException('Katalog H2H melebihi batas halaman API.');
                 }
             }
 
-            return $products;
+            return $state;
         });
+
+        return $this->presentCatalog($updated === false ? Cache::get($cacheKey, $initial) : $updated);
+    }
+
+    /**
+     * @param  array{products: array, next_page: int, complete: bool, retry_at: int}  $state
+     * @return array{products: array, complete: bool, count: int, retry_after: int}
+     */
+    private function presentCatalog(array $state): array
+    {
+        return [
+            'products' => array_values($state['products']),
+            'complete' => $state['complete'],
+            'count' => count($state['products']),
+            'retry_after' => max(0, $state['retry_at'] - now()->timestamp),
+        ];
     }
 
     public function checkUsername(string $game, string $uid, string $server, ?string $serviceCode = null): array
